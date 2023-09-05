@@ -12,3 +12,8 @@ app.get("/", (req, res) => {
 app.listen(port, () => {
     console.log("Server running on port: " + port);
 });
+
+/*
+MONGO_CONNECTION_STRING=mongodb+srv://kizido:Xiiq0PHcTxVeFE63@operazzicluster.shyjeaa.mongodb.net/operazzi_app?retryWrites=true&w=majority
+PORT=5000
+*/
