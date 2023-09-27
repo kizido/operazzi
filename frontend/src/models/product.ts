@@ -7,6 +7,7 @@ export interface Product {
     category: string,
     description: string,
     cogs: string,
+    dimensions: Int32Array,
     packagingCosts: string,
     weight: string, // in grams
     domesticShippingCosts: string,

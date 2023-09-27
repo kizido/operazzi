@@ -1,8 +1,13 @@
 import { useReactTable, getCoreRowModel, flexRender, getPaginationRowModel, getSortedRowModel, getFilteredRowModel } from '@tanstack/react-table';
 import mData from './MOCK_DATA.json';
 import { useMemo, useState } from 'react';
-import {IconButton} from '@mui/material';
-import {IconCirclePlus} from '@tabler/icons-react';
+import { IconButton } from '@mui/material';
+import { IconCirclePlus } from '@tabler/icons-react';
+import { Form } from 'react-hook-form';
+import { Modal } from 'react-bootstrap';
+import ScrollableForm from './form/ScrollableForm';
+import AddEditProductDialog from './AddEditProductDialog';
+import { Product as ProductModel } from '../models/product';
 
 export default function ProductTable() {
 
@@ -40,7 +45,7 @@ export default function ProductTable() {
     // Sets states for sorting and searching/filtering of the table
     const [sorting, setSorting] = useState([
         // Initial state of table sorting is ascending order by product name
-        {id: "productName", desc: false}
+        { id: "productName", desc: false }
     ])
     const [filtering, setFiltering] = useState('')
 
@@ -60,10 +65,20 @@ export default function ProductTable() {
         sortDescFirst: false,
     })
 
-    return <div class="w3-container">
+    const [products, setProducts] = useState<ProductModel[]>([]);
+    const [showAddProductDialog, setShowAddProductDialog] = useState(false);
+
+    const openAddProductDialog = () => {
+        setShowAddProductDialog(true);
+    }
+    const closeAddProductDialog = () => {
+        setShowAddProductDialog(false);
+    }
+
+    return <div className="w3-container">
         {/* Creates global search bar for table */}
         <input type="text" value={filtering} onChange={e => setFiltering(e.target.value)} placeholder='Search...' />
-        <table class="w3-table-all">
+        <table className="w3-table-all">
             <thead>
                 {/* Render headers */}
                 {table.getHeaderGroups().map(headerGroup => (
@@ -73,8 +88,9 @@ export default function ProductTable() {
                                 header.getContext()
                             )}
                             {
-                                { asc: '🔼', desc: '🔽'} [header.column.getIsSorted() ?? null]
+                                header.column.getIsSorted() === 'asc' ? '🔼' : header.column.getIsSorted() === 'desc' ? '🔽' : null
                             }
+
                         </th>)}
                     </tr>
                 ))}
@@ -101,8 +117,17 @@ export default function ProductTable() {
             <button disabled={!table.getCanNextPage()} onClick={() => table.nextPage()}>Next Page</button>
             <button onClick={() => table.setPageIndex(table.getPageCount() - 1)}>Last Page</button>
         </div>
-        <IconButton onClick={() => }>
+        <IconButton onClick={() => openAddProductDialog()}>
             <IconCirclePlus size={50} stroke={3} color='#2fb344'></IconCirclePlus>
         </IconButton>
+        {showAddProductDialog &&
+            <AddEditProductDialog
+                onDismiss={() => setShowAddProductDialog(false)}
+                onProductSaved={(newProduct) => {
+                    setProducts([...products, newProduct]);
+                    setShowAddProductDialog(false);
+                }}
+            />
+        }
     </div>
 }

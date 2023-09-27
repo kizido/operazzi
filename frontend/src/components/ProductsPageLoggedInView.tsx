@@ -17,7 +17,6 @@ const ProductsPageLoggedInView = () => {
         <ProductTable></ProductTable>
         </>
     );
-    // const [products, setProducts] = useState<ProductModel[]>([]);
     // const [productsLoading, setProductsLoading] = useState(true);
     // const [showProductsLoadingError, setShowProductsLoadingError] = useState(false);
 
