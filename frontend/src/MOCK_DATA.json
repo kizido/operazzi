@@ -1,0 +1,37 @@
+[
+    {
+        "id": 1,
+        "product_name": "SurvivorCord XT Black",
+        "manufacturerSku": "C17LA9G6JN",
+        "barCode": "193842685140",
+        "weight": "1.5"
+    },
+    {
+        "id": 2,
+        "product_name": "SurvivorCord XT Camo",
+        "manufacturerSku": "J38NB04AC3",
+        "barCode": "201749382918",
+        "weight": "1.5"
+    },
+    {
+        "id": 3,
+        "product_name": "SurvivorCord XT Orange",
+        "manufacturerSku": "VM86U4L0GH",
+        "barCode": "583010505849",
+        "weight": "1.5"
+    },
+    {
+        "id": 4,
+        "product_name": "Emergency Sleeping Bag",
+        "manufacturerSku": "L93DF8J5T",
+        "barCode": "7281990654",
+        "weight": "1.2"
+    },
+    {
+        "id": 5,
+        "product_name": "50L Backpack",
+        "manufacturerSku": "AL9341Q0", 
+        "barCode": "976329817053",
+        "weight": "3.0"
+    }
+]

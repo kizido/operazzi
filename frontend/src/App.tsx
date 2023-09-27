@@ -3,10 +3,10 @@ import LoginModal from './components/LoginModal';
 import NavBar from './components/NavBar';
 import SignUpModal from './components/SignUpModal';
 import { User } from './models/user';
-import * as NotesApi from "./network/notes_api";
+import * as ProductsApi from "./network/products_api";
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { Container } from 'react-bootstrap';
-import NotesPage from './pages/NotesPage';
+import ProductsPage from './pages/ProductsPage';
 import PrivacyPage from './pages/PrivacyPage';
 import NotFoundPage from './pages/NotFoundPage';
 import styles from './styles/App.module.css';
@@ -21,7 +21,7 @@ function App() {
 	useEffect(() => {
 		async function fetchLoggedInUser() {
 			try {
-				const user = await NotesApi.getLoggedInUser();
+				const user = await ProductsApi.getLoggedInUser();
 				setLoggedInUser(user);
 			} catch (error) {
 				console.error(error);
@@ -44,7 +44,7 @@ function App() {
 					<Routes>
 						<Route
 							path='/'
-							element={<NotesPage loggedInUser={loggedInUser} />}
+							element={<ProductsPage loggedInUser={loggedInUser} />}
 						/>
 						<Route
 							path='/privacy'
