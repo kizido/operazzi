@@ -2,6 +2,7 @@ import { error } from "console";
 import { ConflictError, UnauthorizedError } from "../errors/http_errors";
 import { Product } from "../models/product";
 import { User } from "../models/user";
+import { Product as ProductModel } from '../models/product';
 
 async function fetchData(input: RequestInfo, init?: RequestInit) {
     const response = await fetch(input, init);
@@ -11,9 +12,9 @@ async function fetchData(input: RequestInfo, init?: RequestInit) {
     else {
         const errorBody = await response.json();
         const errorMessage = errorBody.error;
-        if(response.status == 401) {
+        if(response.status === 401) {
             throw new UnauthorizedError(errorMessage);
-        } else if(response.status == 409) {
+        } else if(response.status === 409) {
             throw new ConflictError(errorMessage);
         } else {
             throw Error("Request failed with status: " + response.status + " message: " + errorMessage);
@@ -75,6 +76,7 @@ export interface ProductInput {
     barcodeUpc: string,
     category: string,
     description: string,
+    dimensions: string,
     cogs: string,
     packagingCosts: string,
     weight: string, // in grams
@@ -84,6 +86,7 @@ export interface ProductInput {
     pickAndPackFee: string,
     amazonReferralFee: string,
     opex: string,
+    activated: boolean,
 }
 
 export async function createProduct(product: ProductInput): Promise<Product> {
@@ -112,4 +115,16 @@ export async function updateProduct(productId: string, product: ProductInput): P
 
 export async function deleteProduct(productId: string) {
     await fetchData("api/products/" + productId, { method: "DELETE" });
+}
+
+export async function toggleActivateProduct(product: ProductModel) {
+    const response = await fetchData("/api/products/" + product._id + "/toggle-activated",
+        {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(product),
+        });
+    return response.json();
 }

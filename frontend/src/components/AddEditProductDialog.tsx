@@ -1,9 +1,10 @@
-import { Button, Form, FormLabel, Modal } from "react-bootstrap";
+import { Button, Dropdown, Form, FormLabel, Modal } from "react-bootstrap";
 import { Product } from "../models/product";
 import { useForm } from "react-hook-form";
 import { ProductInput } from "../network/products_api";
 import * as ProductsApi from "../network/products_api";
 import TextInputField from "./form/TextInputField";
+import DropdownInputField from "./form/DropdownInputField";
 
 interface AddEditProductDialogProps {
     productToEdit?: Product,
@@ -18,11 +19,12 @@ const AddEditProductDialog = ({ productToEdit, onDismiss, onProductSaved }: AddE
         defaultValues: {
             name: productToEdit?.name || "",
             productSku: productToEdit?.productSku || "",
-            brand: productToEdit?.productSku || "",
+            brand: productToEdit?.brand || "",
             barcodeUpc: productToEdit?.barcodeUpc || "",
             category: productToEdit?.category || "",
             description: productToEdit?.description || "",
             cogs: productToEdit?.cogs || "",
+            dimensions: productToEdit?.dimensions || "",
             packagingCosts: productToEdit?.packagingCosts || "",
             weight: productToEdit?.weight || "",
             domesticShippingCosts: productToEdit?.domesticShippingCosts || "",
@@ -61,7 +63,7 @@ const AddEditProductDialog = ({ productToEdit, onDismiss, onProductSaved }: AddE
                 <Form id="addEditProductForm" onSubmit={handleSubmit(onSubmit)}>
                     <TextInputField
                         name="name"
-                        label="Product Name"
+                        label="Product Name*"
                         type="text"
                         placeholder="Product Name"
                         register={register}
@@ -69,38 +71,51 @@ const AddEditProductDialog = ({ productToEdit, onDismiss, onProductSaved }: AddE
                     />
                     <TextInputField
                         name="productSku"
-                        label="Product Sku"
+                        label="Product Sku*"
                         type="text"
                         placeholder="Product Sku"
                         register={register}
                         registerOptions={{ required: "Required" }}
                     />
-                    <TextInputField
+                    <DropdownInputField
                         name="brand"
-                        label="Brand"
+                        label="Brand*"
                         type="text"
                         placeholder="Brand"
                         register={register}
-                        registerOptions={{ required: "Required" }}
+                        registerOptions={{ required: "Required", }}
+                        options={[
+                            {value: "TITAN Survival", label: "TITAN Survival"},
+                            {value: "TACAMO", label: "TACAMO"},
+                            {value: "SurvivorCord", label: "SurvivorCord"},
+                            {value: "Choktaw Tinder", label: "Choktaw Tinder"},
+                        ]}
                     />
                     <TextInputField
                         name="barcodeUpc"
-                        label="UPC Barcode"
+                        label="UPC Barcode*"
                         type="text"
                         placeholder="UPC Barcode"
                         register={register}
                         registerOptions={{ required: "Required" }}
                     />
-                    <TextInputField
+                    <DropdownInputField
                         name="category"
                         label="Category"
                         type="text"
                         placeholder="Category"
                         register={register}
+                        options={[
+                            {value: "Clothing", label: "Clothing"},
+                            {value: "Combustion", label: "Combustion"},
+                            {value: "Cordage", label: "Cordage"},
+                            {value: "Cover", label: "Cover"},
+                            {value: "Cutting", label: "Cutting"},
+                        ]}
                     />
                     <TextInputField
                         name="cogs"
-                        label="COGS"
+                        label="COGS*"
                         type="text"
                         placeholder="COGS"
                         register={register}
@@ -108,7 +123,7 @@ const AddEditProductDialog = ({ productToEdit, onDismiss, onProductSaved }: AddE
                     />
                     <TextInputField
                         name="dimensions"
-                        label="Dimensions"
+                        label="Dimensions*"
                         type="text"
                         placeholder="Dimensions"
                         register={register}
@@ -116,7 +131,7 @@ const AddEditProductDialog = ({ productToEdit, onDismiss, onProductSaved }: AddE
                     />
                     <TextInputField
                         name="packagingCosts"
-                        label="Packaging Costs"
+                        label="Packaging Costs*"
                         type="text"
                         placeholder="Packaging Costs"
                         register={register}
@@ -124,7 +139,7 @@ const AddEditProductDialog = ({ productToEdit, onDismiss, onProductSaved }: AddE
                     />
                     <TextInputField
                         name="weight"
-                        label="Weight"
+                        label="Weight*"
                         type="text"
                         placeholder="Weight"
                         register={register}

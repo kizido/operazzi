@@ -7,7 +7,7 @@ export interface Product {
     category: string,
     description: string,
     cogs: string,
-    dimensions: Int32Array,
+    dimensions: string,
     packagingCosts: string,
     weight: string, // in grams
     domesticShippingCosts: string,
@@ -16,6 +16,7 @@ export interface Product {
     pickAndPackFee: string,
     amazonReferralFee: string,
     opex: string,
+    activated: boolean,
     createdAt: string,
     updatedAt: string,
 }

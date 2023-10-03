@@ -21,6 +21,7 @@ const Product = ({ product, onProductClicked, onDeleteProductClicked, className 
         category,
         description,
         cogs,
+        dimensions,
         packagingCosts,
         weight,
         domesticShippingCosts,
@@ -29,6 +30,7 @@ const Product = ({ product, onProductClicked, onDeleteProductClicked, className 
         pickAndPackFee,
         amazonReferralFee,
         opex,
+        activated,
         createdAt,
         updatedAt
     } = product;

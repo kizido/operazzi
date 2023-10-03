@@ -45,22 +45,24 @@ export const getProduct: RequestHandler = async (req, res, next) => {
 }
 
 interface CreateProductBody {
-    name?: string;
-    manufacturerSku?: string;
-    productSku?: string;
-    brand?: string;
-    barcodeUpc?: string;
-    category?: string;
-    description?: string;
-    cogs?: string;
-    packagingCosts?: string;
-    weight?: string;
-    domesticShippingCosts?: string;
-    internationalShippingCosts?: string;
-    dutiesAndTariffs?: string;
-    pickAndPackFee?: string;
-    amazonReferralFee?: string;
-    opex?: string;
+    name?: string,
+    manufacturerSku?: string,
+    productSku?: string,
+    brand?: string,
+    barcodeUpc?: string,
+    category?: string,
+    description?: string,
+    dimensions?: string,
+    cogs?: string,
+    packagingCosts?: string,
+    weight?: string,
+    domesticShippingCosts?: string,
+    internationalShippingCosts?: string,
+    dutiesAndTariffs?: string,
+    pickAndPackFee?: string,
+    amazonReferralFee?: string,
+    opex?: string,
+    activated?: boolean,
 }
 
 export const createProduct: RequestHandler<unknown, unknown, CreateProductBody, unknown> = async (req, res, next) => {
@@ -71,6 +73,7 @@ export const createProduct: RequestHandler<unknown, unknown, CreateProductBody, 
     const category = req.body.category;
     const description = req.body.description;
     const cogs = req.body.cogs;
+    const dimensions = req.body.dimensions;
     const packagingCosts = req.body.packagingCosts;
     const weight = req.body.weight;
     const domesticShippingCosts = req.body.domesticShippingCosts;
@@ -79,6 +82,7 @@ export const createProduct: RequestHandler<unknown, unknown, CreateProductBody, 
     const pickAndPackFee = req.body.pickAndPackFee;
     const amazonReferralFee = req.body.amazonReferralFee;
     const opex = req.body.opex;
+    const activated = req.body.activated;
     const authenticatedUserId = req.session.userId;
 
     try {
@@ -97,6 +101,7 @@ export const createProduct: RequestHandler<unknown, unknown, CreateProductBody, 
             category: category,
             description: description,
             cogs: cogs,
+            dimensions: dimensions,
             packagingCosts: packagingCosts,
             weight: weight,
             domesticShippingCosts: domesticShippingCosts,
@@ -105,6 +110,7 @@ export const createProduct: RequestHandler<unknown, unknown, CreateProductBody, 
             pickAndPackFee: pickAndPackFee,
             amazonReferralFee: amazonReferralFee,
             opex: opex,
+            activated: activated,
         });
 
         res.status(201).json(newProduct);
@@ -125,6 +131,7 @@ interface UpdateProductBody {
     category?: string,
     description?: string,
     cogs?: string,
+    dimensions?: string,
     packagingCosts?: string,
     weight?: string,
     domesticShippingCosts?: string,
@@ -133,6 +140,7 @@ interface UpdateProductBody {
     pickAndPackFee?: string,
     amazonReferralFee?: string,
     opex?: string,
+    activated?: boolean,
 }
 
 export const updateProduct: RequestHandler<UpdateProductParams, unknown, UpdateProductBody, unknown> = async (req, res, next) => {
@@ -144,6 +152,7 @@ export const updateProduct: RequestHandler<UpdateProductParams, unknown, UpdateP
     const newCategory = req.body.category;
     const newDescription = req.body.description;
     const newCogs = req.body.cogs;
+    const newDimensions = req.body.dimensions;
     const newPackagingCosts = req.body.packagingCosts;
     const newWeight = req.body.weight;
     const newDomesticShippingCosts = req.body.domesticShippingCosts;
@@ -152,6 +161,7 @@ export const updateProduct: RequestHandler<UpdateProductParams, unknown, UpdateP
     const newPickAndPackFee = req.body.pickAndPackFee;
     const newAmazonReferralFee = req.body.amazonReferralFee;
     const newOpex = req.body.opex;
+    const newActivated = req.body.activated;
     const authenticatedUserId = req.session.userId;
 
     try {
@@ -160,14 +170,32 @@ export const updateProduct: RequestHandler<UpdateProductParams, unknown, UpdateP
         if (!mongoose.isValidObjectId(productId)) {
             throw createHttpError(400, "Invalid product ID");
         }
-        // Validate product body
-        if (!newName || !newProductSku || !newBrand || !newBarcodeUpc || !newCategory
-            || !newDescription || !newCogs || !newPackagingCosts || !newWeight
-            || !newDomesticShippingCosts || !newInternationalShippingCosts || !newDutiesAndTariffs
-            || !newPickAndPackFee || !newAmazonReferralFee || !newAmazonReferralFee || !newOpex) {
-            throw createHttpError(400, "Product must have all  required attributes!");
-        }
 
+        // Validate product body
+        if (!newName) {
+            throw createHttpError(400, "Product must have a name!");
+        }
+        if (!newProductSku) {
+            throw createHttpError(400, "Product must have a sku!");
+        }
+        if (!newBrand) {
+            throw createHttpError(400, "Product must have a brand!");
+        }
+        if (!newBarcodeUpc) {
+            throw createHttpError(400, "Product must have a UPC barcode!");
+        }
+        if (!newCogs) {
+            throw createHttpError(400, "Product must have a COGS!");
+        }
+        if (!newDimensions) {
+            throw createHttpError(400, "Product must have dimensions!");
+        }
+        if (!newPackagingCosts) {
+            throw createHttpError(400, "Product must have packaging costs!");
+        }
+        if (!newWeight) {
+            throw createHttpError(400, "Product must have a weight!");
+        }
 
         const product = await ProductModel.findById(productId).exec();
 
@@ -186,6 +214,7 @@ export const updateProduct: RequestHandler<UpdateProductParams, unknown, UpdateP
         product.category = newCategory;
         product.description = newDescription;
         product.cogs = newCogs;
+        product.dimensions = newDimensions;
         product.packagingCosts = newPackagingCosts;
         product.weight = newWeight;
         product.domesticShippingCosts = newDomesticShippingCosts;
@@ -194,6 +223,42 @@ export const updateProduct: RequestHandler<UpdateProductParams, unknown, UpdateP
         product.pickAndPackFee = newPickAndPackFee;
         product.amazonReferralFee = newAmazonReferralFee;
         product.opex = newOpex;
+        product.activated = newActivated;
+
+        const updatedProduct = await product.save();
+        res.status(200).json(updatedProduct);
+    } catch (error) {
+        next(error);
+    }
+}
+
+export const toggleActivateProduct: RequestHandler<UpdateProductParams, unknown, UpdateProductBody, unknown> = async (req, res, next) => {
+    
+    const productId = req.params.productId;
+
+    // TOGGLES ACTIVATION STATUS
+    const newActivated = !req.body.activated;
+
+    const authenticatedUserId = req.session.userId;
+
+    try {
+        assertIsDefined(authenticatedUserId);
+
+        if (!mongoose.isValidObjectId(productId)) {
+            throw createHttpError(400, "Invalid product ID");
+        }
+
+        const product = await ProductModel.findById(productId).exec();
+
+        if (!product) {
+            throw createHttpError(404, "Product not found");
+        }
+
+        if (!product.userId.equals(authenticatedUserId)) {
+            throw createHttpError(401, "You cannot access this product");
+        }
+        
+        product.activated = newActivated;
 
         const updatedProduct = await product.save();
         res.status(200).json(updatedProduct);

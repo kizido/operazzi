@@ -7,6 +7,7 @@ router.get("/", ProductsController.getProducts);
 router.get("/:productId", ProductsController.getProduct);
 router.post("/", ProductsController.createProduct);
 router.patch("/:productId", ProductsController.updateProduct);
+router.patch("/:productId/toggle-activated", ProductsController.toggleActivateProduct);
 router.delete("/:productId", ProductsController.deleteProduct);
 
 export default router;
