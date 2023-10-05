@@ -1,0 +1,21 @@
+/** DIMENSION INPUT FORM */
+
+.dimensionInput {
+    width: 4rem;
+}
+
+.dFlex {
+    display: flex;
+}
+
+.leftAlignColumns {
+    justify-content: flex-start;
+}
+
+.noFlex {
+    flex: 0 0 auto;
+}
+
+.columnPadding {
+    margin-right: 3rem;
+}

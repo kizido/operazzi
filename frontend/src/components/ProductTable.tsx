@@ -96,8 +96,8 @@ export default function ProductTable() {
             footer: 'OPEX',
         },
         {
-            header: "",
-            accessorKey: 'opex',
+            header: "Activated",
+            accessorKey: 'active',
             cell: ({ row }: { row: any }) => (  // TypeScript type annotation added here
                 <div>
                     <button onClick={() => setProductToEdit(row.original)}>
@@ -106,14 +106,6 @@ export default function ProductTable() {
                     {/* <button onClick={() => deleteProduct(row.original)}>
                         Delete
                     </button> */}
-                </div>
-            ),
-        },
-        {
-            header: "Activated",
-            accessorKey: 'active',
-            cell: ({ row }: { row: any }) => (  // TypeScript type annotation added here
-                <div>
                     <button onClick={() => toggleActivateProduct(row.original)}>
                         {showOnlyActivated ? 'Deactivate' : 'Activate'}
                     </button>
