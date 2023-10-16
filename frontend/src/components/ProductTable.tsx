@@ -61,9 +61,9 @@ export default function ProductTable() {
             footer: 'Dimensions',
         },
         {
-            header: 'Packaging Costs',
-            accessorKey: 'packagingCosts',
-            footer: 'Packaging Costs',
+            header: 'Package',
+            accessorKey: 'packageType',
+            footer: 'Package',
         },
         {
             header: 'Domestic Shipping Costs',

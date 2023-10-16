@@ -1,5 +1,6 @@
 import { Form } from "react-bootstrap";
 import { FieldError, RegisterOptions, UseFormRegister } from "react-hook-form";
+import styles from '../../styles/Forms.module.css';
 
 
 interface TextInputFieldProps {
@@ -13,9 +14,9 @@ interface TextInputFieldProps {
 
 const TextInputField = ({ name, label, register, registerOptions, error, ...props }: TextInputFieldProps) => {
     return (
-        <Form.Group className='mb-3' controlId={name + "-input"}>
-            <Form.Label>{label}</Form.Label>
-            <Form.Control
+        <Form.Group controlId={name + "-input"}>
+            <Form.Label className={styles.formLabel}>{label}</Form.Label>
+            <Form.Control size="sm"
                 {...props}
                 {...register(name, registerOptions)}
                 isInvalid={!!error}

@@ -8,7 +8,7 @@ export interface Product {
     description: string,
     cogs: string,
     dimensions: string,
-    packagingCosts: string,
+    packageType: string,
     weight: string, // in grams
     domesticShippingCosts: string,
     internationalShippingCosts: string,

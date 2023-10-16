@@ -10,7 +10,7 @@ const productSchema = new Schema({
     description: { type: String },
     cogs: { type: String, required: true },
     dimensions: { type: String, required: true },
-    packagingCosts: { type: String, required: true },
+    packageType: { type: String, required: true },
     weight: { type: String, required: true }, // in grams
     domesticShippingCosts: { type: String },
     internationalShippingCosts: { type: String },

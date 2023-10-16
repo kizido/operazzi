@@ -1,0 +1,53 @@
+.productModalWidth {
+    max-width: 60rem;
+}
+
+.productModalBody {
+    max-height: 40rem;
+    min-height: 40rem;
+    margin: 0px 10px 25px 10px;
+}
+
+.productModalTabs {
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.productModalTabLink {
+    font-size: 0.8em;
+    padding: 5px 10px;
+    color: gray;
+}
+
+.productModalTabLink :hover {
+    color: black;
+}
+
+.dropDownEditModalWidth {
+    max-width: 40rem;
+}
+
+.dropDownEditModalBody {
+    max-height: 30rem;
+    min-height: 30rem;
+}
+
+.editCategoryRow {
+    border: 1px black solid;
+    margin: 0.1rem;
+}
+
+.editCategoryRowText {
+    margin: 0.5rem;
+    display: inline-block;
+    width: min-content;
+    font-size: large;
+    font-weight: bold;
+    margin-right: auto;
+}
+
+.editCategoryRowButton {
+    margin: 0.5rem;
+    display: inline-block;
+    width: min-content;
+}

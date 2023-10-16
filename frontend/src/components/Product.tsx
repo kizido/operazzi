@@ -22,7 +22,7 @@ const Product = ({ product, onProductClicked, onDeleteProductClicked, className 
         description,
         cogs,
         dimensions,
-        packagingCosts,
+        packageType,
         weight,
         domesticShippingCosts,
         internationalShippingCosts,

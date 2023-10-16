@@ -19,3 +19,11 @@
 .columnPadding {
     margin-right: 3rem;
 }
+
+.formLabel {
+    font-size: 10px;
+}
+
+.formControl {
+    height: 5px;
+}

@@ -1,4 +1,4 @@
-import { Button, Dropdown, Form, FormLabel, Modal, Nav, NavItem, Tab } from "react-bootstrap";
+import { Button, Col, Dropdown, Form, FormLabel, InputGroup, Modal, Nav, NavItem, Row, Tab } from "react-bootstrap";
 import { Product } from "../models/product";
 import { useForm } from "react-hook-form";
 import { ProductInput } from "../network/products_api";
@@ -6,7 +6,12 @@ import * as ProductsApi from "../network/products_api";
 import TextInputField from "./form/TextInputField";
 import DropdownInputField from "./form/DropdownInputField";
 import DimensionsInputField from "./form/DimensionsInputField";
-import styles from '../styles/Forms.module.css';
+import styles from '../styles/Modal.module.css';
+import { useEffect, useState } from "react";
+import { ProductCategory } from "../models/productCategory";
+import CategoryInputField from "./form/CategoryInputField";
+import BrandInputField from "./form/BrandInputField";
+import PackageTypeInputField from "./form/PackageTypeInputField";
 
 interface AddEditProductDialogProps {
     productToEdit?: Product,
@@ -27,7 +32,7 @@ const AddEditProductDialog = ({ productToEdit, onDismiss, onProductSaved }: AddE
             description: productToEdit?.description || "",
             cogs: productToEdit?.cogs || "",
             dimensions: productToEdit?.dimensions || "",
-            packagingCosts: productToEdit?.packagingCosts || "",
+            packageType: productToEdit?.packageType || "",
             weight: productToEdit?.weight || "",
             domesticShippingCosts: productToEdit?.domesticShippingCosts || "",
             internationalShippingCosts: productToEdit?.internationalShippingCosts || "",
@@ -54,32 +59,57 @@ const AddEditProductDialog = ({ productToEdit, onDismiss, onProductSaved }: AddE
         }
     }
 
+    const [categories, setCategories] = useState<ProductCategory[]>();
+    const [brands, setBrands] = useState([]);
+    const [packageType, setPackageTypes] = useState([]);
+
+    useEffect(() => {
+        async function loadCategories() {
+            try {
+                const productCategories = await ProductsApi.fetchProductCategories();
+                setCategories(productCategories);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        loadCategories();
+    }, []);
+
     return (
-        <Modal show onHide={onDismiss}>
+        <Modal
+            show onHide={onDismiss}
+            backdrop="static"
+            centered={true}
+            dialogClassName={`${styles.productModalWidth}`}>
             <Modal.Header closeButton>
                 <Modal.Title>
-                    {productToEdit ? "Edit Product" : "Add Product"}
+                    {productToEdit ? productToEdit.name : "Add Product"}
                 </Modal.Title>
             </Modal.Header>
 
-            <Modal.Body>
+            <Modal.Body className={styles.productModalBody}>
 
-                <Tab.Container>
-                    <Nav variant="tabs">
+                <Tab.Container defaultActiveKey="basicInfo">
+                    <Nav variant="tabs" className={styles.productModalTabs}>
                         <Nav.Item>
-                            <Nav.Link eventKey='basicInfo'>Basic Info</Nav.Link>
+                            <Nav.Link className={styles.productModalTabLink}
+                                eventKey='basicInfo'>BASIC INFO</Nav.Link>
                         </Nav.Item>
                         <Nav.Item>
-                            <Nav.Link eventKey='gallery'>Gallery</Nav.Link>
+                            <Nav.Link className={styles.productModalTabLink}
+                                eventKey='gallery'>GALLERY</Nav.Link>
                         </Nav.Item>
                         <Nav.Item>
-                            <Nav.Link eventKey='listingSkus'>Listing Skus</Nav.Link>
+                            <Nav.Link className={styles.productModalTabLink}
+                                eventKey='listingSkus'>LISTING SKUS</Nav.Link>
                         </Nav.Item>
                         <Nav.Item>
-                            <Nav.Link eventKey='vendorProducts'>Vendor Products</Nav.Link>
+                            <Nav.Link className={styles.productModalTabLink}
+                                eventKey='vendorProducts'>VENDOR PRODUCTS</Nav.Link>
                         </Nav.Item>
                         <Nav.Item>
-                            <Nav.Link eventKey='customs'>Customs</Nav.Link>
+                            <Nav.Link className={styles.productModalTabLink}
+                                eventKey='customs'>CUSTOMS</Nav.Link>
                         </Nav.Item>
                     </Nav>
 
@@ -94,110 +124,132 @@ const AddEditProductDialog = ({ productToEdit, onDismiss, onProductSaved }: AddE
                                     register={register}
                                     registerOptions={{ required: "Required" }}
                                 />
-                                <TextInputField
-                                    name="productSku"
-                                    label="Product Sku*"
-                                    type="text"
-                                    placeholder="Product Sku"
-                                    register={register}
-                                    registerOptions={{ required: "Required" }}
-                                />
-                                <DropdownInputField
-                                    name="brand"
-                                    label="Brand*"
-                                    type="text"
-                                    placeholder="Brand"
-                                    register={register}
-                                    registerOptions={{ required: "Required", }}
-                                    options={[
-                                        { value: "TITAN Survival", label: "TITAN Survival" },
-                                        { value: "TACAMO", label: "TACAMO" },
-                                        { value: "SurvivorCord", label: "SurvivorCord" },
-                                        { value: "Choktaw Tinder", label: "Choktaw Tinder" },
-                                    ]}
-                                />
-                                <TextInputField
-                                    name="barcodeUpc"
-                                    label="UPC Barcode*"
-                                    type="text"
-                                    placeholder="UPC Barcode"
-                                    register={register}
-                                    registerOptions={{ required: "Required" }}
-                                />
-                                <DropdownInputField
-                                    name="category"
-                                    label="Category"
-                                    type="text"
-                                    placeholder="Category"
-                                    register={register}
-                                    options={[
-                                        { value: "Clothing", label: "Clothing" },
-                                        { value: "Combustion", label: "Combustion" },
-                                        { value: "Cordage", label: "Cordage" },
-                                        { value: "Cover", label: "Cover" },
-                                        { value: "Cutting", label: "Cutting" },
-                                    ]}
-                                />
-                                <TextInputField
-                                    name="cogs"
-                                    label="COGS*"
-                                    type="text"
-                                    placeholder="COGS"
-                                    register={register}
-                                    registerOptions={{ required: "Required" }}
-                                />
-                                <DimensionsInputField
-                                    name="dimensions"
-                                    label="Dimensions"
-                                    type="text"
-                                    placeholder="Dimensions"
-                                    register={register}
-                                    registerOptions={{ required: "Required" }}
-                                />
-                                <TextInputField
-                                    name="packagingCosts"
-                                    label="Packaging Costs*"
-                                    type="text"
-                                    placeholder="Packaging Costs"
-                                    register={register}
-                                    registerOptions={{ required: "Required" }}
-                                />
-                                <TextInputField
-                                    name="weight"
-                                    label="Weight*"
-                                    type="text"
-                                    placeholder="Weight"
-                                    register={register}
-                                    registerOptions={{ required: "Required" }}
-                                />
-                                <TextInputField
-                                    name="domesticShippingCosts"
-                                    label="Domestic Shipping Costs"
-                                    type="text"
-                                    placeholder="Domestic Shipping Costs"
-                                    register={register}
-                                />
-                                <TextInputField
-                                    name="internationalShippingCosts"
-                                    label="International Shipping Costs"
-                                    type="text"
-                                    placeholder="International Shipping Costs"
-                                    register={register}
-                                />
-                                <TextInputField
-                                    name="dutiesAndTariffs"
-                                    label="Duties And Tariffs"
-                                    type="text"
-                                    placeholder="Duties And Tariffs"
-                                    register={register}
-                                />
-                                <TextInputField
-                                    name="pickAndPackFee"
-                                    label="Pick And Pack Fee"
-                                    type="text"
-                                    placeholder="Pick And Pack Fee"
-                                    register={register}
-                                />
+                                <Row>
+                                    <Col>
+                                        <BrandInputField
+                                            name="brand"
+                                            label="Brand*"
+                                            type="text"
+                                            placeholder="Brand"
+                                            register={register}
+                                            registerOptions={{ required: "Required", }}
+                                        />
+                                    </Col>
+                                    <Col>
+                                        <CategoryInputField
+                                            name="category"
+                                            label="Category"
+                                            type="text"
+                                            placeholder="Category"
+                                            register={register}
+                                        />
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col>
+                                        <TextInputField
+                                            name="productSku"
+                                            label="Product Sku*"
+                                            type="text"
+                                            placeholder="Product Sku"
+                                            register={register}
+                                            registerOptions={{ required: "Required" }}
+                                        />
+                                    </Col>
+                                    <Col>
+                                        <TextInputField
+                                            name="barcodeUpc"
+                                            label="UPC Barcode*"
+                                            type="text"
+                                            placeholder="UPC Barcode"
+                                            register={register}
+                                            registerOptions={{ required: "Required" }}
+                                        />
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col>
+                                        <TextInputField
+                                            name="dimensions"
+                                            label="Dimensions"
+                                            type="text"
+                                            placeholder="Dimensions"
+                                            register={register}
+                                            registerOptions={{ required: "Required" }}
+                                        />
+                                    </Col>
+                                    <Col>
+                                        <TextInputField
+                                            name="weight"
+                                            label="Weight (grams)*"
+                                            type="text"
+                                            placeholder="Weight"
+                                            register={register}
+                                            registerOptions={{ required: "Required" }}
+                                        />
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col>
+                                        <TextInputField
+                                            name="cogs"
+                                            label="Cost of Goods Sold*"
+                                            type="text"
+                                            placeholder="COGS"
+                                            register={register}
+                                            registerOptions={{ required: "Required" }}
+                                        />
+                                    </Col>
+                                    <Col>
+                                        <PackageTypeInputField
+                                            name="packageType"
+                                            label="Package Type"
+                                            type="text"
+                                            placeholder="Package Type"
+                                            register={register}
+                                        />
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col>
+                                        <TextInputField
+                                            name="domesticShippingCosts"
+                                            label="Domestic Shipping Costs"
+                                            type="text"
+                                            placeholder="Domestic Shipping Costs"
+                                            register={register}
+                                        />
+                                    </Col>
+                                    <Col>
+                                        <TextInputField
+                                            name="internationalShippingCosts"
+                                            label="International Shipping Costs"
+                                            type="text"
+                                            placeholder="International Shipping Costs"
+                                            register={register}
+                                        />
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col>
+                                        <TextInputField
+                                            name="dutiesAndTariffs"
+                                            label="Duties And Tariffs"
+                                            type="text"
+                                            placeholder="Duties And Tariffs"
+                                            register={register}
+                                        />
+                                    </Col>
+                                    <Col>
+                                        <TextInputField
+                                            name="pickAndPackFee"
+                                            label="Pick And Pack Fee"
+                                            type="text"
+                                            placeholder="Pick And Pack Fee"
+                                            register={register}
+                                        />
+                                    </Col>
+                                </Row>
                                 <TextInputField
                                     name="amazonReferralFee"
                                     label="Amazon Referral Fee"
@@ -209,7 +261,7 @@ const AddEditProductDialog = ({ productToEdit, onDismiss, onProductSaved }: AddE
                                     name="description"
                                     label="Description"
                                     as="textarea"
-                                    rows={3}
+                                    rows={2}
                                     placeholder="Description"
                                     register={register}
                                 />

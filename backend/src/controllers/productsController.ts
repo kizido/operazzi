@@ -54,7 +54,7 @@ interface CreateProductBody {
     description?: string,
     dimensions?: string,
     cogs?: string,
-    packagingCosts?: string,
+    packageType?: string,
     weight?: string,
     domesticShippingCosts?: string,
     internationalShippingCosts?: string,
@@ -74,7 +74,7 @@ export const createProduct: RequestHandler<unknown, unknown, CreateProductBody, 
     const description = req.body.description;
     const cogs = req.body.cogs;
     const dimensions = req.body.dimensions;
-    const packagingCosts = req.body.packagingCosts;
+    const packageType = req.body.packageType;
     const weight = req.body.weight;
     const domesticShippingCosts = req.body.domesticShippingCosts;
     const internationalShippingCosts = req.body.internationalShippingCosts;
@@ -102,7 +102,7 @@ export const createProduct: RequestHandler<unknown, unknown, CreateProductBody, 
             description: description,
             cogs: cogs,
             dimensions: dimensions,
-            packagingCosts: packagingCosts,
+            packageType: packageType,
             weight: weight,
             domesticShippingCosts: domesticShippingCosts,
             internationalShippingCosts: internationalShippingCosts,
@@ -132,7 +132,7 @@ interface UpdateProductBody {
     description?: string,
     cogs?: string,
     dimensions?: string,
-    packagingCosts?: string,
+    packageType?: string,
     weight?: string,
     domesticShippingCosts?: string,
     internationalShippingCosts?: string,
@@ -153,7 +153,7 @@ export const updateProduct: RequestHandler<UpdateProductParams, unknown, UpdateP
     const newDescription = req.body.description;
     const newCogs = req.body.cogs;
     const newDimensions = req.body.dimensions;
-    const newPackagingCosts = req.body.packagingCosts;
+    const newPackageType = req.body.packageType;
     const newWeight = req.body.weight;
     const newDomesticShippingCosts = req.body.domesticShippingCosts;
     const newInternationalShippingCosts = req.body.internationalShippingCosts;
@@ -190,8 +190,8 @@ export const updateProduct: RequestHandler<UpdateProductParams, unknown, UpdateP
         if (!newDimensions) {
             throw createHttpError(400, "Product must have dimensions!");
         }
-        if (!newPackagingCosts) {
-            throw createHttpError(400, "Product must have packaging costs!");
+        if (!newPackageType) {
+            throw createHttpError(400, "Product must have package type!");
         }
         if (!newWeight) {
             throw createHttpError(400, "Product must have a weight!");
@@ -215,7 +215,7 @@ export const updateProduct: RequestHandler<UpdateProductParams, unknown, UpdateP
         product.description = newDescription;
         product.cogs = newCogs;
         product.dimensions = newDimensions;
-        product.packagingCosts = newPackagingCosts;
+        product.packageType = newPackageType;
         product.weight = newWeight;
         product.domesticShippingCosts = newDomesticShippingCosts;
         product.internationalShippingCosts = newInternationalShippingCosts;
