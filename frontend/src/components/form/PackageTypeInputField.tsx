@@ -1,10 +1,13 @@
-import { Button, Form, InputGroup, Modal } from "react-bootstrap";
+import { Button, Col, Form, InputGroup, Modal, Row } from "react-bootstrap";
 import { FieldError, RegisterOptions, UseFormRegister } from "react-hook-form";
 import styles from '../../styles/Forms.module.css';
-import { useState, useEffect } from "react";
-import { ProductPackageType } from "../../models/productPackageType";
-import { ProductPackageTypeInput  } from "../../network/products_api";
+import { useState, useEffect, useRef } from "react";
+import { ProductPackageType as ProductPackageTypeModel } from "../../models/productPackageType";
+import { ProductPackageTypeInput } from "../../network/products_api";
 import * as ProductsApi from "../../network/products_api";
+import modalStyles from '../../styles/Modal.module.css';
+import { IconButton } from "@mui/material";
+import { IconSettings } from "@tabler/icons-react";
 
 
 interface PackageTypeInputFieldProps {
@@ -18,12 +21,14 @@ interface PackageTypeInputFieldProps {
 
 const PackageTypeInputField = ({ name, label, register, registerOptions, error, ...props }: PackageTypeInputFieldProps) => {
 
-    const [packageTypes, setPackageTypes] = useState<ProductPackageType[]>([]);
-    // const [brands, setBrands] = useState([]);
-    // const [packageType, setPackageTypes] = useState([]);
+    const [packageTypes, setPackageTypes] = useState<ProductPackageTypeModel[]>([]);
 
-    const [newOption, setNewOption] = useState<ProductPackageTypeInput>();
+    const [editingIndex, setEditingIndex] = useState<number | null>(null);
+
+    const valueSubmittedRef = useRef(false);
+    const [newOption, setNewOption] = useState<ProductPackageTypeInput>({ packageType: '' });
     const [addOptionDialog, setAddOptionDialog] = useState(false);
+    const [editOptionDialog, setEditOptionDialog] = useState(false);
 
     useEffect(() => {
         async function loadPackageTypes() {
@@ -40,8 +45,8 @@ const PackageTypeInputField = ({ name, label, register, registerOptions, error, 
 
     async function handleAddPackageType(input: ProductPackageTypeInput) {
         try {
-            let productPackageTypeResponse: ProductPackageType;
-            
+            let productPackageTypeResponse: ProductPackageTypeModel;
+
             productPackageTypeResponse = await ProductsApi.createProductPackageType(input);
             setPackageTypes([...packageTypes, productPackageTypeResponse]);
             setAddOptionDialog(false);
@@ -50,6 +55,49 @@ const PackageTypeInputField = ({ name, label, register, registerOptions, error, 
             alert(error);
         }
     }
+
+    async function handleEditPackageType(packageTypeInput: ProductPackageTypeInput, idInput: string) {
+        try {
+            await ProductsApi.updateProductPackageType(packageTypeInput, idInput);
+        } catch (error) {
+            console.error(error);
+            alert(error);
+        }
+        setNewOption({ packageType: '' });
+    }
+
+    // Separate the keydown logic
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            valueSubmittedRef.current = true;
+            (e.currentTarget as HTMLInputElement).blur();
+        }
+        else if (e.key === 'Escape') {
+            (e.currentTarget as HTMLInputElement).blur();
+        }
+    };
+
+    // Handle save of data in the onBlur event
+    const handleSave = (index: number) => {
+        if (newOption.packageType !== '') {
+            const updatedPackageTypes = [...packageTypes]
+            updatedPackageTypes[index].packageType = newOption.packageType
+            setPackageTypes(updatedPackageTypes)
+            handleEditPackageType(newOption, updatedPackageTypes[index]._id)
+            setEditingIndex(null)
+        } else {
+            revertSave(index);
+        }
+        valueSubmittedRef.current = false;
+    };
+
+    // Handle revert of data in the onBlur event when input is escaped or clicked out of
+    const revertSave = (index: number) => {
+        const updatedPackageTypes = [...packageTypes];
+        setNewOption({ packageType: updatedPackageTypes[index].packageType })
+        setPackageTypes(updatedPackageTypes);
+        setEditingIndex(null);
+    };
 
     return (
         <div>
@@ -71,11 +119,12 @@ const PackageTypeInputField = ({ name, label, register, registerOptions, error, 
                         {error?.message}
                     </Form.Control.Feedback>
                     <Button onClick={() => setAddOptionDialog(true)}>+</Button>
+                    <IconButton onClick={() => setEditOptionDialog(true)}><IconSettings /></IconButton>
                 </InputGroup>
             </Form.Group>
 
             {addOptionDialog &&
-                <Modal show onHide={() => {setAddOptionDialog(false); setNewOption({packageType: ''})}}>
+                <Modal show onHide={() => { setAddOptionDialog(false); setNewOption({ packageType: '' }) }}>
                     <Modal.Header closeButton>
                         <Modal.Title>Add {label}</Modal.Title>
                     </Modal.Header>
@@ -90,13 +139,61 @@ const PackageTypeInputField = ({ name, label, register, registerOptions, error, 
                         </Form>
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button variant="secondary" onClick={() => {setAddOptionDialog(false); setNewOption({packageType: ''})}}>Close</Button>
-                        <Button variant="primary" onClick={() => {handleAddPackageType(newOption!); setNewOption({packageType: ''})}}>Add PackageType</Button>
+                        <Button variant="secondary" onClick={() => { setAddOptionDialog(false); setNewOption({ packageType: '' }) }}>Close</Button>
+                        <Button variant="primary" onClick={() => { handleAddPackageType(newOption!); setNewOption({ packageType: '' }) }}>Add PackageType</Button>
                     </Modal.Footer>
+                </Modal>
+            }
+            {editOptionDialog &&
+                <Modal
+                    show onHide={() => setEditOptionDialog(false)}
+                    dialogClassName={modalStyles.dropDownEditModalWidth}
+                    centered={true}
+                    keyboard={false}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Edit {label}</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body className={modalStyles.dropDownEditModalBody}>
+                        <Col>
+                            {packageTypes.map((packageTypeModel: ProductPackageTypeModel, index: number) => {
+                                return (
+                                    <Row key={index} className={modalStyles.editCategoryRow}>
+                                        {editingIndex === index ? (
+                                            <input
+                                                className={modalStyles.editCategoryRowText}
+                                                value={newOption.packageType}
+                                                onChange={(e) => setNewOption({ packageType: e.target.value })}
+                                                onBlur={() => {valueSubmittedRef.current === true ? handleSave(index) : revertSave(index)}}
+                                                autoFocus
+                                                onKeyDown={handleKeyDown}
+                                            />
+                                        ) : (
+                                            <p className={modalStyles.editCategoryRowText}>{packageTypeModel.packageType}</p>
+                                        )}
+                                        <Button
+                                            className={modalStyles.editCategoryRowButton}
+                                            onClick={() => { setEditingIndex(index); setNewOption({ packageType: packageTypeModel.packageType }); }}>Edit</Button>
+                                        <Button
+                                            className={modalStyles.editCategoryRowButton}
+                                            onClick={() => deleteProductPackageType(packageTypeModel)}>Delete</Button>
+                                    </Row>
+                                );
+                            })}
+                        </Col>
+                    </Modal.Body>
                 </Modal>
             }
         </div>
     );
+    async function deleteProductPackageType(productPackageType: ProductPackageTypeModel) {
+        try {
+            await ProductsApi.deleteProductPackageType(productPackageType._id);
+            setPackageTypes(packageTypes.filter(existingPackageType => existingPackageType._id !== productPackageType._id));
+        } catch (error) {
+            console.error(error);
+            alert(error);
+        }
+    }
 }
 
 export default PackageTypeInputField;

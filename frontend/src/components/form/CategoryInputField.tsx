@@ -1,7 +1,7 @@
 import { Button, Col, Form, InputGroup, Modal, Row } from "react-bootstrap";
 import { FieldError, RegisterOptions, UseFormRegister } from "react-hook-form";
 import styles from '../../styles/Forms.module.css';
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ProductCategory as ProductCategoryModel } from "../../models/productCategory";
 import { ProductCategoryInput } from "../../network/products_api";
 import * as ProductsApi from "../../network/products_api";
@@ -23,7 +23,10 @@ const CategoryInputField = ({ name, label, register, registerOptions, error, ...
 
     const [categories, setCategories] = useState<ProductCategoryModel[]>([]);
 
-    const [newOption, setNewOption] = useState<ProductCategoryInput>();
+    const [editingIndex, setEditingIndex] = useState<number | null>(null);
+
+    const valueSubmittedRef = useRef(false);
+    const [newOption, setNewOption] = useState<ProductCategoryInput>({ category: '' });
     const [addOptionDialog, setAddOptionDialog] = useState(false);
     const [editOptionDialog, setEditOptionDialog] = useState(false);
 
@@ -39,6 +42,47 @@ const CategoryInputField = ({ name, label, register, registerOptions, error, ...
         loadCategories();
     }, []);
 
+    async function handleEditCategory(categoryInput: ProductCategoryInput, idInput: string) {
+        try {
+            await ProductsApi.updateProductCategory(categoryInput, idInput);
+        } catch (error) {
+            console.error(error);
+            alert(error);
+        }
+    }
+
+    // Separate the keydown logic
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            valueSubmittedRef.current = true;
+            (e.currentTarget as HTMLInputElement).blur();
+        }
+        else if (e.key === 'Escape') {
+            (e.currentTarget as HTMLInputElement).blur();
+        }
+    };
+
+    // Handle save of data in the onBlur event
+    const handleSave = (index: number) => {
+        if (newOption.category !== '') {
+            const updatedCategories = [...categories]
+            updatedCategories[index].category = newOption.category
+            setCategories(updatedCategories)
+            handleEditCategory(newOption, updatedCategories[index]._id)
+            setEditingIndex(null)
+        } else {
+            revertSave(index);
+        }
+        valueSubmittedRef.current = false;
+    };
+
+    // Handle revert of data in the onBlur event when input is escaped or clicked out of
+    const revertSave = (index: number) => {
+        const updatedCategories = [...categories];
+        setNewOption({ category: updatedCategories[index].category })
+        setCategories(updatedCategories);
+        setEditingIndex(null);
+    };
 
     async function handleAddCategory(input: ProductCategoryInput) {
         try {
@@ -52,6 +96,7 @@ const CategoryInputField = ({ name, label, register, registerOptions, error, ...
             alert(error);
         }
     }
+
 
     return (
         <div>
@@ -72,7 +117,10 @@ const CategoryInputField = ({ name, label, register, registerOptions, error, ...
                     <Form.Control.Feedback type="invalid">
                         {error?.message}
                     </Form.Control.Feedback>
-                    <Button onClick={() => setAddOptionDialog(true)}>+</Button>
+                    <Button onClick={() => {
+                        setNewOption({ category: '' });
+                        setAddOptionDialog(true);
+                    }}>+</Button>
                     <IconButton onClick={() => setEditOptionDialog(true)}><IconSettings /></IconButton>
                 </InputGroup>
             </Form.Group>
@@ -110,22 +158,49 @@ const CategoryInputField = ({ name, label, register, registerOptions, error, ...
                 <Modal
                     show onHide={() => setEditOptionDialog(false)}
                     dialogClassName={modalStyles.dropDownEditModalWidth}
-                    centered={true}>
+                    centered={true}
+                    keyboard={false}>
                     <Modal.Header closeButton>
                         <Modal.Title>Edit {label}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body className={modalStyles.dropDownEditModalBody}>
                         <Col>
-                            {categories.map(({category}: any) => {
-                                return <Row className={modalStyles.editCategoryRow}>
-                                    <p className={modalStyles.editCategoryRowText}>{category}</p>
-                                    <Button className={modalStyles.editCategoryRowButton}>Edit</Button>
-                                    <Button 
-                                    className={modalStyles.editCategoryRowButton}
-                                    onClick={() => deleteProductCategory(category.original)}>Delete</Button>
+                            {categories.map((categoryModel: ProductCategoryModel, index: number) => {
+                                return (
+                                    <Row key={index} className={modalStyles.editCategoryRow}>
+                                        {editingIndex === index ? (
+                                            <input
+                                                className={modalStyles.editCategoryRowText}
+                                                value={newOption.category}
+                                                onChange={(e) => setNewOption({ category: e.target.value })}
+                                                onBlur={() => { valueSubmittedRef.current === true ? handleSave(index) : revertSave(index) }}
+                                                // onBlur={() => revertSave(index)}
+                                                autoFocus
+                                                onKeyDown={handleKeyDown}
+                                            />
+                                        ) : (
+                                            <p className={modalStyles.editCategoryRowText}>{categoryModel.category}</p>
+                                        )}
+
+                                        <Button
+                                            disabled={editingIndex !== null}
+                                            className={modalStyles.editCategoryRowButton}
+                                            onClick={() => { setEditingIndex(index); setNewOption({ category: categoryModel.category }); }}
+                                        >
+                                            Edit
+                                        </Button>
+
+                                        <Button
+                                            className={modalStyles.editCategoryRowButton}
+                                            onClick={() => deleteProductCategory(categoryModel)}
+                                        >
+                                            Delete
+                                        </Button>
                                     </Row>
+                                );
                             })}
                         </Col>
+
                     </Modal.Body>
                 </Modal>
             }

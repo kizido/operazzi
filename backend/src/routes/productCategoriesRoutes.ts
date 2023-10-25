@@ -6,7 +6,8 @@ const router = express.Router();
 router.get("/", ProductCategoriesController.getProductCategories);
 router.get("/:productCategoryId", ProductCategoriesController.getProductCategory);
 router.post("/", ProductCategoriesController.createProductCategory);
-router.delete("/:produtCategoryId", ProductCategoriesController.deleteProductCategory);
+router.delete("/:productCategoryId", ProductCategoriesController.deleteProductCategory);
+router.patch("/:productCategoryId", ProductCategoriesController.updateProductCategory);
 
 
 export default router;

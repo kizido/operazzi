@@ -6,6 +6,7 @@
     max-height: 40rem;
     min-height: 40rem;
     margin: 0px 10px 25px 10px;
+    position: relative;
 }
 
 .productModalTabs {
@@ -30,6 +31,7 @@
 .dropDownEditModalBody {
     max-height: 30rem;
     min-height: 30rem;
+    overflow-y: scroll;
 }
 
 .editCategoryRow {
@@ -40,7 +42,7 @@
 .editCategoryRowText {
     margin: 0.5rem;
     display: inline-block;
-    width: min-content;
+    width: 65%;
     font-size: large;
     font-weight: bold;
     margin-right: auto;
@@ -50,4 +52,10 @@
     margin: 0.5rem;
     display: inline-block;
     width: min-content;
+}
+
+.editCategoryRowInput {
+    display: inline-block;
+    width: 65%;
+    margin-right: auto;
 }

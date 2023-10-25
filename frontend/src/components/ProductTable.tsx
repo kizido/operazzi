@@ -1,10 +1,9 @@
 import { useReactTable, getCoreRowModel, flexRender, getPaginationRowModel, getSortedRowModel, getFilteredRowModel } from '@tanstack/react-table';
-import mData from './MOCK_DATA.json';
 import { useEffect, useMemo, useState } from 'react';
 import { IconButton } from '@mui/material';
 import { IconCirclePlus } from '@tabler/icons-react';
 import { Form } from 'react-hook-form';
-import { Modal } from 'react-bootstrap';
+import { Button, Modal } from 'react-bootstrap';
 import AddEditProductDialog from './AddEditProductDialog';
 import { Product as ProductModel } from '../models/product';
 import { ColumnDef } from '@tanstack/react-table';
@@ -245,9 +244,9 @@ export default function ProductTable() {
                 <button disabled={!table.getCanNextPage()} onClick={() => table.nextPage()}>Next Page</button>
                 <button onClick={() => table.setPageIndex(table.getPageCount() - 1)}>Last Page</button>
             </div>
-            <IconButton onClick={() => setShowAddProductDialog(true)}>
-                <IconCirclePlus size={50} stroke={3} color='#2fb344'></IconCirclePlus>
-            </IconButton>
+            <Button onClick={() => setShowAddProductDialog(true)} className='btn btn-success'>
+                Add Product
+            </Button>
             {showAddProductDialog &&
                 <AddEditProductDialog
                     onDismiss={() => setShowAddProductDialog(false)}

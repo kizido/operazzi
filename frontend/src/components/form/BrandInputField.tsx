@@ -1,10 +1,13 @@
-import { Button, Form, InputGroup, Modal } from "react-bootstrap";
+import { Button, Col, Form, InputGroup, Modal, Row } from "react-bootstrap";
 import { FieldError, RegisterOptions, UseFormRegister } from "react-hook-form";
 import styles from '../../styles/Forms.module.css';
-import { useState, useEffect } from "react";
-import { ProductBrand } from "../../models/productBrand";
-import { ProductBrandInput  } from "../../network/products_api";
+import { useState, useEffect, useRef } from "react";
+import { ProductBrand as ProductBrandModel } from "../../models/productBrand";
+import { ProductBrandInput } from "../../network/products_api";
 import * as ProductsApi from "../../network/products_api";
+import modalStyles from '../../styles/Modal.module.css';
+import { IconSettings } from "@tabler/icons-react";
+import { IconButton } from "@mui/material";
 
 
 interface BrandInputFieldProps {
@@ -18,12 +21,14 @@ interface BrandInputFieldProps {
 
 const BrandInputField = ({ name, label, register, registerOptions, error, ...props }: BrandInputFieldProps) => {
 
-    const [brands, setBrands] = useState<ProductBrand[]>([]);
-    // const [brands, setBrands] = useState([]);
-    // const [packageType, setPackageTypes] = useState([]);
+    const [brands, setBrands] = useState<ProductBrandModel[]>([]);
 
-    const [newOption, setNewOption] = useState<ProductBrandInput>();
+    const [editingIndex, setEditingIndex] = useState<number | null>(null);
+
+    const valueSubmittedRef = useRef(false);
+    const [newOption, setNewOption] = useState<ProductBrandInput>({ brand: '' });
     const [addOptionDialog, setAddOptionDialog] = useState(false);
+    const [editOptionDialog, setEditOptionDialog] = useState(false);
 
     useEffect(() => {
         async function loadBrands() {
@@ -40,8 +45,8 @@ const BrandInputField = ({ name, label, register, registerOptions, error, ...pro
 
     async function handleAddBrand(input: ProductBrandInput) {
         try {
-            let productBrandResponse: ProductBrand;
-            
+            let productBrandResponse: ProductBrandModel;
+
             productBrandResponse = await ProductsApi.createProductBrand(input);
             setBrands([...brands, productBrandResponse]);
             setAddOptionDialog(false);
@@ -50,6 +55,48 @@ const BrandInputField = ({ name, label, register, registerOptions, error, ...pro
             alert(error);
         }
     }
+
+    async function handleEditBrand(brandInput: ProductBrandInput, idInput: string) {
+        try {
+            await ProductsApi.updateProductBrand(brandInput, idInput);
+        } catch (error) {
+            console.error(error);
+            alert(error);
+        }
+    }
+
+    // Separate the keydown logic
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            valueSubmittedRef.current = true;
+            (e.currentTarget as HTMLInputElement).blur();
+        }
+        else if (e.key === 'Escape') {
+            (e.currentTarget as HTMLInputElement).blur();
+        }
+    };
+
+    // Handle save of data in the onBlur event
+    const handleSave = (index: number) => {
+        if (newOption.brand !== '') {
+            const updatedBrands = [...brands]
+            updatedBrands[index].brand = newOption.brand
+            setBrands(updatedBrands)
+            handleEditBrand(newOption, updatedBrands[index]._id)
+            setEditingIndex(null)
+        } else {
+            revertSave(index);
+        }
+        valueSubmittedRef.current = false;
+    };
+
+    // Handle revert of data in the onBlur event when input is escaped or clicked out of
+    const revertSave = (index: number) => {
+        const updatedBrands = [...brands];
+        setNewOption({ brand: updatedBrands[index].brand })
+        setBrands(updatedBrands);
+        setEditingIndex(null);
+    };
 
     return (
         <div>
@@ -71,11 +118,12 @@ const BrandInputField = ({ name, label, register, registerOptions, error, ...pro
                         {error?.message}
                     </Form.Control.Feedback>
                     <Button onClick={() => setAddOptionDialog(true)}>+</Button>
+                    <IconButton onClick={() => setEditOptionDialog(true)}><IconSettings /></IconButton>
                 </InputGroup>
             </Form.Group>
 
             {addOptionDialog &&
-                <Modal show onHide={() => {setAddOptionDialog(false); setNewOption({brand: ''})}}>
+                <Modal show onHide={() => { setAddOptionDialog(false); setNewOption({ brand: '' }) }}>
                     <Modal.Header closeButton>
                         <Modal.Title>Add {label}</Modal.Title>
                     </Modal.Header>
@@ -90,13 +138,61 @@ const BrandInputField = ({ name, label, register, registerOptions, error, ...pro
                         </Form>
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button variant="secondary" onClick={() => {setAddOptionDialog(false); setNewOption({brand: ''})}}>Close</Button>
-                        <Button variant="primary" onClick={() => {handleAddBrand(newOption!); setNewOption({brand: ''})}}>Add Brand</Button>
+                        <Button variant="secondary" onClick={() => { setAddOptionDialog(false); setNewOption({ brand: '' }) }}>Close</Button>
+                        <Button variant="primary" onClick={() => { handleAddBrand(newOption!); setNewOption({ brand: '' }) }}>Add Brand</Button>
                     </Modal.Footer>
+                </Modal>
+            }
+            {editOptionDialog &&
+                <Modal
+                    show onHide={() => setEditOptionDialog(false)}
+                    dialogClassName={modalStyles.dropDownEditModalWidth}
+                    centered={true}
+                    keyboard={false}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Edit {label}</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body className={modalStyles.dropDownEditModalBody}>
+                        <Col>
+                            {brands.map((brandModel: ProductBrandModel, index: number) => {
+                                return (
+                                    <Row key={index} className={modalStyles.editCategoryRow}>
+                                        {editingIndex === index ? (
+                                            <input
+                                                className={modalStyles.editCategoryRowText}
+                                                value={newOption.brand}
+                                                onChange={(e) => setNewOption({ brand: e.target.value })}
+                                                onBlur={() => {valueSubmittedRef.current === true ? handleSave(index) : revertSave(index)}}
+                                                autoFocus
+                                                onKeyDown={handleKeyDown}
+                                            />
+                                        ) : (
+                                            <p className={modalStyles.editCategoryRowText}>{brandModel.brand}</p>
+                                        )}
+                                        <Button
+                                            className={modalStyles.editCategoryRowButton}
+                                            onClick={() => { setEditingIndex(index); setNewOption({ brand: brandModel.brand }); }}>Edit</Button>
+                                        <Button
+                                            className={modalStyles.editCategoryRowButton}
+                                            onClick={() => deleteProductBrand(brandModel)}>Delete</Button>
+                                    </Row>
+                                );
+                            })}
+                        </Col>
+                    </Modal.Body>
                 </Modal>
             }
         </div>
     );
+    async function deleteProductBrand(productBrand: ProductBrandModel) {
+        try {
+            await ProductsApi.deleteProductBrand(productBrand._id);
+            setBrands(brands.filter(existingBrand => existingBrand._id !== productBrand._id));
+        } catch (error) {
+            console.error(error);
+            alert(error);
+        }
+    }
 }
 
 export default BrandInputField;

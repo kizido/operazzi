@@ -1,17 +1,18 @@
 import { Button, Col, Dropdown, Form, FormLabel, InputGroup, Modal, Nav, NavItem, Row, Tab } from "react-bootstrap";
 import { Product } from "../models/product";
 import { useForm } from "react-hook-form";
-import { ProductInput } from "../network/products_api";
+import { ProductInput, ProductImageInput } from "../network/products_api";
 import * as ProductsApi from "../network/products_api";
 import TextInputField from "./form/TextInputField";
 import DropdownInputField from "./form/DropdownInputField";
 import DimensionsInputField from "./form/DimensionsInputField";
 import styles from '../styles/Modal.module.css';
 import { useEffect, useState } from "react";
-import { ProductCategory } from "../models/productCategory";
 import CategoryInputField from "./form/CategoryInputField";
 import BrandInputField from "./form/BrandInputField";
 import PackageTypeInputField from "./form/PackageTypeInputField";
+import GalleryInput from "./GalleryInput";
+import ImageGallery from "./ImageGallery";
 
 interface AddEditProductDialogProps {
     productToEdit?: Product,
@@ -58,22 +59,6 @@ const AddEditProductDialog = ({ productToEdit, onDismiss, onProductSaved }: AddE
             alert(error);
         }
     }
-
-    const [categories, setCategories] = useState<ProductCategory[]>();
-    const [brands, setBrands] = useState([]);
-    const [packageType, setPackageTypes] = useState([]);
-
-    useEffect(() => {
-        async function loadCategories() {
-            try {
-                const productCategories = await ProductsApi.fetchProductCategories();
-                setCategories(productCategories);
-            } catch (error) {
-                console.error(error);
-            }
-        }
-        loadCategories();
-    }, []);
 
     return (
         <Modal
@@ -266,7 +251,9 @@ const AddEditProductDialog = ({ productToEdit, onDismiss, onProductSaved }: AddE
                                     register={register}
                                 />
                             </Tab.Pane>
-                            <Tab.Pane eventKey="gallery"></Tab.Pane>
+                            <Tab.Pane eventKey="gallery">
+                                <ImageGallery />
+                            </Tab.Pane>
                             <Tab.Pane eventKey="listingSkus"></Tab.Pane>
                             <Tab.Pane eventKey="vendorProducts"></Tab.Pane>
                             <Tab.Pane eventKey="customs"></Tab.Pane>

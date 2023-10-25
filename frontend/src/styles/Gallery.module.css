@@ -1,0 +1,64 @@
+.galleryInputContainer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.galleryInput {
+    margin: 1rem 0;
+}
+
+.galleryInputAddButton {}
+
+/* Container styling */
+.galleryTab {}
+.galleryConfirmButton {
+    margin-left: auto;
+    display: block;
+}
+
+.gallerySelectionSearchBar {
+    width: 100%;
+    padding-left: 0.5rem;
+}
+.gallerySelectionWindow {
+    height: 28rem;
+    border: 3px darkgray groove;
+    display: flex;
+    flex-direction: column;
+}
+.galleryPreviewWindow {
+    display: flex;
+    flex: 1; /* Take up all available space */
+    flex-wrap: wrap;
+    overflow-y: scroll;
+    align-items: flex-start;
+}
+
+.galleryPreviewItem {
+    flex: 0 0 calc(25% - 30px);
+    margin: 15px;
+    max-width: calc(25% - 30px);
+    border: 1px black dashed;
+    aspect-ratio: 1/1;
+    position: relative;
+}
+
+.galleryPreviewItem img {
+    object-fit: contain;
+    height: auto;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.galleryPreviewItem:hover {
+    border: 2px black solid;
+}
+
+.galleryPreviewItem:active {
+    border: 5px black solid;
+}

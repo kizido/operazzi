@@ -71,7 +71,7 @@ export const createProductCategory: RequestHandler<unknown, unknown, CreateProdu
 };
 
 export const deleteProductCategory: RequestHandler = async (req, res, next) => {
-    const productCategoryId = req.params.productId;
+    const productCategoryId = req.params.productCategoryId;
     const authenticatedUserId = req.session.userId;
 
 
@@ -94,6 +94,50 @@ export const deleteProductCategory: RequestHandler = async (req, res, next) => {
 
         res.sendStatus(204);
 
+    } catch (error) {
+        next(error);
+    }
+}
+
+interface UpdateProductCategoryParams {
+    productCategoryId: string,
+}
+interface UpdateProductCategoryBody {
+    category?: string,
+}
+
+export const updateProductCategory: RequestHandler<UpdateProductCategoryParams, unknown, UpdateProductCategoryBody, unknown> = async (req, res, next) => {
+    const productCategoryId = req.params.productCategoryId;
+    const newCategory = req.body.category;
+
+    const authenticatedUserId = req.session.userId;
+
+    try {
+        assertIsDefined(authenticatedUserId);
+
+        if (!mongoose.isValidObjectId(productCategoryId)) {
+            throw createHttpError(400, "Invalid product category ID");
+        }
+
+        // Validate product body
+        if (!newCategory) {
+            throw createHttpError(400, "Category must have a category name!");
+        }
+
+        const productCategory = await ProductCategoryModel.findById(productCategoryId).exec();
+
+        if (!productCategory) {
+            throw createHttpError(404, "Product category not found");
+        }
+
+        if (!productCategory.userId.equals(authenticatedUserId)) {
+            throw createHttpError(401, "You cannot access this product category");
+        }
+
+        productCategory.category = newCategory;
+
+        const updatedProductCategory = await productCategory.save();
+        res.status(200).json(updatedProductCategory);
     } catch (error) {
         next(error);
     }

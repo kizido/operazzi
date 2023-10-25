@@ -69,3 +69,76 @@ export const createProductPackageType: RequestHandler<unknown, unknown, CreatePr
         next(error);
     }
 };
+
+export const deleteProductPackageType: RequestHandler = async (req, res, next) => {
+    const productPackageTypeId = req.params.productPackageTypeId;
+    const authenticatedUserId = req.session.userId;
+
+
+    try {
+        assertIsDefined(authenticatedUserId);
+        if (!mongoose.isValidObjectId(productPackageTypeId)) {
+            throw createHttpError(400, "Invalid product package type id");
+        }
+        const productPackageType = await ProductPackageTypeModel.findById(productPackageTypeId).exec();
+
+        if (!productPackageType) {
+            throw createHttpError(404, "Product package type not found");
+        }
+
+        if (!productPackageType.userId.equals(authenticatedUserId)) {
+            throw createHttpError(401, "You cannot access this product package type");
+        }
+
+        await productPackageType.deleteOne();
+
+        res.sendStatus(204);
+
+    } catch (error) {
+        next(error);
+    }
+}
+
+interface UpdateProductPackageTypeParams {
+    productPackageTypeId: string,
+}
+interface UpdateProductPackageTypeBody {
+    packageType?: string,
+}
+
+export const updateProductPackageType: RequestHandler<UpdateProductPackageTypeParams, unknown, UpdateProductPackageTypeBody, unknown> = async (req, res, next) => {
+    const productPackageTypeId = req.params.productPackageTypeId;
+    const newPackageType = req.body.packageType;
+
+    const authenticatedUserId = req.session.userId;
+
+    try {
+        assertIsDefined(authenticatedUserId);
+
+        if (!mongoose.isValidObjectId(productPackageTypeId)) {
+            throw createHttpError(400, "Invalid product package type ID");
+        }
+
+        // Validate product body
+        if (!newPackageType) {
+            throw createHttpError(400, "PackageType must have a package type name!");
+        }
+
+        const productPackageType = await ProductPackageTypeModel.findById(productPackageTypeId).exec();
+
+        if (!productPackageType) {
+            throw createHttpError(404, "Product package type not found");
+        }
+
+        if (!productPackageType.userId.equals(authenticatedUserId)) {
+            throw createHttpError(401, "You cannot access this product package type");
+        }
+
+        productPackageType.packageType = newPackageType;
+
+        const updatedProductPackageType = await productPackageType.save();
+        res.status(200).json(updatedProductPackageType);
+    } catch (error) {
+        next(error);
+    }
+}
