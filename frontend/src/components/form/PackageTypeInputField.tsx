@@ -7,7 +7,7 @@ import { ProductPackageTypeInput } from "../../network/products_api";
 import * as ProductsApi from "../../network/products_api";
 import modalStyles from '../../styles/Modal.module.css';
 import { IconButton } from "@mui/material";
-import { IconSettings } from "@tabler/icons-react";
+import { IconPlus, IconSettings } from "@tabler/icons-react";
 
 
 interface PackageTypeInputFieldProps {
@@ -118,8 +118,8 @@ const PackageTypeInputField = ({ name, label, register, registerOptions, error, 
                     <Form.Control.Feedback type="invalid">
                         {error?.message}
                     </Form.Control.Feedback>
-                    <Button onClick={() => setAddOptionDialog(true)}>+</Button>
-                    <IconButton onClick={() => setEditOptionDialog(true)}><IconSettings /></IconButton>
+                    <IconButton onClick={() => setAddOptionDialog(true)} className={styles.formButton}><IconPlus/></IconButton>
+                    <IconButton onClick={() => setEditOptionDialog(true)} className={styles.formButton}><IconSettings /></IconButton>
                 </InputGroup>
             </Form.Group>
 

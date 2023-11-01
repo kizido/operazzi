@@ -39,9 +39,17 @@
     flex: 0 0 calc(25% - 30px);
     margin: 15px;
     max-width: calc(25% - 30px);
-    border: 1px black dashed;
+    
     aspect-ratio: 1/1;
     position: relative;
+}
+
+.galleryPreviewItemSelected {
+    border: 4px black solid !important;
+}
+
+.galleryPreviewItemUnselected {
+    border: 1px black dashed;
 }
 
 .galleryPreviewItem img {
@@ -59,6 +67,19 @@
     border: 2px black solid;
 }
 
-.galleryPreviewItem:active {
-    border: 5px black solid;
-}
+.galleryModal .modal-dialog {
+    max-height: 80%;
+  }
+  
+  .galleryModal .modal-header, .galleryModal .modal-footer {
+    max-height: 10%;
+  }
+  
+  .galleryModal .modal-body {
+    max-height: 60%;
+    overflow-y: auto;
+  }
+
+  .gallerySpinner {
+    margin: auto;
+  }

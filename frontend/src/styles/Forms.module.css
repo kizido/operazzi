@@ -22,8 +22,20 @@
 
 .formLabel {
     font-size: 10px;
+    margin-bottom: 0px;
 }
 
 .formControl {
-    height: 5px;
+    height: 2.5rem;
+}
+
+.formButton {
+    height: 29.2px;
+    text-align: center;
+    justify-content: center;
+    
+}
+
+.formButton p {
+    margin-top: 0;
 }

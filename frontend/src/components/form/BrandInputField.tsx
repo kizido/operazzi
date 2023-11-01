@@ -6,7 +6,7 @@ import { ProductBrand as ProductBrandModel } from "../../models/productBrand";
 import { ProductBrandInput } from "../../network/products_api";
 import * as ProductsApi from "../../network/products_api";
 import modalStyles from '../../styles/Modal.module.css';
-import { IconSettings } from "@tabler/icons-react";
+import { IconSettings, IconPlus } from "@tabler/icons-react";
 import { IconButton } from "@mui/material";
 
 
@@ -103,7 +103,7 @@ const BrandInputField = ({ name, label, register, registerOptions, error, ...pro
             <Form.Group controlId={name + "-input"}>
                 <Form.Label className={styles.formLabel}>{label}</Form.Label>
                 <InputGroup>
-                    <Form.Select size="sm"
+                    <Form.Select  size="sm"
                         {...props}
                         {...register(name, registerOptions)}
                         isInvalid={!!error}
@@ -117,8 +117,8 @@ const BrandInputField = ({ name, label, register, registerOptions, error, ...pro
                     <Form.Control.Feedback type="invalid">
                         {error?.message}
                     </Form.Control.Feedback>
-                    <Button onClick={() => setAddOptionDialog(true)}>+</Button>
-                    <IconButton onClick={() => setEditOptionDialog(true)}><IconSettings /></IconButton>
+                    <IconButton onClick={() => setAddOptionDialog(true)} className={styles.formButton}><IconPlus/></IconButton>
+                    <IconButton onClick={() => setEditOptionDialog(true)} className={styles.formButton}><IconSettings /></IconButton>
                 </InputGroup>
             </Form.Group>
 

@@ -24,6 +24,10 @@
     color: black;
 }
 
+.productModalInput {
+    height: 5rem;
+}
+
 .dropDownEditModalWidth {
     max-width: 40rem;
 }
@@ -37,6 +41,7 @@
 .editCategoryRow {
     border: 1px black solid;
     margin: 0.1rem;
+    height: 3.5rem;
 }
 
 .editCategoryRowText {
@@ -58,4 +63,26 @@
     display: inline-block;
     width: 65%;
     margin-right: auto;
+}
+.productPreviewContainer {
+    border: 1px black dashed;
+    height: 10rem;
+    width: 24rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #fcfcfc;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.productPreviewImage {
+    width: 7rem;
+    height: 7rem;
+    margin: auto;
+    display: block;
+}
+
+.productPreviewContainer:hover {
+    cursor: pointer;
 }

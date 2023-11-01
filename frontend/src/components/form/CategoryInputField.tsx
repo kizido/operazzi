@@ -6,7 +6,7 @@ import { ProductCategory as ProductCategoryModel } from "../../models/productCat
 import { ProductCategoryInput } from "../../network/products_api";
 import * as ProductsApi from "../../network/products_api";
 import { IconButton } from "@mui/material";
-import { IconSettings, IconPencil, IconX } from '@tabler/icons-react';
+import { IconSettings, IconPencil, IconX, IconPlus } from '@tabler/icons-react';
 import modalStyles from '../../styles/Modal.module.css';
 
 
@@ -117,11 +117,11 @@ const CategoryInputField = ({ name, label, register, registerOptions, error, ...
                     <Form.Control.Feedback type="invalid">
                         {error?.message}
                     </Form.Control.Feedback>
-                    <Button onClick={() => {
+                    <IconButton onClick={() => {
                         setNewOption({ category: '' });
                         setAddOptionDialog(true);
-                    }}>+</Button>
-                    <IconButton onClick={() => setEditOptionDialog(true)}><IconSettings /></IconButton>
+                    }} className={styles.formButton}><IconPlus/></IconButton>
+                    <IconButton onClick={() => setEditOptionDialog(true)} className={styles.formButton}><IconSettings /></IconButton>
                 </InputGroup>
             </Form.Group>
 

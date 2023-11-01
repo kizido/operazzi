@@ -13,12 +13,13 @@ import BrandInputField from "./form/BrandInputField";
 import PackageTypeInputField from "./form/PackageTypeInputField";
 import GalleryInput from "./GalleryInput";
 import ImageGallery from "./ImageGallery";
+import addImageIcon from '../assets/addImageIcon.png'
+import GalleryModal from "./GalleryModal";
 
 interface AddEditProductDialogProps {
     productToEdit?: Product,
     onDismiss: () => void,
     onProductSaved: (product: Product) => void,
-
 }
 
 const AddEditProductDialog = ({ productToEdit, onDismiss, onProductSaved }: AddEditProductDialogProps) => {
@@ -44,6 +45,8 @@ const AddEditProductDialog = ({ productToEdit, onDismiss, onProductSaved }: AddE
             activated: productToEdit?.activated || true,
         }
     });
+
+    const [showGalleryModal, setShowGalleryModal] = useState(false);
 
     async function onSubmit(input: ProductInput) {
         try {
@@ -82,10 +85,6 @@ const AddEditProductDialog = ({ productToEdit, onDismiss, onProductSaved }: AddE
                         </Nav.Item>
                         <Nav.Item>
                             <Nav.Link className={styles.productModalTabLink}
-                                eventKey='gallery'>GALLERY</Nav.Link>
-                        </Nav.Item>
-                        <Nav.Item>
-                            <Nav.Link className={styles.productModalTabLink}
                                 eventKey='listingSkus'>LISTING SKUS</Nav.Link>
                         </Nav.Item>
                         <Nav.Item>
@@ -101,16 +100,16 @@ const AddEditProductDialog = ({ productToEdit, onDismiss, onProductSaved }: AddE
                     <Form id="addEditProductForm" onSubmit={handleSubmit(onSubmit)}>
                         <Tab.Content>
                             <Tab.Pane eventKey="basicInfo">
-                                <TextInputField
-                                    name="name"
-                                    label="Product Name*"
-                                    type="text"
-                                    placeholder="Product Name"
-                                    register={register}
-                                    registerOptions={{ required: "Required" }}
-                                />
                                 <Row>
                                     <Col>
+                                        <TextInputField
+                                            name="name"
+                                            label="Product Name*"
+                                            type="text"
+                                            placeholder="Product Name"
+                                            register={register}
+                                            registerOptions={{ required: "Required" }}
+                                        />
                                         <BrandInputField
                                             name="brand"
                                             label="Brand*"
@@ -119,8 +118,6 @@ const AddEditProductDialog = ({ productToEdit, onDismiss, onProductSaved }: AddE
                                             register={register}
                                             registerOptions={{ required: "Required", }}
                                         />
-                                    </Col>
-                                    <Col>
                                         <CategoryInputField
                                             name="category"
                                             label="Category"
@@ -128,6 +125,19 @@ const AddEditProductDialog = ({ productToEdit, onDismiss, onProductSaved }: AddE
                                             placeholder="Category"
                                             register={register}
                                         />
+                                    </Col>
+                                    <Col>
+                                        <button type="button" className={styles.productPreviewContainer} onClick={() => setShowGalleryModal(true)}>
+                                            <img src={addImageIcon} alt="Example" className={styles.productPreviewImage} />
+                                        </button>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col>
+
+                                    </Col>
+                                    <Col>
+
                                     </Col>
                                 </Row>
                                 <Row>
@@ -251,9 +261,6 @@ const AddEditProductDialog = ({ productToEdit, onDismiss, onProductSaved }: AddE
                                     register={register}
                                 />
                             </Tab.Pane>
-                            <Tab.Pane eventKey="gallery">
-                                <ImageGallery />
-                            </Tab.Pane>
                             <Tab.Pane eventKey="listingSkus"></Tab.Pane>
                             <Tab.Pane eventKey="vendorProducts"></Tab.Pane>
                             <Tab.Pane eventKey="customs"></Tab.Pane>
@@ -270,6 +277,7 @@ const AddEditProductDialog = ({ productToEdit, onDismiss, onProductSaved }: AddE
                     Save
                 </Button>
             </Modal.Footer>
+            {showGalleryModal && <GalleryModal onDismiss={() => setShowGalleryModal(false)}/>}
         </Modal>
     );
 }
