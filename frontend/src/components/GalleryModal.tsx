@@ -2,12 +2,15 @@ import React from 'react'
 import { Modal } from 'react-bootstrap';
 import styles from '../styles/Gallery.module.css';
 import ImageGallery from './ImageGallery';
+import { Product } from '../models/product';
+import { ProductImage } from '../models/productImage';
 
 interface GalleryModalProps {
-    onDismiss: () => void;
+    onDismiss: () => void,
+    onSave: (updatedImage: ProductImage | null) => void,
 }
 
-export default function GalleryModal({onDismiss}: GalleryModalProps) {
+export default function GalleryModal({onDismiss, onSave}: GalleryModalProps) {
     return (
         <Modal show onHide={() => {
             onDismiss();
@@ -16,7 +19,7 @@ export default function GalleryModal({onDismiss}: GalleryModalProps) {
                 <Modal.Title>Gallery</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <ImageGallery/>
+                <ImageGallery onSave={onSave} onDismiss={onDismiss}/>
             </Modal.Body>
         </Modal>
   )

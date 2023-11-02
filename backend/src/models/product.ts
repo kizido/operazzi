@@ -17,7 +17,8 @@ const productSchema = new Schema({
     dutiesAndTariffs: { type: String },
     pickAndPackFee: { type: String },
     amazonReferralFee: { type: String },
-    opex: { type: String }, // operating expendatures
+    opex: { type: String }, // operating expenditures
+    productImageId: { type: Schema.Types.ObjectId, ref: 'ProductImage' }, // Reference to the ProductImage
     activated: { type: Boolean }
 }, { timestamps: true });
 

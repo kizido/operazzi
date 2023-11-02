@@ -89,6 +89,7 @@ export interface ProductInput {
     pickAndPackFee: string,
     amazonReferralFee: string,
     opex: string,
+    productImageId: string,
     activated: boolean,
 }
 
@@ -205,6 +206,10 @@ export async function createProductImage(formData: FormData): Promise<ProductIma
             method: "POST",
             body: formData,
         });
+    return response.json();
+}
+export async function fetchProductImage(productImageId: string): Promise<ProductImage> {
+    const response = await fetchData("/api/productImages/" + productImageId, { method: "GET" });
     return response.json();
 }
 export async function fetchProductImages(): Promise<ProductImage[]> {

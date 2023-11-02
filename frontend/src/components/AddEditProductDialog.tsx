@@ -1,4 +1,4 @@
-import { Button, Col, Dropdown, Form, FormLabel, InputGroup, Modal, Nav, NavItem, Row, Tab } from "react-bootstrap";
+import { Button, Col, Dropdown, Form, FormLabel, InputGroup, Modal, Nav, NavItem, Row, Spinner, Tab } from "react-bootstrap";
 import { Product } from "../models/product";
 import { useForm } from "react-hook-form";
 import { ProductInput, ProductImageInput } from "../network/products_api";
@@ -15,6 +15,7 @@ import GalleryInput from "./GalleryInput";
 import ImageGallery from "./ImageGallery";
 import addImageIcon from '../assets/addImageIcon.png'
 import GalleryModal from "./GalleryModal";
+import { ProductImage } from "../models/productImage";
 
 interface AddEditProductDialogProps {
     productToEdit?: Product,
@@ -42,13 +43,37 @@ const AddEditProductDialog = ({ productToEdit, onDismiss, onProductSaved }: AddE
             pickAndPackFee: productToEdit?.pickAndPackFee || "",
             amazonReferralFee: productToEdit?.amazonReferralFee || "",
             opex: productToEdit?.opex || "",
+            productImageId: productToEdit?.productImageId || "",
             activated: productToEdit?.activated || true,
         }
     });
 
+    useEffect(() => {
+        const loadImage = async () => {
+            if (productToEdit && productToEdit.productImageId !== '' && productToEdit.productImageId !== undefined) {
+                try {
+                    const imageToLoad = await ProductsApi.fetchProductImage(productToEdit.productImageId);
+                    setSelectedImage(imageToLoad);
+                    setImageLoading(false);
+                } catch (error) {
+                    console.log(error);
+                }
+            }
+            else {
+                setImageLoading(false);
+            }
+        };
+        loadImage();
+    }, [])
+
     const [showGalleryModal, setShowGalleryModal] = useState(false);
+    const [selectedImage, setSelectedImage] = useState<ProductImage | null>(null);
+    const [imageLoading, setImageLoading] = useState(true);
 
     async function onSubmit(input: ProductInput) {
+
+        selectedImage && (input.productImageId = selectedImage?._id);
+
         try {
             let productResponse: Product;
             if (productToEdit) {
@@ -61,6 +86,10 @@ const AddEditProductDialog = ({ productToEdit, onDismiss, onProductSaved }: AddE
             console.error(error);
             alert(error);
         }
+    }
+
+    function saveImageToProduct(updatedImage: ProductImage | null) {
+        setSelectedImage(updatedImage);
     }
 
     return (
@@ -128,16 +157,13 @@ const AddEditProductDialog = ({ productToEdit, onDismiss, onProductSaved }: AddE
                                     </Col>
                                     <Col>
                                         <button type="button" className={styles.productPreviewContainer} onClick={() => setShowGalleryModal(true)}>
-                                            <img src={addImageIcon} alt="Example" className={styles.productPreviewImage} />
+                                            {imageLoading ? (
+                                                <Spinner />
+                                            ) : (
+                                                <img src={selectedImage ? `data:${selectedImage.contentType};base64,${selectedImage.imageFileBase64}` : addImageIcon} alt={selectedImage?._id} className={styles.productPreviewImage} />
+                                            )
+                                            }
                                         </button>
-                                    </Col>
-                                </Row>
-                                <Row>
-                                    <Col>
-
-                                    </Col>
-                                    <Col>
-
                                     </Col>
                                 </Row>
                                 <Row>
@@ -277,7 +303,8 @@ const AddEditProductDialog = ({ productToEdit, onDismiss, onProductSaved }: AddE
                     Save
                 </Button>
             </Modal.Footer>
-            {showGalleryModal && <GalleryModal onDismiss={() => setShowGalleryModal(false)}/>}
+            {showGalleryModal && <GalleryModal onDismiss={() => setShowGalleryModal(false)} onSave={saveImageToProduct}
+            />}
         </Modal>
     );
 }

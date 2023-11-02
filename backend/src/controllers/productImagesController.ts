@@ -17,6 +17,8 @@ export const getProductImages: RequestHandler = async (req, res, next) => {
                 fileName: img.fileName,
                 imageFileBase64: img.imageBuffer.toString('base64'),
                 contentType: img.contentType,
+                createdAt: img.createdAt,
+                updatedAt: img.updatedAt,
             }
         })
         res.status(200).json(productImagesBase64);
@@ -42,11 +44,20 @@ export const getProductImage: RequestHandler = async (req, res, next) => {
             throw createHttpError(404, "Product image not found!");
         }
 
+        const productImageBase64 = {
+            _id: productImage._id,
+            fileName: productImage.fileName,
+            imageFileBase64: productImage.imageBuffer.toString('base64'),
+            contentType: productImage.contentType,
+            createdAt: productImage.createdAt,
+            updatedAt: productImage.updatedAt,
+        };
+
         if (!productImage.userId.equals(authenticatedUserId)) {
             throw createHttpError(401, "You cannot access this product image");
         }
 
-        res.status(200).json(productImage);
+        res.status(200).json(productImageBase64);
     } catch (error) {
         next(error);
     }
@@ -79,6 +90,8 @@ export const createProductImage: RequestHandler<unknown, unknown, CreateProductI
             fileName: newProductImage.fileName,
             imageFileBase64: newProductImage.imageBuffer.toString('base64'),
             contentType: newProductImage.contentType,
+            createdAt: newProductImage.createdAt,
+            updatedAt: newProductImage.updatedAt,
         }
 
         res.status(201).json(newProductImageBase64);

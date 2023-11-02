@@ -1,7 +1,7 @@
 import { RequestHandler } from "express";
 import ProductModel from "../models/product";
 import createHttpError from "http-errors";
-import mongoose from "mongoose";
+import mongoose, { Types, isValidObjectId } from "mongoose";
 import { assertIsDefined } from "../util/assertIsDefined";
 
 export const getProducts: RequestHandler = async (req, res, next) => {
@@ -62,6 +62,7 @@ interface CreateProductBody {
     pickAndPackFee?: string,
     amazonReferralFee?: string,
     opex?: string,
+    productImageId?: Types.ObjectId,
     activated?: boolean,
 }
 
@@ -83,6 +84,7 @@ export const createProduct: RequestHandler<unknown, unknown, CreateProductBody, 
     const amazonReferralFee = req.body.amazonReferralFee;
     const opex = req.body.opex;
     const activated = req.body.activated;
+    const productImageId = req.body.productImageId;
     const authenticatedUserId = req.session.userId;
 
     try {
@@ -90,6 +92,9 @@ export const createProduct: RequestHandler<unknown, unknown, CreateProductBody, 
 
         if (!name) {
             throw createHttpError(400, "Product must have a name!");
+        }
+        if (!isValidObjectId(productImageId)) {
+            throw createHttpError(400, "Product image id not valid!")
         }
 
         const newProduct = await ProductModel.create({
@@ -110,6 +115,7 @@ export const createProduct: RequestHandler<unknown, unknown, CreateProductBody, 
             pickAndPackFee: pickAndPackFee,
             amazonReferralFee: amazonReferralFee,
             opex: opex,
+            productImageId: productImageId, 
             activated: activated,
         });
 
@@ -140,6 +146,7 @@ interface UpdateProductBody {
     pickAndPackFee?: string,
     amazonReferralFee?: string,
     opex?: string,
+    productImageId?: Types.ObjectId,
     activated?: boolean,
 }
 
@@ -161,6 +168,7 @@ export const updateProduct: RequestHandler<UpdateProductParams, unknown, UpdateP
     const newPickAndPackFee = req.body.pickAndPackFee;
     const newAmazonReferralFee = req.body.amazonReferralFee;
     const newOpex = req.body.opex;
+    const newProductImageId = req.body.productImageId;
     const newActivated = req.body.activated;
     const authenticatedUserId = req.session.userId;
 
@@ -169,6 +177,9 @@ export const updateProduct: RequestHandler<UpdateProductParams, unknown, UpdateP
 
         if (!mongoose.isValidObjectId(productId)) {
             throw createHttpError(400, "Invalid product ID");
+        }
+        if (!mongoose.isValidObjectId(newProductImageId)) {
+            throw createHttpError(400, "Product image id not valid!")
         }
 
         // Validate product body
@@ -223,6 +234,7 @@ export const updateProduct: RequestHandler<UpdateProductParams, unknown, UpdateP
         product.pickAndPackFee = newPickAndPackFee;
         product.amazonReferralFee = newAmazonReferralFee;
         product.opex = newOpex;
+        product.productImageId = newProductImageId;
         product.activated = newActivated;
 
         const updatedProduct = await product.save();

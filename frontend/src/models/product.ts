@@ -1,3 +1,5 @@
+import { ProductImage } from "./productImage";
+
 export interface Product {
     _id: string,
     name: string,
@@ -16,6 +18,7 @@ export interface Product {
     pickAndPackFee: string,
     amazonReferralFee: string,
     opex: string,
+    productImageId: string,
     activated: boolean,
     createdAt: string,
     updatedAt: string,

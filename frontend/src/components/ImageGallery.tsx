@@ -6,7 +6,12 @@ import { useState } from 'react'
 import { ProductImage } from '../models/productImage'
 import { Spinner } from 'react-bootstrap'
 
-export default function ImageGallery() {
+interface ImageGalleryProps {
+    onSave: (updatedImage: ProductImage | null) => void,
+    onDismiss: () => void,
+}
+
+export default function ImageGallery({onSave, onDismiss}: ImageGalleryProps) {
 
     const [galleryImages, setGalleryImages] = useState<ProductImage[]>([])
     const [searchQuery, setSearchQuery] = useState('')
@@ -14,7 +19,13 @@ export default function ImageGallery() {
     const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
     const [selectedImage, setSelectedImage] = useState<ProductImage | null>(null);
 
-    const filteredImages = galleryImages.filter(galleryImg => galleryImg.fileName.includes(searchQuery))
+    const sortedImages = [...galleryImages].sort((a, b) => {
+        const dateA = a.createdAt ? new Date(a.createdAt) : new Date(0); // defaulting to a very old date if undefined
+        const dateB = b.createdAt ? new Date(b.createdAt) : new Date(0);
+        
+        return dateB.getTime() - dateA.getTime();
+      });
+    const filteredImages = sortedImages.filter(sortedImg => sortedImg.fileName.includes(searchQuery))
 
     useEffect(() => {
         async function loadImages() {
@@ -43,6 +54,7 @@ export default function ImageGallery() {
             }
         }
     };
+    
     return (
         <div className={styles.galleryTab}>
             <GalleryInput onFileSelect={handleFileSelect} />
@@ -53,7 +65,7 @@ export default function ImageGallery() {
                         filteredImages.map((galleryImg, index) => (
                             <div
                             className={`${styles.galleryPreviewItem} ${selectedImageIndex === index ? styles.galleryPreviewItemSelected : styles.galleryPreviewItemUnselected}`}
-                            onClick={() => {setSelectedImageIndex(index); setSelectedImage(galleryImages[index])}}>
+                            onClick={() => {setSelectedImageIndex(index); setSelectedImage(filteredImages[index])}}>
                                 <img
                                     key={index}
                                     src={`data:${galleryImg.contentType};base64,${galleryImg.imageFileBase64}`}
@@ -66,7 +78,7 @@ export default function ImageGallery() {
                     )}
                 </div>
             </div>
-            <button className={styles.galleryConfirmButton}>Apply</button>
+            <button onClick={() => {onSave(selectedImage); onDismiss()}} className={styles.galleryConfirmButton}>Apply</button>
         </div>
     )
 }
