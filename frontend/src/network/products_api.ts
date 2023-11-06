@@ -79,7 +79,9 @@ export interface ProductInput {
     barcodeUpc: string,
     category: string,
     description: string,
-    dimensions: string,
+    dimensions: { productLength: number, productWidth: number, productHeight: number, productDiameter: number },
+    masterCaseDimensions: { masterCaseLength: number, masterCaseWidth: number, masterCaseHeight: number, masterCaseQuantity: number },
+    masterCaseWeight: number,
     cogs: string,
     packageType: string,
     weight: string, // in grams

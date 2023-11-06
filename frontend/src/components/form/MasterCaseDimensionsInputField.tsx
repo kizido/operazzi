@@ -13,14 +13,14 @@ interface MasterCaseDimensionsInputFieldProps {
 
 const MasterCaseDimensionsInputField: React.FC<MasterCaseDimensionsInputFieldProps> = ({ name, label, register, registerOptions, error }) => {
     return (
-        <Form.Group controlId={`${name}-dimensions-input`}>
+        <Form.Group controlId={`${name}-master-case-dimensions-input`}>
             <Form.Label className={styles.formLabel}>{label}</Form.Label>
             <InputGroup size="sm">
                     <Form.Control
                         size="sm"
                         type="number"
                         step={0.1}
-                        {...register(`${name}.productLength`, { ...registerOptions })}
+                        {...register(`${name}.masterCaseLength`, { ...registerOptions })}
                         isInvalid={!!error}
                     />
                     <InputGroup.Text>in.</InputGroup.Text>
@@ -28,7 +28,7 @@ const MasterCaseDimensionsInputField: React.FC<MasterCaseDimensionsInputFieldPro
                         size="sm"
                         type="number"
                         step={0.1}
-                        {...register(`${name}.productWidth`, { ...registerOptions })}
+                        {...register(`${name}.masterCaseWidth`, { ...registerOptions })}
                         isInvalid={!!error}
                     />
                     <InputGroup.Text>in.</InputGroup.Text>
@@ -36,18 +36,17 @@ const MasterCaseDimensionsInputField: React.FC<MasterCaseDimensionsInputFieldPro
                         size="sm"
                         type="number"
                         step={0.1}
-                        {...register(`${name}.productHeight`, { ...registerOptions })}
+                        {...register(`${name}.masterCaseHeight`, { ...registerOptions })}
                         isInvalid={!!error}
                     />
                     <InputGroup.Text>in.</InputGroup.Text>
                     <Form.Control
                         size="sm"
                         type="number"
-                        step={0.1}
-                        {...register(`${name}.productDiameter`, { ...registerOptions })}
+                        {...register(`${name}.masterCaseQuantity`, { ...registerOptions })}
                         isInvalid={!!error}
                     />
-                    <InputGroup.Text>mm.</InputGroup.Text>
+                    <InputGroup.Text>units</InputGroup.Text>
             </InputGroup>
             <Form.Control.Feedback type="invalid">
                 {error?.message}

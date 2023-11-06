@@ -16,7 +16,9 @@ const TextInputField = ({ name, label, register, registerOptions, error, ...prop
     return (
         <Form.Group controlId={name + "-input"}>
             <Form.Label className={styles.formLabel}>{label}</Form.Label>
-            <Form.Control size="sm"
+            <Form.Control
+                size="sm"
+                step={0.1}
                 {...props}
                 {...register(name, registerOptions)}
                 isInvalid={!!error}

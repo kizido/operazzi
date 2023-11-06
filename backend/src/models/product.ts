@@ -9,7 +9,19 @@ const productSchema = new Schema({
     category: { type: String },
     description: { type: String },
     cogs: { type: String, required: true },
-    dimensions: { type: String, required: true },
+    dimensions: {
+        productLength: { type: Number, required: true },
+        productWidth: { type: Number, required: true },
+        productHeight: { type: Number, required: true },
+        productDiameter: { type: Number },
+    },
+    masterCaseDimensions: {
+        masterCaseLength: { type: Number, required: true },
+        masterCaseWidth: { type: Number, required: true },
+        masterCaseHeight: { type: Number, required: true },
+        masterCaseQuantity: { type: Number },
+    },
+    masterCaseWeight: { type: Number, required: true },
     packageType: { type: String, required: true },
     weight: { type: String, required: true }, // in grams
     domesticShippingCosts: { type: String },

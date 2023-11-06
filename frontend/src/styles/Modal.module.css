@@ -67,13 +67,12 @@
 .productPreviewContainer {
     border: 1px black dashed;
     height: 10rem;
-    width: 24rem;
+    width: 10rem;
     display: flex;
     justify-content: center;
     align-items: center;
     background-color: #fcfcfc;
     margin-left: auto;
-    margin-right: auto;
 }
 
 .productPreviewImage {

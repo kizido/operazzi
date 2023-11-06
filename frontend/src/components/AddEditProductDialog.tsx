@@ -16,6 +16,7 @@ import ImageGallery from "./ImageGallery";
 import addImageIcon from '../assets/addImageIcon.png'
 import GalleryModal from "./GalleryModal";
 import { ProductImage } from "../models/productImage";
+import MasterCaseDimensionsInputField from "./form/MasterCaseDimensionsInputField";
 
 interface AddEditProductDialogProps {
     productToEdit?: Product,
@@ -34,7 +35,19 @@ const AddEditProductDialog = ({ productToEdit, onDismiss, onProductSaved }: AddE
             category: productToEdit?.category || "",
             description: productToEdit?.description || "",
             cogs: productToEdit?.cogs || "",
-            dimensions: productToEdit?.dimensions || "",
+            dimensions: {
+                productLength: productToEdit?.dimensions?.productLength || 0,
+                productWidth: productToEdit?.dimensions?.productWidth || 0,
+                productHeight: productToEdit?.dimensions?.productHeight || 0,
+                productDiameter: productToEdit?.dimensions?.productDiameter || 0,
+            },
+            masterCaseDimensions: {
+                masterCaseLength: productToEdit?.masterCaseDimensions?.masterCaseLength || 0,
+                masterCaseWidth: productToEdit?.masterCaseDimensions?.masterCaseWidth || 0,
+                masterCaseHeight: productToEdit?.masterCaseDimensions?.masterCaseHeight || 0,
+                masterCaseQuantity: productToEdit?.masterCaseDimensions?.masterCaseQuantity || 0,
+            },
+            masterCaseWeight: productToEdit?.masterCaseWeight || 0,
             packageType: productToEdit?.packageType || "",
             weight: productToEdit?.weight || "",
             domesticShippingCosts: productToEdit?.domesticShippingCosts || "",
@@ -130,7 +143,7 @@ const AddEditProductDialog = ({ productToEdit, onDismiss, onProductSaved }: AddE
                         <Tab.Content>
                             <Tab.Pane eventKey="basicInfo">
                                 <Row>
-                                    <Col>
+                                    <Col xs={9}>
                                         <TextInputField
                                             name="name"
                                             label="Product Name*"
@@ -190,11 +203,9 @@ const AddEditProductDialog = ({ productToEdit, onDismiss, onProductSaved }: AddE
                                 </Row>
                                 <Row>
                                     <Col>
-                                        <TextInputField
+                                        <DimensionsInputField
                                             name="dimensions"
                                             label="Dimensions"
-                                            type="text"
-                                            placeholder="Dimensions"
                                             register={register}
                                             registerOptions={{ required: "Required" }}
                                         />
@@ -271,21 +282,44 @@ const AddEditProductDialog = ({ productToEdit, onDismiss, onProductSaved }: AddE
                                         />
                                     </Col>
                                 </Row>
-                                <TextInputField
-                                    name="amazonReferralFee"
-                                    label="Amazon Referral Fee"
-                                    type="text"
-                                    placeholder="Amazon Referral Fee"
-                                    register={register}
-                                />
-                                <TextInputField
-                                    name="description"
-                                    label="Description"
-                                    as="textarea"
-                                    rows={2}
-                                    placeholder="Description"
-                                    register={register}
-                                />
+                                <Row>
+                                    <Col>
+                                        <TextInputField
+                                            name="amazonReferralFee"
+                                            label="Amazon Referral Fee"
+                                            type="text"
+                                            placeholder="Amazon Referral Fee"
+                                            register={register}
+                                        />
+                                    </Col>
+                                    <Col>
+                                        <TextInputField
+                                            name="description"
+                                            label="Description"
+                                            type="text"
+                                            placeholder="Description"
+                                            register={register}
+                                        />
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col>
+                                        <MasterCaseDimensionsInputField
+                                            name="masterCaseDimensions"
+                                            label="Master Case Dimensions"
+                                            register={register}
+                                        />
+                                    </Col>
+                                    <Col>
+                                    <TextInputField
+                                        name="masterCaseWeight"
+                                        label="Master Case Weight (lbs.)"
+                                        type="number"
+                                        placeholder="Master Case Weight"
+                                        register={register}
+                                    />
+                                    </Col>
+                                </Row>
                             </Tab.Pane>
                             <Tab.Pane eventKey="listingSkus"></Tab.Pane>
                             <Tab.Pane eventKey="vendorProducts"></Tab.Pane>

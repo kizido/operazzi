@@ -52,7 +52,9 @@ interface CreateProductBody {
     barcodeUpc?: string,
     category?: string,
     description?: string,
-    dimensions?: string,
+    dimensions?: { productLength?: number, productWidth?: number, productHeight?: number, productDiameter?: number },
+    masterCaseDimensions?: { masterCaseLength?: number, masterCaseWidth?: number, masterCaseHeight?: number, masterCaseQuantity?: number },
+    masterCaseWeight?: number,
     cogs?: string,
     packageType?: string,
     weight?: string,
@@ -75,6 +77,8 @@ export const createProduct: RequestHandler<unknown, unknown, CreateProductBody, 
     const description = req.body.description;
     const cogs = req.body.cogs;
     const dimensions = req.body.dimensions;
+    const masterCaseDimensions = req.body.masterCaseDimensions;
+    const masterCaseWeight = req.body.masterCaseWeight;
     const packageType = req.body.packageType;
     const weight = req.body.weight;
     const domesticShippingCosts = req.body.domesticShippingCosts;
@@ -107,6 +111,8 @@ export const createProduct: RequestHandler<unknown, unknown, CreateProductBody, 
             description: description,
             cogs: cogs,
             dimensions: dimensions,
+            masterCaseDimensions: masterCaseDimensions,
+            masterCaseWeight: masterCaseWeight,
             packageType: packageType,
             weight: weight,
             domesticShippingCosts: domesticShippingCosts,
@@ -115,7 +121,7 @@ export const createProduct: RequestHandler<unknown, unknown, CreateProductBody, 
             pickAndPackFee: pickAndPackFee,
             amazonReferralFee: amazonReferralFee,
             opex: opex,
-            productImageId: productImageId, 
+            productImageId: productImageId,
             activated: activated,
         });
 
@@ -137,7 +143,9 @@ interface UpdateProductBody {
     category?: string,
     description?: string,
     cogs?: string,
-    dimensions?: string,
+    dimensions?: { productLength?: number, productWidth?: number, productHeight?: number, productDiameter?: number },
+    masterCaseDimensions?: { masterCaseLength?: number, masterCaseWidth?: number, masterCaseHeight?: number, masterCaseQuantity?: number },
+    masterCaseWeight?: number,
     packageType?: string,
     weight?: string,
     domesticShippingCosts?: string,
@@ -160,6 +168,8 @@ export const updateProduct: RequestHandler<UpdateProductParams, unknown, UpdateP
     const newDescription = req.body.description;
     const newCogs = req.body.cogs;
     const newDimensions = req.body.dimensions;
+    const newMasterCaseDimensions = req.body.masterCaseDimensions;
+    const newMasterCaseWeight = req.body.masterCaseWeight;
     const newPackageType = req.body.packageType;
     const newWeight = req.body.weight;
     const newDomesticShippingCosts = req.body.domesticShippingCosts;
@@ -198,8 +208,14 @@ export const updateProduct: RequestHandler<UpdateProductParams, unknown, UpdateP
         if (!newCogs) {
             throw createHttpError(400, "Product must have a COGS!");
         }
-        if (!newDimensions) {
-            throw createHttpError(400, "Product must have dimensions!");
+        if (!newDimensions || !newDimensions.productLength || !newDimensions.productWidth || !newDimensions.productHeight || !newDimensions.productDiameter) {
+            throw createHttpError(400, "Product must have all dimensions!");
+        }
+        if (!newMasterCaseDimensions || !newMasterCaseDimensions.masterCaseLength || !newMasterCaseDimensions.masterCaseWidth || !newMasterCaseDimensions.masterCaseHeight || !newMasterCaseDimensions.masterCaseQuantity) {
+            throw createHttpError(400, "Product must have master case dimensions!");
+        }
+        if(!newMasterCaseWeight) {
+            throw createHttpError(400, "Product must have a master case weight!");
         }
         if (!newPackageType) {
             throw createHttpError(400, "Product must have package type!");
@@ -225,7 +241,19 @@ export const updateProduct: RequestHandler<UpdateProductParams, unknown, UpdateP
         product.category = newCategory;
         product.description = newDescription;
         product.cogs = newCogs;
-        product.dimensions = newDimensions;
+        product.dimensions = {
+            productLength: newDimensions!.productLength,
+            productWidth: newDimensions!.productWidth,
+            productHeight: newDimensions!.productHeight,
+            productDiameter: newDimensions!.productDiameter,
+        };
+        product.masterCaseDimensions = {
+            masterCaseLength: newMasterCaseDimensions!.masterCaseLength,
+            masterCaseWidth: newMasterCaseDimensions!.masterCaseWidth,
+            masterCaseHeight: newMasterCaseDimensions!.masterCaseHeight,
+            masterCaseQuantity: newMasterCaseDimensions!.masterCaseQuantity,
+        };
+        product.masterCaseWeight = newMasterCaseWeight;
         product.packageType = newPackageType;
         product.weight = newWeight;
         product.domesticShippingCosts = newDomesticShippingCosts;
@@ -245,7 +273,7 @@ export const updateProduct: RequestHandler<UpdateProductParams, unknown, UpdateP
 }
 
 export const toggleActivateProduct: RequestHandler<UpdateProductParams, unknown, UpdateProductBody, unknown> = async (req, res, next) => {
-    
+
     const productId = req.params.productId;
 
     // TOGGLES ACTIVATION STATUS
@@ -269,7 +297,7 @@ export const toggleActivateProduct: RequestHandler<UpdateProductParams, unknown,
         if (!product.userId.equals(authenticatedUserId)) {
             throw createHttpError(401, "You cannot access this product");
         }
-        
+
         product.activated = newActivated;
 
         const updatedProduct = await product.save();

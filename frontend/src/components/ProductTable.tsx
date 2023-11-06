@@ -55,8 +55,16 @@ export default function ProductTable() {
             footer: 'COGS',
         },
         {
-            header: 'Dimensions',
+            header: 'Dimensions (in.)',
             accessorKey: 'dimensions',
+            cell: (info) => {
+                const dimensions = info.getValue() as ProductModel['dimensions'];
+                if (dimensions && dimensions.productLength && dimensions.productWidth && dimensions.productHeight) {
+                    const { productLength, productWidth, productHeight } = dimensions;
+                    return `${productLength}x${productWidth}x${productHeight}`;
+                }
+                return '-';
+            },
             footer: 'Dimensions',
         },
         {
