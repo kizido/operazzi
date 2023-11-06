@@ -19,6 +19,7 @@ const MasterCaseDimensionsInputField: React.FC<MasterCaseDimensionsInputFieldPro
                     <Form.Control
                         size="sm"
                         type="number"
+                        placeholder="Length"
                         step={0.1}
                         {...register(`${name}.masterCaseLength`, { ...registerOptions })}
                         isInvalid={!!error}
@@ -27,6 +28,7 @@ const MasterCaseDimensionsInputField: React.FC<MasterCaseDimensionsInputFieldPro
                     <Form.Control
                         size="sm"
                         type="number"
+                        placeholder="Width"
                         step={0.1}
                         {...register(`${name}.masterCaseWidth`, { ...registerOptions })}
                         isInvalid={!!error}
@@ -35,6 +37,7 @@ const MasterCaseDimensionsInputField: React.FC<MasterCaseDimensionsInputFieldPro
                     <Form.Control
                         size="sm"
                         type="number"
+                        placeholder="Height"
                         step={0.1}
                         {...register(`${name}.masterCaseHeight`, { ...registerOptions })}
                         isInvalid={!!error}
@@ -43,6 +46,7 @@ const MasterCaseDimensionsInputField: React.FC<MasterCaseDimensionsInputFieldPro
                     <Form.Control
                         size="sm"
                         type="number"
+                        placeholder="# Units"
                         {...register(`${name}.masterCaseQuantity`, { ...registerOptions })}
                         isInvalid={!!error}
                     />

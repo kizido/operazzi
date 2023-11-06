@@ -178,7 +178,11 @@ export async function createProductBrand(brand: ProductBrandInput): Promise<Prod
 }
 
 export interface ProductPackageTypeInput {
-    packageType: string,
+    packageName: string,
+    packageLength: number,
+    packageWidth: number,
+    packageHeight: number,
+    packageWeight: number,
 }
 
 export async function fetchProductPackageTypes(): Promise<ProductPackageType[]> {

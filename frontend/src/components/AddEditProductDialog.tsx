@@ -205,7 +205,7 @@ const AddEditProductDialog = ({ productToEdit, onDismiss, onProductSaved }: AddE
                                     <Col>
                                         <DimensionsInputField
                                             name="dimensions"
-                                            label="Dimensions"
+                                            label="Dimensions*"
                                             register={register}
                                             registerOptions={{ required: "Required" }}
                                         />
@@ -235,9 +235,9 @@ const AddEditProductDialog = ({ productToEdit, onDismiss, onProductSaved }: AddE
                                     <Col>
                                         <PackageTypeInputField
                                             name="packageType"
-                                            label="Package Type"
+                                            label="Shipping Package"
                                             type="text"
-                                            placeholder="Package Type"
+                                            placeholder="Shipping Package"
                                             register={register}
                                         />
                                     </Col>

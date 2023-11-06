@@ -1,6 +1,10 @@
 export interface ProductPackageType {
     _id: string,
-    packageType: string,
+    packageName: string,
+    packageLength: number,
+    packageWidth: number,
+    packageHeight: number,
+    packageWeight: number,
     createdAt: string,
     updatedAt: string,
 }
