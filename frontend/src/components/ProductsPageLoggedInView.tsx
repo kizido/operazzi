@@ -1,12 +1,3 @@
-import { useEffect, useState } from 'react';
-import { Button, Col, Row, Spinner } from "react-bootstrap";
-import { FaPlus } from 'react-icons/fa';
-import { Product as ProductModel } from '../models/product';
-import * as ProductsApi from "../network/products_api";
-import styleUtils from '../styles/utils.module.css';
-import AddEditProductDialog from "./AddEditProductDialog";
-import Product from './Product';
-import styles from '../styles/ProductsPage.module.css';
 import ProductTable from './ProductTable';
 
 

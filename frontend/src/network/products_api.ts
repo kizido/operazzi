@@ -83,7 +83,7 @@ export interface ProductInput {
     masterCaseDimensions: { masterCaseLength: number, masterCaseWidth: number, masterCaseHeight: number, masterCaseQuantity: number },
     masterCaseWeight: number,
     cogs: string,
-    packageType: string,
+    packageTypeId: string,
     weight: string, // in grams
     domesticShippingCosts: string,
     internationalShippingCosts: string,
@@ -179,10 +179,10 @@ export async function createProductBrand(brand: ProductBrandInput): Promise<Prod
 
 export interface ProductPackageTypeInput {
     packageName: string,
-    packageLength: number,
-    packageWidth: number,
-    packageHeight: number,
-    packageWeight: number,
+    packageLength: number | null,
+    packageWidth: number | null,
+    packageHeight: number | null,
+    packageWeight: number | null,
 }
 
 export async function fetchProductPackageTypes(): Promise<ProductPackageType[]> {

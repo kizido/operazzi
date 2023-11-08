@@ -48,7 +48,7 @@ const AddEditProductDialog = ({ productToEdit, onDismiss, onProductSaved }: AddE
                 masterCaseQuantity: productToEdit?.masterCaseDimensions?.masterCaseQuantity || 0,
             },
             masterCaseWeight: productToEdit?.masterCaseWeight || 0,
-            packageType: productToEdit?.packageType || "",
+            packageTypeId: productToEdit?.packageTypeId || "",
             weight: productToEdit?.weight || "",
             domesticShippingCosts: productToEdit?.domesticShippingCosts || "",
             internationalShippingCosts: productToEdit?.internationalShippingCosts || "",
@@ -311,13 +311,13 @@ const AddEditProductDialog = ({ productToEdit, onDismiss, onProductSaved }: AddE
                                         />
                                     </Col>
                                     <Col>
-                                    <TextInputField
-                                        name="masterCaseWeight"
-                                        label="Master Case Weight (lbs.)"
-                                        type="number"
-                                        placeholder="Master Case Weight"
-                                        register={register}
-                                    />
+                                        <TextInputField
+                                            name="masterCaseWeight"
+                                            label="Master Case Weight (lbs.)"
+                                            type="number"
+                                            placeholder="Master Case Weight"
+                                            register={register}
+                                        />
                                     </Col>
                                 </Row>
                             </Tab.Pane>

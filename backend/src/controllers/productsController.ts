@@ -56,7 +56,7 @@ interface CreateProductBody {
     masterCaseDimensions?: { masterCaseLength?: number, masterCaseWidth?: number, masterCaseHeight?: number, masterCaseQuantity?: number },
     masterCaseWeight?: number,
     cogs?: string,
-    packageType?: string,
+    packageTypeId?: Types.ObjectId,
     weight?: string,
     domesticShippingCosts?: string,
     internationalShippingCosts?: string,
@@ -79,7 +79,7 @@ export const createProduct: RequestHandler<unknown, unknown, CreateProductBody, 
     const dimensions = req.body.dimensions;
     const masterCaseDimensions = req.body.masterCaseDimensions;
     const masterCaseWeight = req.body.masterCaseWeight;
-    const packageType = req.body.packageType;
+    const packageTypeId = req.body.packageTypeId;
     const weight = req.body.weight;
     const domesticShippingCosts = req.body.domesticShippingCosts;
     const internationalShippingCosts = req.body.internationalShippingCosts;
@@ -100,6 +100,10 @@ export const createProduct: RequestHandler<unknown, unknown, CreateProductBody, 
         if (!isValidObjectId(productImageId)) {
             throw createHttpError(400, "Product image id not valid!")
         }
+        if (!isValidObjectId(packageTypeId)) {
+            throw createHttpError(400, "Package type id not valid!")
+        }
+
 
         const newProduct = await ProductModel.create({
             userId: authenticatedUserId,
@@ -113,7 +117,7 @@ export const createProduct: RequestHandler<unknown, unknown, CreateProductBody, 
             dimensions: dimensions,
             masterCaseDimensions: masterCaseDimensions,
             masterCaseWeight: masterCaseWeight,
-            packageType: packageType,
+            packageTypeId: packageTypeId,
             weight: weight,
             domesticShippingCosts: domesticShippingCosts,
             internationalShippingCosts: internationalShippingCosts,
@@ -146,7 +150,7 @@ interface UpdateProductBody {
     dimensions?: { productLength?: number, productWidth?: number, productHeight?: number, productDiameter?: number },
     masterCaseDimensions?: { masterCaseLength?: number, masterCaseWidth?: number, masterCaseHeight?: number, masterCaseQuantity?: number },
     masterCaseWeight?: number,
-    packageType?: string,
+    packageTypeId?: Types.ObjectId,
     weight?: string,
     domesticShippingCosts?: string,
     internationalShippingCosts?: string,
@@ -170,7 +174,7 @@ export const updateProduct: RequestHandler<UpdateProductParams, unknown, UpdateP
     const newDimensions = req.body.dimensions;
     const newMasterCaseDimensions = req.body.masterCaseDimensions;
     const newMasterCaseWeight = req.body.masterCaseWeight;
-    const newPackageType = req.body.packageType;
+    const newPackageTypeId = req.body.packageTypeId;
     const newWeight = req.body.weight;
     const newDomesticShippingCosts = req.body.domesticShippingCosts;
     const newInternationalShippingCosts = req.body.internationalShippingCosts;
@@ -190,6 +194,9 @@ export const updateProduct: RequestHandler<UpdateProductParams, unknown, UpdateP
         }
         if (!mongoose.isValidObjectId(newProductImageId)) {
             throw createHttpError(400, "Product image id not valid!")
+        }
+        if (!mongoose.isValidObjectId(newPackageTypeId)) {
+            throw createHttpError(400, "Package type id not valid!")
         }
 
         // Validate product body
@@ -216,9 +223,6 @@ export const updateProduct: RequestHandler<UpdateProductParams, unknown, UpdateP
         }
         if(!newMasterCaseWeight) {
             throw createHttpError(400, "Product must have a master case weight!");
-        }
-        if (!newPackageType) {
-            throw createHttpError(400, "Product must have package type!");
         }
         if (!newWeight) {
             throw createHttpError(400, "Product must have a weight!");
@@ -254,7 +258,7 @@ export const updateProduct: RequestHandler<UpdateProductParams, unknown, UpdateP
             masterCaseQuantity: newMasterCaseDimensions!.masterCaseQuantity,
         };
         product.masterCaseWeight = newMasterCaseWeight;
-        product.packageType = newPackageType;
+        product.packageTypeId = newPackageTypeId;
         product.weight = newWeight;
         product.domesticShippingCosts = newDomesticShippingCosts;
         product.internationalShippingCosts = newInternationalShippingCosts;

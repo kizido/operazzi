@@ -24,14 +24,23 @@ const PackageTypeInputField = ({ name, label, register, registerOptions, error, 
     const [packageTypes, setPackageTypes] = useState<ProductPackageTypeModel[]>([]);
     const [packageType, setPackageType] = useState<ProductPackageTypeInput>({
         packageName: '',
-        packageLength: 0,
-        packageWidth: 0,
-        packageHeight: 0,
-        packageWeight: 0,
+        packageLength: null,
+        packageWidth: null,
+        packageHeight: null,
+        packageWeight: null,
     });
 
     const [addOptionDialog, setAddOptionDialog] = useState(false);
-    const [editOptionDialog, setEditOptionDialog] = useState(false);
+    const [packageIdToEdit, setPackageIdToEdit] = useState<string | null>(null);
+    const [editOptionMenuDialog, setEditOptionMenuDialog] = useState(false);
+
+    const [errors, setErrors] = useState({
+        packageName: false,
+        packageLength: false,
+        packageWidth: false,
+        packageHeight: false,
+        packageWeight: false,
+    });
 
     useEffect(() => {
         async function loadPackageTypes() {
@@ -45,75 +54,102 @@ const PackageTypeInputField = ({ name, label, register, registerOptions, error, 
         loadPackageTypes();
     }, []);
 
+    const isFormValid = (): boolean => {
+        // Create a new object to hold the updated error states
+        const newErrors = {
+            packageName: packageType.packageName.trim() === '',
+            packageLength: packageType.packageLength === null || packageType.packageLength <= 0,
+            packageWidth: packageType.packageWidth === null || packageType.packageWidth <= 0,
+            packageHeight: packageType.packageHeight === null || packageType.packageHeight <= 0,
+            packageWeight: packageType.packageWeight === null || packageType.packageWeight <= 0,
+        };
+
+        // Update the errors state with the new error states
+        setErrors(newErrors);
+
+        // Determine if the form is valid by checking if any of the error states are true
+        return !Object.values(newErrors).some(Boolean);
+    };
 
     async function handleAddPackageType() {
-        try {
-            let productPackageTypeResponse: ProductPackageTypeModel;
-
-            productPackageTypeResponse = await ProductsApi.createProductPackageType(packageType);
-            setPackageTypes([...packageTypes, productPackageTypeResponse]);
-            setPackageType({ // Reset the form state
-                packageName: '',
-                packageLength: 0,
-                packageWidth: 0,
-                packageHeight: 0,
-                packageWeight: 0,
-            });
-            setAddOptionDialog(false);
-        } catch (error) {
-            console.error('Error adding package type:', error);
+        if (isFormValid()) {
+            try {
+                let productPackageTypeResponse: ProductPackageTypeModel;
+                setAddOptionDialog(false);
+                productPackageTypeResponse = await ProductsApi.createProductPackageType(packageType);
+                setPackageTypes([...packageTypes, productPackageTypeResponse]);
+                resetPackageType();
+                resetErrors();
+            } catch (error) {
+                console.error('Error adding package type:', error);
+            }
         }
     }
 
-    async function handleEditPackageType(packageTypeInput: ProductPackageTypeInput, idInput: string) {
-        try {
-            await ProductsApi.updateProductPackageType(packageTypeInput, idInput);
-        } catch (error) {
-            console.error(error);
-            alert(error);
+    async function handleEditPackageType() {
+        if (isFormValid()) {
+            try {
+                let productPackageTypeResponse: ProductPackageTypeModel;
+
+                productPackageTypeResponse = await ProductsApi.updateProductPackageType(packageType, packageIdToEdit!);
+                setAddOptionDialog(false);
+                resetPackageType();
+                updateLoadedPackages(productPackageTypeResponse);
+                setPackageIdToEdit(null);
+                resetErrors();
+            } catch (error) {
+                console.error(error);
+                alert(error);
+            }
         }
+    }
+
+    function updateLoadedPackages(newPackage: ProductPackageTypeModel) {
+        setPackageTypes(prevPackages =>
+            prevPackages.map(curPackage =>
+                curPackage._id === newPackage._id ? newPackage : curPackage
+            )
+        )
     }
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setPackageType((prev) => ({
-            ...prev,
-            [name]: value,
+        let newValue: string | number | null = value;
+      
+        // For package name, ensure it is always treated as a string.
+        if (name === 'packageName') {
+          newValue = value;
+        } else {
+          // For numeric inputs, convert to a number or null if the input is empty.
+          // Additionally, we can trim any white spaces for numeric inputs as well,
+          // in case they are entered as text.
+          newValue = value.trim() === '' ? null : Number(value.trim());
+        }
+      
+        setPackageType(prev => ({
+          ...prev,
+          [name]: newValue,
         }));
-    };
+      };
 
-    // // Separate the keydown logic
-    // const handleKeyDown = (e: React.KeyboardEvent) => {
-    //     if (e.key === 'Enter') {
-    //         valueSubmittedRef.current = true;
-    //         (e.currentTarget as HTMLInputElement).blur();
-    //     }
-    //     else if (e.key === 'Escape') {
-    //         (e.currentTarget as HTMLInputElement).blur();
-    //     }
-    // };
-
-    // Handle save of data in the onBlur event
-    // const handleSave = (index: number) => {
-    //     if (newOption.packageType !== '') {
-    //         const updatedPackageTypes = [...packageTypes]
-    //         updatedPackageTypes[index].packageType = newOption.packageType
-    //         setPackageTypes(updatedPackageTypes)
-    //         handleEditPackageType(newOption, updatedPackageTypes[index]._id)
-    //         setEditingIndex(null)
-    //     } else {
-    //         revertSave(index);
-    //     }
-    //     valueSubmittedRef.current = false;
-    // };
-
-    // Handle revert of data in the onBlur event when input is escaped or clicked out of
-    // const revertSave = (index: number) => {
-    //     const updatedPackageTypes = [...packageTypes];
-    //     setNewOption({ packageType: updatedPackageTypes[index].packageType })
-    //     setPackageTypes(updatedPackageTypes);
-    //     setEditingIndex(null);
-    // };
+    const resetPackageType = () => {
+        setPackageType({ // Reset the form state
+            packageName: '',
+            packageLength: null,
+            packageWidth: null,
+            packageHeight: null,
+            packageWeight: null,
+        });
+    }
+    const resetErrors = () => {
+        setErrors({
+            packageName: false,
+            packageLength: false,
+            packageWidth: false,
+            packageHeight: false,
+            packageWeight: false,
+        })
+    }
 
     return (
         <div>
@@ -127,7 +163,7 @@ const PackageTypeInputField = ({ name, label, register, registerOptions, error, 
                     >
                         {packageTypes?.map((packageType, index) => (
                             <option key={index}>
-                                {packageType.packageName}
+                                {packageType.packageName + " (" + packageType.packageLength + "\" x " + packageType.packageWidth + "\" x " + packageType.packageHeight + ")"}
                             </option>
                         ))}
                     </Form.Select>
@@ -135,14 +171,15 @@ const PackageTypeInputField = ({ name, label, register, registerOptions, error, 
                         {error?.message}
                     </Form.Control.Feedback>
                     <IconButton onClick={() => setAddOptionDialog(true)} className={styles.formButton}><IconPlus /></IconButton>
-                    <IconButton onClick={() => setEditOptionDialog(true)} className={styles.formButton}><IconSettings /></IconButton>
+                    <IconButton onClick={() => setEditOptionMenuDialog(true)} className={styles.formButton}><IconSettings /></IconButton>
                 </InputGroup>
             </Form.Group>
 
             {addOptionDialog &&
-                <Modal show onHide={() => setAddOptionDialog(false)}>
+                <Modal show onHide={() => { setAddOptionDialog(false); resetPackageType(); setPackageIdToEdit(null); resetErrors(); }}>
                     <Modal.Header closeButton>
-                        <Modal.Title>Add {label}</Modal.Title>
+                        {packageIdToEdit ? (<Modal.Title>Edit {packageType.packageName}</Modal.Title>) : (<Modal.Title>Add {label}</Modal.Title>)}
+
                     </Modal.Header>
                     <Modal.Body>
                         <Form>
@@ -152,58 +189,75 @@ const PackageTypeInputField = ({ name, label, register, registerOptions, error, 
                                 type="text"
                                 value={packageType.packageName}
                                 onChange={handleInputChange}
+                                isInvalid={errors.packageName}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                {errors.packageName && 'Package name cannot be empty.'}
+                            </Form.Control.Feedback>
                             <Form.Label>Package Length (in.)</Form.Label>
                             <Form.Control
                                 name="packageLength"
                                 type="number"
                                 step={0.1}
-                                value={packageType.packageLength}
+                                value={packageType.packageLength || ''}
                                 onChange={handleInputChange}
+                                isInvalid={errors.packageLength}
                             />
+                            <Form.Control.Feedback type="invalid">
+                            {errors.packageLength && 'Package length cannot be empty.'}
+                            </Form.Control.Feedback>
                             <Form.Label>Package Width (in.)</Form.Label>
                             <Form.Control
                                 name="packageWidth"
                                 type="number"
                                 step={0.1}
-                                value={packageType.packageWidth}
+                                value={packageType.packageWidth || ''}
                                 onChange={handleInputChange}
+                                isInvalid={errors.packageWidth}
                             />
+                            <Form.Control.Feedback type="invalid">
+                            {errors.packageWidth && 'Package width cannot be empty.'}
+                            </Form.Control.Feedback>
                             <Form.Label>Package Height (in.)</Form.Label>
                             <Form.Control
                                 name="packageHeight"
                                 type="number"
                                 step={0.1}
-                                value={packageType.packageHeight}
+                                value={packageType.packageHeight || ''}
                                 onChange={handleInputChange}
+                                isInvalid={errors.packageHeight}
                             />
+                            <Form.Control.Feedback type="invalid">
+                            {errors.packageHeight && 'Package height cannot be empty.'}
+                            </Form.Control.Feedback>
                             <Form.Label>Package Weight (lbs.)</Form.Label>
                             <Form.Control
                                 name="packageWeight"
                                 type="number"
                                 step={0.1}
-                                value={packageType.packageWeight}
+                                value={packageType.packageWeight || ''}
                                 onChange={handleInputChange}
+                                isInvalid={errors.packageWeight}
                             />
+                            <Form.Control.Feedback type="invalid">
+                            {errors.packageWeight && 'Package weight cannot be empty.'}
+                            </Form.Control.Feedback>
                         </Form>
                     </Modal.Body>
                     <Modal.Footer>
                         <Button variant="secondary" onClick={() => {
-                            setAddOptionDialog(false); setPackageType({ // Reset the form state
-                                packageName: '',
-                                packageLength: 0,
-                                packageWidth: 0,
-                                packageHeight: 0,
-                                packageWeight: 0,
-                            })
+                            setAddOptionDialog(false); resetPackageType(); setPackageIdToEdit(null); resetErrors();
                         }}>Close</Button>
-                        <Button variant="primary" onClick={() => handleAddPackageType}>Add Package Type</Button>
+                        {/* Add Package Type Button */}
+                        {packageIdToEdit ?
+                            (<Button variant="primary" onClick={() => handleEditPackageType()}>Apply</Button>) :
+                            (<Button variant="primary" onClick={() => handleAddPackageType()}>Add</Button>)}
                     </Modal.Footer>
                 </Modal>
             }
-            {editOptionDialog &&
+            {editOptionMenuDialog &&
                 <Modal
-                    show onHide={() => setEditOptionDialog(false)}
+                    show onHide={() => setEditOptionMenuDialog(false)}
                     dialogClassName={modalStyles.dropDownEditModalWidth}
                     centered={true}
                     keyboard={false}>
@@ -215,16 +269,23 @@ const PackageTypeInputField = ({ name, label, register, registerOptions, error, 
                             {packageTypes.map((packageTypeModel: ProductPackageTypeModel, index: number) => {
                                 return (
                                     <Row key={index} className={modalStyles.editCategoryRow}>
-                                        <p className={modalStyles.editCategoryRowText}>{packageTypeModel.packageName}</p>
+                                        <p className={modalStyles.editCategoryRowText}>{packageTypeModel.packageName + " (" + packageTypeModel.packageLength + "\" x " + packageTypeModel.packageWidth + "\" x " + packageTypeModel.packageHeight + ")"}</p>
                                         <Button
                                             className={modalStyles.editCategoryRowButton}
-                                            onClick={() => setPackageType({
-                                                packageName: packageTypeModel.packageName,
-                                                packageLength: packageTypeModel.packageLength,
-                                                packageWidth: packageTypeModel.packageWidth,
-                                                packageHeight: packageTypeModel.packageHeight,
-                                                packageWeight: packageTypeModel.packageWeight,
-                                            })}>Edit</Button>
+                                            onClick={() => {
+                                                // Update the package type state
+                                                setPackageType({
+                                                    packageName: packageTypeModel.packageName,
+                                                    packageLength: packageTypeModel.packageLength,
+                                                    packageWidth: packageTypeModel.packageWidth,
+                                                    packageHeight: packageTypeModel.packageHeight,
+                                                    packageWeight: packageTypeModel.packageWeight,
+                                                });
+
+                                                // Then, set the dialog to open
+                                                setPackageIdToEdit(packageTypeModel._id)
+                                                setAddOptionDialog(true);
+                                            }}>Edit</Button>
                                         <Button
                                             className={modalStyles.editCategoryRowButton}
                                             onClick={() => deleteProductPackageType(packageTypeModel)}>Delete</Button>

@@ -12,7 +12,7 @@ export interface Product {
     dimensions: { productLength: number, productWidth: number, productHeight: number, productDiameter: number },
     masterCaseDimensions: { masterCaseLength: number, masterCaseWidth: number, masterCaseHeight: number, masterCaseQuantity: number },
     masterCaseWeight: number,
-    packageType: string,
+    packageTypeId: string,
     weight: string, // in grams
     domesticShippingCosts: string,
     internationalShippingCosts: string,

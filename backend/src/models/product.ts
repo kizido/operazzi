@@ -22,7 +22,7 @@ const productSchema = new Schema({
         masterCaseQuantity: { type: Number },
     },
     masterCaseWeight: { type: Number, required: true },
-    packageType: { type: String, required: true },
+    packageTypeId: { type: Schema.Types.ObjectId, ref: 'ProductPackageType' },
     weight: { type: String, required: true }, // in grams
     domesticShippingCosts: { type: String },
     internationalShippingCosts: { type: String },
