@@ -17,6 +17,7 @@ import addImageIcon from '../assets/addImageIcon.png'
 import GalleryModal from "./GalleryModal";
 import { ProductImage } from "../models/productImage";
 import MasterCaseDimensionsInputField from "./form/MasterCaseDimensionsInputField";
+import ListingSkusModal from "./ListingSkusModal";
 
 interface AddEditProductDialogProps {
     productToEdit?: Product,
@@ -321,7 +322,9 @@ const AddEditProductDialog = ({ productToEdit, onDismiss, onProductSaved }: AddE
                                     </Col>
                                 </Row>
                             </Tab.Pane>
-                            <Tab.Pane eventKey="listingSkus"></Tab.Pane>
+                            <Tab.Pane eventKey="listingSkus">
+                                <ListingSkusModal/>
+                            </Tab.Pane>
                             <Tab.Pane eventKey="vendorProducts"></Tab.Pane>
                             <Tab.Pane eventKey="customs"></Tab.Pane>
                         </Tab.Content>

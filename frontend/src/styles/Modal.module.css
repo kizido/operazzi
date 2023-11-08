@@ -64,6 +64,7 @@
     width: 65%;
     margin-right: auto;
 }
+
 .productPreviewContainer {
     border: 1px black dashed;
     height: 10rem;
@@ -84,4 +85,73 @@
 
 .productPreviewContainer:hover {
     cursor: pointer;
+}
+
+.smallDescriptionText {
+    font-size: 0.8em;
+    line-height: 14px;
+}
+
+.scrollableTableContainer {
+    height: 29.7rem;
+    margin-top: 0.5rem;
+    /* Adjust the max-height as needed */
+    overflow: auto;
+    border: 2px solid lightgray;
+}
+
+.listingSkuTable {
+    width: 100%;
+    overflow: scroll;
+}
+
+.listingSkuTableBody {
+    border-bottom: 1px solid lightgray;
+}
+
+.listingSkuTableBody td {
+    font-size: 13px;
+}
+
+.listingSkuTableH {
+    border-bottom: 1px solid lightgray;
+    border-right: 1px solid lightgray;
+    padding: 2px 4px;
+}
+
+.grayButton {
+    border-color: #f8f8f8;
+    background-color: #f8f8f8;
+}
+
+.grayButton:hover {
+    background-color: #dddddd;
+    color: #4fa2a8;
+    border-color: #f0f0f0;
+}
+
+.grayButton:active {
+    background-color: #dddddd !important;
+    color: #4fa2a8 !important;
+    border-color: #f0f0f0 !important;
+    outline: 0 !important
+}
+
+.buttonRow {
+    display: flex;
+    width: 100%;
+    justify-content: flex-start;
+    gap: 6px;
+}
+
+.toggleGreen {
+    margin-left: 0.2rem;
+    height: auto;
+    width: 15px;
+}
+
+.toggleRed {
+    margin-left: 0.2rem;
+    height: auto;
+    width: 15px;
 }

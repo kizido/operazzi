@@ -28,7 +28,7 @@
 }
 
 .productTable th {
-    background-color: #f1f1f1
+    background-color: #f8f8f8
 }
 
 .productTable th:first-child,
@@ -39,7 +39,7 @@
 
 
 .tableRow:nth-child(even) {
-    background-color: #f1f1f1;
+    background-color: #f8f8f8;
     /* Light gray */
 }
 
