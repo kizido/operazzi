@@ -19,11 +19,17 @@
     background-color: #f1f1f1
 } */
 
-.productTable td,
-.productTable th {
+.productTable td {
     padding: 8px 8px;
     display: table-cell;
     text-align: left;
+    vertical-align: top
+}
+
+.productTable th {
+    padding: 8px 8px;
+    display: table-cell;
+    text-align: center;
     vertical-align: top
 }
 

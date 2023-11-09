@@ -18,6 +18,7 @@ import GalleryModal from "./GalleryModal";
 import { ProductImage } from "../models/productImage";
 import MasterCaseDimensionsInputField from "./form/MasterCaseDimensionsInputField";
 import ListingSkusModal from "./ListingSkusModal";
+import VendorProductsModal from "./VendorProductsModal";
 
 interface AddEditProductDialogProps {
     productToEdit?: Product,
@@ -325,7 +326,9 @@ const AddEditProductDialog = ({ productToEdit, onDismiss, onProductSaved }: AddE
                             <Tab.Pane eventKey="listingSkus">
                                 <ListingSkusModal/>
                             </Tab.Pane>
-                            <Tab.Pane eventKey="vendorProducts"></Tab.Pane>
+                            <Tab.Pane eventKey="vendorProducts">
+                                <VendorProductsModal/>
+                            </Tab.Pane>
                             <Tab.Pane eventKey="customs"></Tab.Pane>
                         </Tab.Content>
                     </Form>
