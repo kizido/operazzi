@@ -10,40 +10,25 @@
 .productTable tr {
     border-bottom: 1px solid #ddd
 }
-
-/* .productTable tr:nth-child(odd) {
-    background-color: #fff
-}
-
-.productTable tr:nth-child(even) {
-    background-color: #f1f1f1
-} */
-
 .productTable td {
     padding: 8px 8px;
     display: table-cell;
     text-align: left;
     vertical-align: top
 }
-
 .productTable th {
     padding: 8px 8px;
     display: table-cell;
-    text-align: center;
+    text-align: left;
     vertical-align: top
 }
-
 .productTable th {
     background-color: #f8f8f8
 }
-
 .productTable th:first-child,
 .productTable td:first-child {
     padding-left: 16px
 }
-
-
-
 .tableRow:nth-child(even) {
     background-color: #f8f8f8;
     /* Light gray */
@@ -63,4 +48,101 @@
     width: 2rem;
     height: 2rem;
     text-align: right;
+}
+
+.listingSkuTable {
+    border-collapse: collapse;
+    border-spacing: 0;
+    width: 100%;
+    display: table;
+    border: 1px solid #ccc;
+}
+
+.listingSkuTable tr {
+    border-bottom: 1px solid #ddd
+}
+.listingSkuTable td {
+    padding: 8px 8px;
+    display: table-cell;
+    text-align: left;
+    vertical-align: top
+}
+.listingSkuTable th {
+    padding: 8px 8px;
+    display: table-cell;
+    text-align: left;
+    vertical-align: top
+}
+.listingSkuTable th {
+    background-color: #f8f8f8
+}
+.listingSkuTable th:first-child,
+.listingSkuTable td:first-child {
+    padding-left: 16px
+}
+
+
+
+.vendorProductTable {
+    border-collapse: collapse;
+    border-spacing: 0;
+    width: 100%;
+    display: table;
+    border: 1px solid #ccc;
+}
+
+.vendorProductTable tr {
+    border-bottom: 1px solid #ddd
+}
+.vendorProductTable td {
+    padding: 8px 8px;
+    display: table-cell;
+    text-align: left;
+    vertical-align: top;
+}
+.vendorProductTable th {
+    padding: 8px 8px;
+    display: table-cell;
+    text-align: left;
+    vertical-align: top
+}
+.vendorProductTable th {
+    background-color: #f8f8f8
+}
+.vendorProductTable th:first-child,
+.vendorProductTable td:first-child {
+    padding-left: 16px;
+    padding-right: 0px;
+    width: 4rem;
+}
+
+
+
+
+.expandedRowTable {
+    border-collapse: collapse;
+    border-spacing: 0;
+    width: 100%;
+    display: table;
+    border: 1px solid #ccc;
+}
+
+.expandedRowTable tr {
+    border-bottom: 1px solid #ddd
+}
+.expandedRowTable td {
+    padding: 8px 8px;
+    display: table-cell;
+    text-align: left;
+    vertical-align: top
+}
+
+.expandedRowTable th {
+    padding: 8px 1px;
+    display: table-cell;
+    text-align: center;
+    vertical-align: top
+}
+.expandedRowTable th {
+    background-color: #f8f8f8
 }

@@ -4,8 +4,9 @@ import productsRoutes from "./routes/productsRoutes";
 import userRoutes from "./routes/usersRoutes";
 import productCategoriesRoutes from "./routes/productCategoriesRoutes";
 import productBrandsRoutes from "./routes/productBrandsRoutes";
-import productPackageTypesRoutes from"./routes/productPackageTypesRoutes";
+import productPackageTypesRoutes from "./routes/productPackageTypesRoutes";
 import productImagesRoutes from "./routes/productImagesRoutes";
+import productCustomsRoutes from "./routes/productCustomsRoutes";
 import morgan from "morgan";
 import createHttpError, { isHttpError } from "http-errors";
 import session from "express-session";
@@ -38,6 +39,7 @@ app.use("/api/productCategories", requiresAuth, productCategoriesRoutes);
 app.use("/api/productBrands", requiresAuth, productBrandsRoutes);
 app.use("/api/productPackageTypes", requiresAuth, productPackageTypesRoutes);
 app.use("/api/productImages", requiresAuth, productImagesRoutes);
+app.use("/api/productCustoms", requiresAuth, productCustomsRoutes);
 
 app.use((req, res, next) => {
     next(createHttpError(404, "Endpoint not found"));

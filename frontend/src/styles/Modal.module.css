@@ -10,7 +10,7 @@
 }
 
 .productModalTabs {
-    justify-content: space-between;
+    justify-content: space-around;
     margin-bottom: 1rem;
 }
 
@@ -116,7 +116,6 @@
 .listingSkuTableH {
     border-bottom: 1px solid lightgray;
     border-right: 1px solid lightgray;
-    padding: 2px 4px;
 }
 
 .grayButton {
@@ -130,11 +129,15 @@
     border-color: #f0f0f0;
 }
 
-.grayButton:active {
+.grayButton:active, .grayButton:focus {
     background-color: #dddddd !important;
     color: #4fa2a8 !important;
     border-color: #f0f0f0 !important;
     outline: 0 !important
+}
+
+.grayButton:disabled {
+    border: none;
 }
 
 .buttonRow {

@@ -3,6 +3,7 @@ import ProductModel from "../models/product";
 import createHttpError from "http-errors";
 import mongoose, { Types, isValidObjectId } from "mongoose";
 import { assertIsDefined } from "../util/assertIsDefined";
+import ProductCustomsModel from '../models/productCustoms'
 
 export const getProducts: RequestHandler = async (req, res, next) => {
     const authenticatedUserId = req.session.userId;
@@ -65,6 +66,7 @@ interface CreateProductBody {
     amazonReferralFee?: string,
     opex?: string,
     productImageId?: Types.ObjectId,
+    productCustomsId?: Types.ObjectId,
     activated?: boolean,
 }
 
@@ -103,7 +105,18 @@ export const createProduct: RequestHandler<unknown, unknown, CreateProductBody, 
         if (!isValidObjectId(packageTypeId)) {
             throw createHttpError(400, "Package type id not valid!")
         }
+        const productCustoms = await ProductCustomsModel.create({
+            userId: authenticatedUserId,
+            customsDeclaration: false,
+            itemDescription: "",
+            harmonizationCode: "",
+            countryOrigin: "",
+            declaredValue: "",
+        });
 
+        if(!mongoose.isValidObjectId(productCustoms._id)) {
+            throw createHttpError(400, "Invalid product customs ID");
+        }
 
         const newProduct = await ProductModel.create({
             userId: authenticatedUserId,
@@ -126,6 +139,7 @@ export const createProduct: RequestHandler<unknown, unknown, CreateProductBody, 
             amazonReferralFee: amazonReferralFee,
             opex: opex,
             productImageId: productImageId,
+            productCustomsId: productCustoms._id,
             activated: activated,
         });
 
@@ -315,7 +329,6 @@ export const deleteProduct: RequestHandler = async (req, res, next) => {
     const productId = req.params.productId;
     const authenticatedUserId = req.session.userId;
 
-
     try {
         assertIsDefined(authenticatedUserId);
         if (!mongoose.isValidObjectId(productId)) {
@@ -331,6 +344,13 @@ export const deleteProduct: RequestHandler = async (req, res, next) => {
             throw createHttpError(401, "You cannot access this product");
         }
 
+        const productCustoms = await ProductCustomsModel.findById(product.productCustomsId).exec();
+
+        if(!productCustoms) {
+            throw createHttpError(404, "Product customs not found!");
+        }
+
+        await productCustoms.deleteOne();
         await product.deleteOne();
 
         res.sendStatus(204);

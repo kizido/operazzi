@@ -31,6 +31,7 @@ const productSchema = new Schema({
     amazonReferralFee: { type: String },
     opex: { type: String }, // operating expenditures
     productImageId: { type: Schema.Types.ObjectId, ref: 'ProductImage' }, // Reference to the ProductImage
+    productCustomsId: { type: Schema.Types.ObjectId, ref: 'ProductCustoms' },
     activated: { type: Boolean }
 }, { timestamps: true });
 

@@ -138,13 +138,13 @@ export default function ListingSkusTable() {
         <div>
             <div className={styles.buttonRow}>
                 <Button variant='outline-dark' className={styles.grayButton}><b>NEW LISTING SKU</b></Button>
-                <Button variant='outline-dark' className={styles.grayButton}><b>EDIT</b></Button>
-                <Button variant='outline-dark' className={styles.grayButton}><b>DEACTIVATE</b></Button>
+                <Button disabled={!selectedRowId} variant='outline-dark' className={styles.grayButton}><b>EDIT</b></Button>
+                <Button disabled={!selectedRowId} variant='outline-dark' className={styles.grayButton}><b>DEACTIVATE</b></Button>
                 <Button variant='outline-dark' className={styles.grayButton}><b>REFRESH CONN.</b></Button>
                 <Button variant='outline-dark' className={styles.grayButton}><b>SHOW INACTIVE</b></Button>
             </div>
             <div className={styles.scrollableTableContainer}>
-                <table className={`${styles.listingSkuTable} ${tableStyles.productTable}`}>
+                <table className={`${styles.listingSkuTable} ${tableStyles.listingSkuTable}`}>
                     <thead>
                         {table.getHeaderGroups().map(headerGroup => (
                             <tr key={headerGroup.id}>
