@@ -22,7 +22,7 @@ const productSchema = new Schema({
         masterCaseQuantity: { type: Number },
     },
     masterCaseWeight: { type: Number, required: true },
-    packageTypeId: { type: Schema.Types.ObjectId, ref: 'ProductPackageType' },
+    packageTypeId: { type: Schema.Types.ObjectId || null, ref: 'ProductPackageType' },
     weight: { type: String, required: true }, // in grams
     domesticShippingCosts: { type: String },
     internationalShippingCosts: { type: String },
@@ -30,7 +30,7 @@ const productSchema = new Schema({
     pickAndPackFee: { type: String },
     amazonReferralFee: { type: String },
     opex: { type: String }, // operating expenditures
-    productImageId: { type: Schema.Types.ObjectId, ref: 'ProductImage' }, // Reference to the ProductImage
+    productImageId: { type: Schema.Types.ObjectId || null, ref: 'ProductImage' }, // Reference to the ProductImage
     productCustomsId: { type: Schema.Types.ObjectId, ref: 'ProductCustoms' },
     activated: { type: Boolean }
 }, { timestamps: true });

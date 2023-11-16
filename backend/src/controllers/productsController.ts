@@ -65,8 +65,9 @@ interface CreateProductBody {
     pickAndPackFee?: string,
     amazonReferralFee?: string,
     opex?: string,
-    productImageId?: Types.ObjectId,
+    productImageId?: Types.ObjectId | null,
     productCustomsId?: Types.ObjectId,
+    productCustomsInfo?: { customsDeclaration?: boolean, itemDescription?: string, harmonizationCode?: string, countryOrigin?: string, declaredValue?: number }
     activated?: boolean,
 }
 
@@ -91,6 +92,7 @@ export const createProduct: RequestHandler<unknown, unknown, CreateProductBody, 
     const opex = req.body.opex;
     const activated = req.body.activated;
     const productImageId = req.body.productImageId;
+    const productCustomsInfo = req.body.productCustomsInfo;
     const authenticatedUserId = req.session.userId;
 
     try {
@@ -99,22 +101,23 @@ export const createProduct: RequestHandler<unknown, unknown, CreateProductBody, 
         if (!name) {
             throw createHttpError(400, "Product must have a name!");
         }
-        if (!isValidObjectId(productImageId)) {
+        if (!isValidObjectId(productImageId) && productImageId != null) {
             throw createHttpError(400, "Product image id not valid!")
         }
-        if (!isValidObjectId(packageTypeId)) {
+        if (!isValidObjectId(packageTypeId) && packageTypeId != null) {
             throw createHttpError(400, "Package type id not valid!")
         }
+
         const productCustoms = await ProductCustomsModel.create({
             userId: authenticatedUserId,
-            customsDeclaration: false,
-            itemDescription: "",
-            harmonizationCode: "",
-            countryOrigin: "",
-            declaredValue: "",
+            customsDeclaration: productCustomsInfo?.customsDeclaration || false,
+            itemDescription: productCustomsInfo?.itemDescription || "",
+            harmonizationCode: productCustomsInfo?.harmonizationCode || "",
+            countryOrigin: productCustomsInfo?.countryOrigin || "",
+            declaredValue: productCustomsInfo?.declaredValue || "",
         });
 
-        if(!mongoose.isValidObjectId(productCustoms._id)) {
+        if (!isValidObjectId(productCustoms._id)) {
             throw createHttpError(400, "Invalid product customs ID");
         }
 
@@ -206,10 +209,10 @@ export const updateProduct: RequestHandler<UpdateProductParams, unknown, UpdateP
         if (!mongoose.isValidObjectId(productId)) {
             throw createHttpError(400, "Invalid product ID");
         }
-        if (!mongoose.isValidObjectId(newProductImageId)) {
+        if (!isValidObjectId(newProductImageId) && newProductImageId != null) {
             throw createHttpError(400, "Product image id not valid!")
         }
-        if (!mongoose.isValidObjectId(newPackageTypeId)) {
+        if (!isValidObjectId(newPackageTypeId) && newPackageTypeId != null) {
             throw createHttpError(400, "Package type id not valid!")
         }
 
@@ -235,7 +238,7 @@ export const updateProduct: RequestHandler<UpdateProductParams, unknown, UpdateP
         if (!newMasterCaseDimensions || !newMasterCaseDimensions.masterCaseLength || !newMasterCaseDimensions.masterCaseWidth || !newMasterCaseDimensions.masterCaseHeight || !newMasterCaseDimensions.masterCaseQuantity) {
             throw createHttpError(400, "Product must have master case dimensions!");
         }
-        if(!newMasterCaseWeight) {
+        if (!newMasterCaseWeight) {
             throw createHttpError(400, "Product must have a master case weight!");
         }
         if (!newWeight) {
@@ -346,11 +349,12 @@ export const deleteProduct: RequestHandler = async (req, res, next) => {
 
         const productCustoms = await ProductCustomsModel.findById(product.productCustomsId).exec();
 
-        if(!productCustoms) {
-            throw createHttpError(404, "Product customs not found!");
+        if (!productCustoms) {
+            // throw createHttpError(404, "Product customs not found!");
         }
-
-        await productCustoms.deleteOne();
+        else {
+            await productCustoms.deleteOne();
+        }
         await product.deleteOne();
 
         res.sendStatus(204);

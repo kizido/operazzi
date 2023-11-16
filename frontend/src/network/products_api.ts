@@ -6,6 +6,7 @@ import { User } from "../models/user";
 import { ProductBrand } from "../models/productBrand";
 import { ProductPackageType } from "../models/productPackageType";
 import { ProductImage } from "../models/productImage";
+import { ProductCustoms } from "../models/productCustoms";
 
 async function fetchData(input: RequestInfo, init?: RequestInit) {
     const response = await fetch(input, init);
@@ -83,7 +84,7 @@ export interface ProductInput {
     masterCaseDimensions: { masterCaseLength: number, masterCaseWidth: number, masterCaseHeight: number, masterCaseQuantity: number },
     masterCaseWeight: number,
     cogs: string,
-    packageTypeId: string,
+    packageTypeId: string | null,
     weight: string, // in grams
     domesticShippingCosts: string,
     internationalShippingCosts: string,
@@ -91,7 +92,8 @@ export interface ProductInput {
     pickAndPackFee: string,
     amazonReferralFee: string,
     opex: string,
-    productImageId: string,
+    productImageId: string | null,
+    productCustomsInfo?: CustomsInput,
     activated: boolean,
 }
 
@@ -266,5 +268,29 @@ export async function updateProductPackageType(productPackageType: ProductPackag
             },
             body: JSON.stringify(productPackageType),
         });
+    return response.json();
+}
+
+export async function fetchProductCustoms(productCustomsId: string): Promise<ProductCustoms> {
+    const response = await fetchData("api/productCustoms/" + productCustomsId, { method: "GET" });
+    return response.json();
+}
+
+export interface CustomsInput {
+    customsDeclaration: boolean,
+    itemDescription: string,
+    harmonizationCode: string,
+    countryOrigin: string,
+    declaredValue: number,
+}
+
+export async function updateProductCustoms(input: CustomsInput, productCustomsId: string): Promise<ProductCustoms> {
+    const response = await fetchData("api/productCustoms/" + productCustomsId, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(input)
+    })
     return response.json();
 }

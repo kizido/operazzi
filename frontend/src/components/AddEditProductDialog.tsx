@@ -20,6 +20,7 @@ import MasterCaseDimensionsInputField from "./form/MasterCaseDimensionsInputFiel
 import ListingSkusModal from "./ListingSkusModal";
 import VendorProductsModal from "./VendorProductsModal";
 import Customs from "./Customs";
+import { CustomsInput } from "../network/products_api";
 
 interface AddEditProductDialogProps {
     productToEdit?: Product,
@@ -51,7 +52,7 @@ const AddEditProductDialog = ({ productToEdit, onDismiss, onProductSaved }: AddE
                 masterCaseQuantity: productToEdit?.masterCaseDimensions?.masterCaseQuantity || 0,
             },
             masterCaseWeight: productToEdit?.masterCaseWeight || 0,
-            packageTypeId: productToEdit?.packageTypeId || "",
+            packageTypeId: productToEdit?.packageTypeId || null,
             weight: productToEdit?.weight || "",
             domesticShippingCosts: productToEdit?.domesticShippingCosts || "",
             internationalShippingCosts: productToEdit?.internationalShippingCosts || "",
@@ -59,14 +60,14 @@ const AddEditProductDialog = ({ productToEdit, onDismiss, onProductSaved }: AddE
             pickAndPackFee: productToEdit?.pickAndPackFee || "",
             amazonReferralFee: productToEdit?.amazonReferralFee || "",
             opex: productToEdit?.opex || "",
-            productImageId: productToEdit?.productImageId || "",
+            productImageId: productToEdit?.productImageId || null,
             activated: productToEdit?.activated || true,
         }
     });
 
     useEffect(() => {
         const loadImage = async () => {
-            if (productToEdit && productToEdit.productImageId !== '' && productToEdit.productImageId !== undefined) {
+            if (productToEdit && productToEdit.productImageId) {
                 try {
                     const imageToLoad = await ProductsApi.fetchProductImage(productToEdit.productImageId);
                     setSelectedImage(imageToLoad);
@@ -86,15 +87,21 @@ const AddEditProductDialog = ({ productToEdit, onDismiss, onProductSaved }: AddE
     const [selectedImage, setSelectedImage] = useState<ProductImage | null>(null);
     const [imageLoading, setImageLoading] = useState(true);
 
+    const [customsData, setCustomsData] =  useState<CustomsInput | null>(null);
+
     async function onSubmit(input: ProductInput) {
 
         selectedImage && (input.productImageId = selectedImage?._id);
+        if(input.packageTypeId === "") input.packageTypeId = null;
+
+        if(customsData) input.productCustomsInfo = customsData;
 
         try {
             let productResponse: Product;
             if (productToEdit) {
                 productResponse = await ProductsApi.updateProduct(productToEdit._id, input);
             } else {
+                console.log(input.packageTypeId)
                 productResponse = await ProductsApi.createProduct(input);
             }
             onProductSaved(productResponse);
@@ -102,6 +109,16 @@ const AddEditProductDialog = ({ productToEdit, onDismiss, onProductSaved }: AddE
             console.error(error);
             alert(error);
         }
+    }
+
+    const handleCustomsData = (input: CustomsInput) => {
+        setCustomsData({
+            customsDeclaration: input.customsDeclaration,
+            itemDescription: input.itemDescription,
+            harmonizationCode: input.harmonizationCode,
+            countryOrigin: input.countryOrigin,
+            declaredValue: input.declaredValue
+        })
     }
 
     function saveImageToProduct(updatedImage: ProductImage | null) {
@@ -141,10 +158,9 @@ const AddEditProductDialog = ({ productToEdit, onDismiss, onProductSaved }: AddE
                                 eventKey='customs'>CUSTOMS</Nav.Link>
                         </Nav.Item>
                     </Nav>
-
-                    <Form id="addEditProductForm" onSubmit={handleSubmit(onSubmit)}>
-                        <Tab.Content>
-                            <Tab.Pane eventKey="basicInfo">
+                    <Tab.Content>
+                        <Tab.Pane eventKey="basicInfo">
+                            <Form id="addEditProductForm" onSubmit={handleSubmit(onSubmit)}>
                                 <Row>
                                     <Col xs={9}>
                                         <TextInputField
@@ -237,10 +253,9 @@ const AddEditProductDialog = ({ productToEdit, onDismiss, onProductSaved }: AddE
                                     </Col>
                                     <Col>
                                         <PackageTypeInputField
-                                            name="packageType"
+                                            name="packageTypeId"
                                             label="Shipping Package"
-                                            type="text"
-                                            placeholder="Shipping Package"
+                                            type="select"
                                             register={register}
                                         />
                                     </Col>
@@ -323,18 +338,18 @@ const AddEditProductDialog = ({ productToEdit, onDismiss, onProductSaved }: AddE
                                         />
                                     </Col>
                                 </Row>
-                            </Tab.Pane>
-                            <Tab.Pane eventKey="listingSkus">
-                                <ListingSkusModal/>
-                            </Tab.Pane>
-                            <Tab.Pane eventKey="vendorProducts">
-                                <VendorProductsModal/>
-                            </Tab.Pane>
-                            <Tab.Pane eventKey="customs">
-                                <Customs/>
-                            </Tab.Pane>
-                        </Tab.Content>
-                    </Form>
+                            </Form>
+                        </Tab.Pane>
+                        <Tab.Pane eventKey="listingSkus">
+                            <ListingSkusModal />
+                        </Tab.Pane>
+                        <Tab.Pane eventKey="vendorProducts">
+                            <VendorProductsModal />
+                        </Tab.Pane>
+                        <Tab.Pane eventKey="customs">
+                            <Customs productToEdit={productToEdit} onCustomsDataSubmit={handleCustomsData} />
+                        </Tab.Pane>
+                    </Tab.Content>
                 </Tab.Container>
             </Modal.Body>
             <Modal.Footer>

@@ -107,22 +107,6 @@ export const updateProductCustoms: RequestHandler<UpdateProductCustomsParams, un
             throw createHttpError(400, "Invalid product customs ID");
         }
 
-        if (!newCustomsDeclaration) {
-            throw createHttpError(400, "Product customs must have a customs declaration");
-        }
-        if (!newItemDescription) {
-            throw createHttpError(400, "Product customs must have an item description");
-        }
-        if (!newHarmonizationCode) {
-            throw createHttpError(400, "Product customs must have a harmonization code");
-        }
-        if (!newCountryOrigin) {
-            throw createHttpError(400, "Product customs must have a country origin");
-        }
-        if (!newDeclaredValue) {
-            throw createHttpError(400, "Product customs must have a declared value");
-        }
-
         const productCustoms = await ProductCustomsModel.findById(productCustomsId).exec();
 
         if (!productCustoms) {

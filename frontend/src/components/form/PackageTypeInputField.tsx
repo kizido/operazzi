@@ -115,22 +115,22 @@ const PackageTypeInputField = ({ name, label, register, registerOptions, error, 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         let newValue: string | number | null = value;
-      
+
         // For package name, ensure it is always treated as a string.
         if (name === 'packageName') {
-          newValue = value;
+            newValue = value;
         } else {
-          // For numeric inputs, convert to a number or null if the input is empty.
-          // Additionally, we can trim any white spaces for numeric inputs as well,
-          // in case they are entered as text.
-          newValue = value.trim() === '' ? null : Number(value.trim());
+            // For numeric inputs, convert to a number or null if the input is empty.
+            // Additionally, we can trim any white spaces for numeric inputs as well,
+            // in case they are entered as text.
+            newValue = value.trim() === '' ? null : Number(value.trim());
         }
-      
+
         setPackageType(prev => ({
-          ...prev,
-          [name]: newValue,
+            ...prev,
+            [name]: newValue,
         }));
-      };
+    };
 
     const resetPackageType = () => {
         setPackageType({ // Reset the form state
@@ -156,14 +156,21 @@ const PackageTypeInputField = ({ name, label, register, registerOptions, error, 
             <Form.Group controlId={name + "-input"}>
                 <Form.Label className={styles.formLabel}>{label}</Form.Label>
                 <InputGroup>
-                    <Form.Select size="sm"
+                    <Form.Select
+                        size="sm"
                         {...props}
                         {...register(name, registerOptions)}
                         isInvalid={!!error}
                     >
-                        {packageTypes?.map((packageType, index) => (
-                            <option key={index}>
-                                {packageType.packageName + " (" + packageType.packageLength + "\" x " + packageType.packageWidth + "\" x " + packageType.packageHeight + ")"}
+                        {/* Conditional rendering of the default option */}
+                        {(!packageTypes || packageTypes.length === 0) && (
+                            <option value="">No package types available</option>
+                        )}
+
+                        {/* Render packageTypes options if available */}
+                        {packageTypes?.map((packageType) => (
+                            <option key={packageType._id} value={packageType._id}>
+                                {`${packageType.packageName} (${packageType.packageLength}" x ${packageType.packageWidth}" x ${packageType.packageHeight})`}
                             </option>
                         ))}
                     </Form.Select>
@@ -204,7 +211,7 @@ const PackageTypeInputField = ({ name, label, register, registerOptions, error, 
                                 isInvalid={errors.packageLength}
                             />
                             <Form.Control.Feedback type="invalid">
-                            {errors.packageLength && 'Package length cannot be empty.'}
+                                {errors.packageLength && 'Package length cannot be empty.'}
                             </Form.Control.Feedback>
                             <Form.Label>Package Width (in.)</Form.Label>
                             <Form.Control
@@ -216,7 +223,7 @@ const PackageTypeInputField = ({ name, label, register, registerOptions, error, 
                                 isInvalid={errors.packageWidth}
                             />
                             <Form.Control.Feedback type="invalid">
-                            {errors.packageWidth && 'Package width cannot be empty.'}
+                                {errors.packageWidth && 'Package width cannot be empty.'}
                             </Form.Control.Feedback>
                             <Form.Label>Package Height (in.)</Form.Label>
                             <Form.Control
@@ -228,7 +235,7 @@ const PackageTypeInputField = ({ name, label, register, registerOptions, error, 
                                 isInvalid={errors.packageHeight}
                             />
                             <Form.Control.Feedback type="invalid">
-                            {errors.packageHeight && 'Package height cannot be empty.'}
+                                {errors.packageHeight && 'Package height cannot be empty.'}
                             </Form.Control.Feedback>
                             <Form.Label>Package Weight (lbs.)</Form.Label>
                             <Form.Control
@@ -240,7 +247,7 @@ const PackageTypeInputField = ({ name, label, register, registerOptions, error, 
                                 isInvalid={errors.packageWeight}
                             />
                             <Form.Control.Feedback type="invalid">
-                            {errors.packageWeight && 'Package weight cannot be empty.'}
+                                {errors.packageWeight && 'Package weight cannot be empty.'}
                             </Form.Control.Feedback>
                         </Form>
                     </Modal.Body>

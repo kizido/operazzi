@@ -44,11 +44,6 @@ export default function ProductTable() {
             accessorKey: 'category',
             footer: 'Category',
         },
-        // {
-        //     header: 'Description',
-        //     accessorKey: 'description',
-        //     footer: 'Description',
-        // },
         {
             header: 'COGS',
             accessorKey: 'cogs',
@@ -66,11 +61,6 @@ export default function ProductTable() {
                 return '-';
             },
             footer: 'Dimensions',
-        },
-        {
-            header: 'Package',
-            accessorKey: 'packageType',
-            footer: 'Package',
         },
         {
             header: 'Domestic Shipping Costs',
@@ -110,9 +100,9 @@ export default function ProductTable() {
                     <button onClick={() => setProductToEdit(row.original)}>
                         Edit
                     </button>
-                    {/* <button onClick={() => deleteProduct(row.original)}>
+                    <button onClick={() => deleteProduct(row.original)}>
                         Delete
-                    </button> */}
+                    </button>
                     <button onClick={() => toggleActivateProduct(row.original)}>
                         {showOnlyActivated ? 'Deactivate' : 'Activate'}
                     </button>
