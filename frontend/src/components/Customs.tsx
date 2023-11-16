@@ -67,17 +67,6 @@ export default function Customs({ productToEdit, onCustomsDataSubmit }: CustomsP
         }
     }
 
-    // const isValidHarmonizationCode = (code: string): boolean | string => {
-    //     // Assuming HS codes are 6, 8, or 10 digits long
-    //     const hsCodePattern = /^[0-9]{6}([0-9]{2})?([0-9]{2})?$/;
-
-    //     if (hsCodePattern.test(code)) {
-    //         return true; // Valid harmonization code
-    //     } else {
-    //         return 'Invalid harmonization code'; // Error message
-    //     }
-    // };
-
     const handleHarmonizationCodeChange = (event: ChangeEvent<HTMLInputElement>) => {
         // Remove all non-digits from the input
         let input = event.target.value.replace(/\D/g, '');
@@ -136,7 +125,6 @@ export default function Customs({ productToEdit, onCustomsDataSubmit }: CustomsP
                                     />
                                 )}
                             />
-
                             <label className={styles.descriptionLabel} htmlFor='itemDescription'>Item Description:</label>
                             <textarea {...register('itemDescription')} id='itemDescription' style={{ resize: 'both' }} rows={5} cols={40}></textarea>
                         </div>
