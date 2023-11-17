@@ -281,7 +281,7 @@ export interface CustomsInput {
     itemDescription: string,
     harmonizationCode: string,
     countryOrigin: string,
-    declaredValue: number,
+    declaredValue: string,
 }
 
 export async function updateProductCustoms(input: CustomsInput, productCustomsId: string): Promise<ProductCustoms> {

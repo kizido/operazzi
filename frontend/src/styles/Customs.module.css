@@ -1,35 +1,56 @@
 /* STYLES FOR CUSTOMS MODAL TAB */
 
 .explanationBox {
-    border: 1px rgb(150, 150, 199) solid;
-    background-color: lavender;
-    padding: 16px 10px 0px;
-    margin-bottom: 2rem;
+  border: 1px rgb(150, 150, 199) solid;
+  background-color: lavender;
+  padding: 16px 10px 0px;
+  margin-bottom: 2rem;
 }
 
 .customFormBox {
-    border: 1px lightgray groove;
-    width: 100%;
-    height: 16rem;
-    padding: 20px 40px;
+  border: 1px lightgray groove;
+  width: 100%;
+  height: 16rem;
+  padding: 20px 40px;
 }
 
 .inputContainer {
-    display: flex;
-    justify-content: center;
+  display: flex;
+  justify-content: center;
 }
 
 .inputColumn {
-    margin-right: 20px;
+  margin-right: 20px;
 }
 
 .descriptionLabel {
-    display: block;
-    /* Adjust as needed */
+  display: block;
+  /* Adjust as needed */
 }
 
 .applyButton {
-    display: block;
-    margin-right: 0;
-    margin-left: auto;
+  display: block;
+  margin-right: 0;
+  margin-left: auto;
+}
+
+.inputWithDollar {
+  position: relative;
+  display: inline-block;
+}
+
+.inputWithDollar::before {
+  content: "$";
+  position: absolute;
+  left: 5px; /* Adjust as needed */
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.inputWithDollar input {
+  padding-left: 15px;
+  /* Allocate space for the dollar sign */
+  /* Set the width of the input field, accounting for the padding */
+  width: calc(100% - 15px); /* Adjust the width calculation as needed */
 }

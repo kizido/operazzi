@@ -45,40 +45,6 @@ export const getProductCustoms: RequestHandler = async (req, res, next) => {
     }
 };
 
-// interface CreateProductCustomsBody {
-//     customsDeclaration?: boolean,
-//     itemDescription?: string,
-//     harmonizationCode?: string,
-//     countryOrigin?: string,
-//     declaredValue?: number,
-// }
-
-// export const createProductCustoms: RequestHandler<unknown, unknown, CreateProductCustomsBody, unknown> = async (req, res, next) => {
-//     const customsDeclaration = req.body.customsDeclaration;
-//     const itemDescription = req.body.itemDescription;
-//     const harmonizationCode = req.body.harmonizationCode;
-//     const countryOrigin = req.body.countryOrigin;
-//     const declaredValue = req.body.declaredValue;
-//     const authenticatedUserId = req.session.userId;
-
-//     try {
-//         assertIsDefined(authenticatedUserId)
-
-//         const newProductCustoms = await ProductCustomsModel.create({
-//             userId: authenticatedUserId,
-//             customsDeclaration: customsDeclaration,
-//             itemDescription: itemDescription,
-//             harmonizationCode: harmonizationCode,
-//             countryOrigin: countryOrigin,
-//             declaredValue: declaredValue,
-//         })
-
-//         res.status(201).json(newProductCustoms)
-//     } catch (error) {
-//         next(error);
-//     }
-// }
-
 interface UpdateProductCustomsParams {
     productCustomsId: string,
 }
@@ -88,7 +54,7 @@ interface UpdateProductCustomsBody {
     itemDescription?: string,
     harmonizationCode?: string,
     countryOrigin?: string,
-    declaredValue?: number,
+    declaredValue?: string,
 }
 
 export const updateProductCustoms: RequestHandler<UpdateProductCustomsParams, unknown, UpdateProductCustomsBody, unknown> = async (req, res, next) => {

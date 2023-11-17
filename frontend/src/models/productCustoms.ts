@@ -4,5 +4,5 @@ export interface ProductCustoms {
     itemDescription: string,
     harmonizationCode: string,
     countryOrigin: string,
-    declaredValue: number,
+    declaredValue: string,
 }

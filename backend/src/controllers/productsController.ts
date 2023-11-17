@@ -67,7 +67,7 @@ interface CreateProductBody {
     opex?: string,
     productImageId?: Types.ObjectId | null,
     productCustomsId?: Types.ObjectId,
-    productCustomsInfo?: { customsDeclaration?: boolean, itemDescription?: string, harmonizationCode?: string, countryOrigin?: string, declaredValue?: number }
+    productCustomsInfo?: { customsDeclaration?: boolean, itemDescription?: string, harmonizationCode?: string, countryOrigin?: string, declaredValue?: string }
     activated?: boolean,
 }
 

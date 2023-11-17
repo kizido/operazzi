@@ -6,7 +6,7 @@ const productCustomsSchema = new Schema({
     itemDescription: { type: String },
     harmonizationCode: { type: String },
     countryOrigin: { type: String },
-    declaredValue: { type: Number },
+    declaredValue: { type: String },
 })
 
 type ProductCustoms = InferSchemaType<typeof productCustomsSchema>;
