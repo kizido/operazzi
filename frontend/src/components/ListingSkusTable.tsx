@@ -1,4 +1,4 @@
-import React, { useState, useReducer } from "react";
+import { useState, useReducer, useContext } from "react";
 import {
   createColumnHelper,
   flexRender,
@@ -14,6 +14,7 @@ import listingSkusStyles from "../styles/ListingSkus.module.css";
 import { Form, useForm } from "react-hook-form";
 import { ListingSkusInput } from "../network/products_api";
 import { Product } from "../models/product";
+import ProductContext from "../contexts/ProductContext";
 
 type ListingSkusTableModel = {
   channel: string;
@@ -142,19 +143,18 @@ const columns = [
     cell: (info) => (info.getValue() ? <i>Active</i> : <i>Inactive</i>), // Added parentheses to imply return
   }),
 ];
-interface ListingSkusTableProps {
-    productToEdit?: Product;
-}
 
 export default function ListingSkusTable() {
   const [data, setData] = useState(() => [...defaultData]);
   const rerender = useReducer(() => ({}), {})[1];
   const [showAddListingSku, setShowAddListingSku] = useState(false);
+  const productToEdit = useContext(ProductContext);
 
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
 
   const { register } = useForm<ListingSkusInput>({
-
+    defaultValues: {
+    }
   });
 
   const table = useReactTable({
@@ -240,7 +240,7 @@ export default function ListingSkusTable() {
           <Modal.Body>
             <Form>
               <label>Channel</label>
-              
+
               <label>Listing Sku</label>
 
               <label>Push Inventory</label>
