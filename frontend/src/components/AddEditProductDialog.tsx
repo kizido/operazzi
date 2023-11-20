@@ -21,6 +21,7 @@ import ListingSkusModal from "./ListingSkusModal";
 import VendorProductsModal from "./VendorProductsModal";
 import Customs from "./Customs";
 import { CustomsInput } from "../network/products_api";
+import Pricing from "./Pricing";
 
 interface AddEditProductDialogProps {
     productToEdit?: Product,
@@ -156,6 +157,10 @@ const AddEditProductDialog = ({ productToEdit, onDismiss, onProductSaved }: AddE
                         <Nav.Item>
                             <Nav.Link className={styles.productModalTabLink}
                                 eventKey='customs'>CUSTOMS</Nav.Link>
+                        </Nav.Item>
+                        <Nav.Item>
+                            <Nav.Link className={styles.productModalTabLink}
+                                eventKey='pricing'>PRICING</Nav.Link>
                         </Nav.Item>
                     </Nav>
                     <Tab.Content>
@@ -348,6 +353,9 @@ const AddEditProductDialog = ({ productToEdit, onDismiss, onProductSaved }: AddE
                         </Tab.Pane>
                         <Tab.Pane eventKey="customs">
                             <Customs productToEdit={productToEdit} onCustomsDataSubmit={handleCustomsData} />
+                        </Tab.Pane>
+                        <Tab.Pane eventKey="pricing">
+                            <Pricing/>
                         </Tab.Pane>
                     </Tab.Content>
                 </Tab.Container>

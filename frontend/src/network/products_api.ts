@@ -294,3 +294,11 @@ export async function updateProductCustoms(input: CustomsInput, productCustomsId
     })
     return response.json();
 }
+
+export interface ListingSkusInput {
+    channel: string,
+    listingSku: string,
+    pushInventory: boolean,
+    latency: string,
+    status: boolean,
+}
