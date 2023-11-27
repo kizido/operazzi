@@ -1,19 +1,20 @@
 import { InferSchemaType, Schema, model } from "mongoose";
-import { IProductListingSku, productListingSkuSchema } from "./productListingSku";
 
-interface IDimensions {
-    productLength: number;
-    productWidth: number;
-    productHeight: number;
-    productDiameter?: number;
-  }
-  
-  interface IMasterCaseDimensions {
-    masterCaseLength: number;
-    masterCaseWidth: number;
-    masterCaseHeight: number;
-    masterCaseQuantity?: number;
-  }
+const productListingSkuSchema = new Schema({
+  channel: { type: String, required: true },
+  listingSku: { type: String, required: true },
+  pushInventory: { type: Boolean, required: true },
+  latency: { type: String, required: true },
+  status: { type: Boolean, required: true },
+});
+
+export interface IProductListingSku {
+  channel: string,
+  listingSku: string,
+  pushInventory: boolean,
+  latency: string,
+  status: boolean,
+}
 
 const productSchema = new Schema(
   {
@@ -60,32 +61,6 @@ const productSchema = new Schema(
   { timestamps: true }
 );
 
-interface IProduct extends Document {
-  userId: Schema.Types.ObjectId;
-  name: string;
-  productSku: string;
-  brand: string;
-  barcodeUpc: string;
-  category?: string;
-  description?: string;
-  cogs: string;
-  dimensions: IDimensions;
-  masterCaseDimensions: IMasterCaseDimensions;
-  masterCaseWeight: number;
-  packageTypeId?: Schema.Types.ObjectId; // Can be null, so it's optional
-  weight: string; // Assuming weight is stored as a string, e.g., "200g"
-  domesticShippingCosts?: string;
-  internationalShippingCosts?: string;
-  dutiesAndTariffs?: string;
-  pickAndPackFee?: string;
-  amazonReferralFee?: string;
-  opex?: string; // operating expenditures
-  productImageId?: Schema.Types.ObjectId; // Can be null, so it's optional
-  productCustomsId: Schema.Types.ObjectId;
-  productListingSkus: IProductListingSku[];
-  activated: boolean;
-  createdAt?: Date; // Comes from timestamps: true
-  updatedAt?: Date; // Comes from timestamps: true
-}
+type Product = InferSchemaType<typeof productSchema>;
 
-export const ProductModel = model<IProduct>('Product', productSchema);
+export default model<Product>("Product", productSchema);

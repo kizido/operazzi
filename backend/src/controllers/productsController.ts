@@ -1,9 +1,9 @@
 import { RequestHandler } from "express";
-import ProductModel from "../models/product";
+import ProductModel, { IProductListingSku } from "../models/product";
 import createHttpError from "http-errors";
 import mongoose, { Types, isValidObjectId } from "mongoose";
 import { assertIsDefined } from "../util/assertIsDefined";
-import ProductCustomsModel from '../models/productCustoms'
+import ProductCustomsModel from '../models/productCustoms';
 
 export const getProducts: RequestHandler = async (req, res, next) => {
     const authenticatedUserId = req.session.userId;
@@ -68,6 +68,7 @@ interface CreateProductBody {
     productImageId?: Types.ObjectId | null,
     productCustomsId?: Types.ObjectId,
     productCustomsInfo?: { customsDeclaration?: boolean, itemDescription?: string, harmonizationCode?: string, countryOrigin?: string, declaredValue?: string }
+    productListingSkus?: Types.DocumentArray<IProductListingSku>,
     activated?: boolean,
 }
 
@@ -93,6 +94,7 @@ export const createProduct: RequestHandler<unknown, unknown, CreateProductBody, 
     const activated = req.body.activated;
     const productImageId = req.body.productImageId;
     const productCustomsInfo = req.body.productCustomsInfo;
+    const productListingSkus = req.body.productListingSkus;
     const authenticatedUserId = req.session.userId;
 
     try {
@@ -143,6 +145,7 @@ export const createProduct: RequestHandler<unknown, unknown, CreateProductBody, 
             opex: opex,
             productImageId: productImageId,
             productCustomsId: productCustoms._id,
+            productListingSkus: productListingSkus,
             activated: activated,
         });
 
@@ -176,6 +179,7 @@ interface UpdateProductBody {
     amazonReferralFee?: string,
     opex?: string,
     productImageId?: Types.ObjectId,
+    productListingSkus?: Types.DocumentArray<IProductListingSku>,
     activated?: boolean,
 }
 
@@ -200,6 +204,7 @@ export const updateProduct: RequestHandler<UpdateProductParams, unknown, UpdateP
     const newAmazonReferralFee = req.body.amazonReferralFee;
     const newOpex = req.body.opex;
     const newProductImageId = req.body.productImageId;
+    const newProductListingSkus = req.body.productListingSkus;
     const newActivated = req.body.activated;
     const authenticatedUserId = req.session.userId;
 
@@ -243,6 +248,12 @@ export const updateProduct: RequestHandler<UpdateProductParams, unknown, UpdateP
         }
         if (!newWeight) {
             throw createHttpError(400, "Product must have a weight!");
+        }
+        if(!newProductListingSkus) {
+            throw createHttpError(400, "Product must have a listing sku array");
+        }
+        if(newActivated === undefined || newActivated === null) {
+            throw createHttpError(400, "Product must have an activation switch")
         }
 
         const product = await ProductModel.findById(productId).exec();
