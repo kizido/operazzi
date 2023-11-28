@@ -158,3 +158,8 @@
     height: auto;
     width: 15px;
 }
+
+.modalHeader {
+    font-weight: 600;
+    font-size: 1.5em;
+}

@@ -1,3 +1,20 @@
-.listingSkusModal {
-    
+.listingSkusForm {
+    display: flex;
+    flex-direction: column;
+}
+
+.listingSkusForm input {
+    margin-bottom: 1rem;
+}
+
+.checkboxSection {
+    display: flex;
+    justify-content: space-evenly;
+}
+.checkboxLabel {
+    margin-right: 1rem;
+}
+.checkboxLarge {
+    width: 20px;
+    height: 20px;
 }

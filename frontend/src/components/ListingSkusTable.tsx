@@ -7,10 +7,10 @@ import {
 } from "@tanstack/react-table";
 import styles from "../styles/Modal.module.css";
 import tableStyles from "../styles/Table.module.css";
+import listingSkusStyles from "../styles/ListingSkus.module.css";
 import { Button, Modal } from "react-bootstrap";
 import redToggle from "../assets/icons8-toggle-on-50.png";
 import greenToggle from "../assets/icons8-toggle-50.png";
-import listingSkusStyles from "../styles/ListingSkus.module.css";
 import { Form, useForm } from "react-hook-form";
 import { ListingSkusInput } from "../network/products_api";
 import { Product } from "../models/product";
@@ -236,19 +236,31 @@ export default function ListingSkusTable() {
       </div>
       {showAddListingSku && (
         <Modal show onHide={() => setShowAddListingSku(false)} centered={true}>
-          <Modal.Header closeButton>Add Listing Sku</Modal.Header>
+          <Modal.Header closeButton className={styles.modalHeader}>Add Listing Sku</Modal.Header>
           <Modal.Body>
-            <Form>
+            <form className={listingSkusStyles.listingSkusForm}>
               <label>Channel</label>
+              <input type="text"{...register("channel")}></input>
 
               <label>Listing Sku</label>
-
-              <label>Push Inventory</label>
+              <input type="text"{...register("listingSku")}></input>
 
               <label>Latency</label>
+              <input type="text"{...register("latency")}></input>
 
-              <label>Status</label>
-            </Form>
+              <div className={listingSkusStyles.checkboxSection}>
+                  <div>
+                      <label className={listingSkusStyles.checkboxLabel}>Push Inventory</label>
+                      <input type="checkbox"{...register("pushInventory")} className={listingSkusStyles.checkboxLarge}></input>
+                  </div>
+                  <div>
+                      <label className={listingSkusStyles.checkboxLabel}>Status</label>
+                      <input type="checkbox"{...register("status")} className={listingSkusStyles.checkboxLarge}></input>
+                  </div>
+              </div>
+
+              <button type="submit">Submit</button>
+            </form>
           </Modal.Body>
         </Modal>
       )}
