@@ -85,11 +85,13 @@ const AddEditProductDialog = ({
     },
   });
 
-  const productContext = useContext(ProductContext)
+  const productContext = useContext(ProductContext);
   useEffect(() => {
-    if(productToEdit) {
+    if (productToEdit) {
       productContext?.setProduct(productToEdit);
-      setListingSkusData(productToEdit.productListingSkus);
+      setListingSkusInputData(productToEdit.productListingSkus);
+    } else {
+      productContext?.setProduct(null);
     }
     const loadImage = async () => {
       if (productToEdit && productToEdit.productImageId) {
@@ -114,7 +116,7 @@ const AddEditProductDialog = ({
   const [imageLoading, setImageLoading] = useState(true);
 
   const [customsData, setCustomsData] = useState<CustomsInput | null>(null);
-  const [listingSkusData, setListingSkusData] = useState<
+  const [listingSkusInputData, setListingSkusInputData] = useState<
     ProductsApi.ListingSkusInput[] | null
   >(null);
 
@@ -123,7 +125,7 @@ const AddEditProductDialog = ({
     if (input.packageTypeId === "") input.packageTypeId = null;
 
     if (customsData) input.productCustomsInfo = customsData;
-    if (listingSkusData) input.productListingSkus = listingSkusData;
+    if (listingSkusInputData) input.productListingSkus = listingSkusInputData;
 
     try {
       let productResponse: Product;
@@ -152,304 +154,314 @@ const AddEditProductDialog = ({
       declaredValue: input.declaredValue,
     });
   };
-  const handleListingSkusData = (input: ProductsApi.ListingSkusInput) => {
-    setListingSkusData((currentData) => {
-      return currentData ? [...currentData, input] : [input];
-    });
-}
-
-    function saveImageToProduct(updatedImage: ProductImage | null) {
-      setSelectedImage(updatedImage);
+  const handleListingSkusData = (
+    input: ProductsApi.ListingSkusInput,
+    index?: number
+  ) => {
+    if (index !== undefined) {
+      console.log("INDEX PASSED");
+      setListingSkusInputData((currentData) => {
+        const newData = [...currentData!];
+        newData[index] = input;
+        return newData;
+      });
+      // setListingSkusInputData([]);
+    } else {
+      console.log("INDEX NOT PASSED");
+      setListingSkusInputData((currentData) => {
+        return currentData ? [...currentData, input] : [input];
+      });
     }
-
-    return (
-      <Modal
-        show
-        onHide={onDismiss}
-        backdrop="static"
-        centered={true}
-        dialogClassName={`${styles.productModalWidth}`}
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>
-            {productToEdit ? productToEdit.name : "Add Product"}
-          </Modal.Title>
-        </Modal.Header>
-
-        <Modal.Body className={styles.productModalBody}>
-          <Tab.Container defaultActiveKey="basicInfo">
-            <Nav variant="tabs" className={styles.productModalTabs}>
-              <Nav.Item>
-                <Nav.Link
-                  className={styles.productModalTabLink}
-                  eventKey="basicInfo"
-                >
-                  BASIC INFO
-                </Nav.Link>
-              </Nav.Item>
-              <Nav.Item>
-                <Nav.Link
-                  className={styles.productModalTabLink}
-                  eventKey="listingSkus"
-                >
-                  LISTING SKUS
-                </Nav.Link>
-              </Nav.Item>
-              <Nav.Item>
-                <Nav.Link
-                  className={styles.productModalTabLink}
-                  eventKey="vendorProducts"
-                >
-                  VENDOR PRODUCTS
-                </Nav.Link>
-              </Nav.Item>
-              <Nav.Item>
-                <Nav.Link
-                  className={styles.productModalTabLink}
-                  eventKey="customs"
-                >
-                  CUSTOMS
-                </Nav.Link>
-              </Nav.Item>
-              <Nav.Item>
-                <Nav.Link
-                  className={styles.productModalTabLink}
-                  eventKey="pricing"
-                >
-                  PRICING
-                </Nav.Link>
-              </Nav.Item>
-            </Nav>
-            <Tab.Content>
-              <Tab.Pane eventKey="basicInfo">
-                <Form id="addEditProductForm" onSubmit={handleSubmit(onSubmit)}>
-                  <Row>
-                    <Col xs={9}>
-                      <TextInputField
-                        name="name"
-                        label="Product Name*"
-                        type="text"
-                        placeholder="Product Name"
-                        register={register}
-                        registerOptions={{ required: "Required" }}
-                      />
-                      <BrandInputField
-                        name="brand"
-                        label="Brand*"
-                        type="text"
-                        placeholder="Brand"
-                        register={register}
-                        registerOptions={{ required: "Required" }}
-                      />
-                      <CategoryInputField
-                        name="category"
-                        label="Category"
-                        type="text"
-                        placeholder="Category"
-                        register={register}
-                      />
-                    </Col>
-                    <Col>
-                      <button
-                        type="button"
-                        className={styles.productPreviewContainer}
-                        onClick={() => setShowGalleryModal(true)}
-                      >
-                        {imageLoading ? (
-                          <Spinner />
-                        ) : (
-                          <img
-                            src={
-                              selectedImage
-                                ? `data:${selectedImage.contentType};base64,${selectedImage.imageFileBase64}`
-                                : addImageIcon
-                            }
-                            alt={selectedImage?._id}
-                            className={styles.productPreviewImage}
-                          />
-                        )}
-                      </button>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col>
-                      <TextInputField
-                        name="productSku"
-                        label="Product Sku*"
-                        type="text"
-                        placeholder="Product Sku"
-                        register={register}
-                        registerOptions={{ required: "Required" }}
-                      />
-                    </Col>
-                    <Col>
-                      <TextInputField
-                        name="barcodeUpc"
-                        label="UPC Barcode*"
-                        type="text"
-                        placeholder="UPC Barcode"
-                        register={register}
-                        registerOptions={{ required: "Required" }}
-                      />
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col>
-                      <DimensionsInputField
-                        name="dimensions"
-                        label="Dimensions*"
-                        register={register}
-                        registerOptions={{ required: "Required" }}
-                      />
-                    </Col>
-                    <Col>
-                      <TextInputField
-                        name="weight"
-                        label="Weight (grams)*"
-                        type="text"
-                        placeholder="Weight"
-                        register={register}
-                        registerOptions={{ required: "Required" }}
-                      />
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col>
-                      <TextInputField
-                        name="cogs"
-                        label="Cost of Goods Sold*"
-                        type="text"
-                        placeholder="COGS"
-                        register={register}
-                        registerOptions={{ required: "Required" }}
-                      />
-                    </Col>
-                    <Col>
-                      <PackageTypeInputField
-                        name="packageTypeId"
-                        label="Shipping Package"
-                        type="select"
-                        register={register}
-                      />
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col>
-                      <TextInputField
-                        name="domesticShippingCosts"
-                        label="Domestic Shipping Costs"
-                        type="text"
-                        placeholder="Domestic Shipping Costs"
-                        register={register}
-                      />
-                    </Col>
-                    <Col>
-                      <TextInputField
-                        name="internationalShippingCosts"
-                        label="International Shipping Costs"
-                        type="text"
-                        placeholder="International Shipping Costs"
-                        register={register}
-                      />
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col>
-                      <TextInputField
-                        name="dutiesAndTariffs"
-                        label="Duties And Tariffs"
-                        type="text"
-                        placeholder="Duties And Tariffs"
-                        register={register}
-                      />
-                    </Col>
-                    <Col>
-                      <TextInputField
-                        name="pickAndPackFee"
-                        label="Pick And Pack Fee"
-                        type="text"
-                        placeholder="Pick And Pack Fee"
-                        register={register}
-                      />
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col>
-                      <TextInputField
-                        name="amazonReferralFee"
-                        label="Amazon Referral Fee"
-                        type="text"
-                        placeholder="Amazon Referral Fee"
-                        register={register}
-                      />
-                    </Col>
-                    <Col>
-                      <TextInputField
-                        name="description"
-                        label="Description"
-                        type="text"
-                        placeholder="Description"
-                        register={register}
-                      />
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col>
-                      <MasterCaseDimensionsInputField
-                        name="masterCaseDimensions"
-                        label="Master Case Dimensions"
-                        register={register}
-                      />
-                    </Col>
-                    <Col>
-                      <TextInputField
-                        name="masterCaseWeight"
-                        label="Master Case Weight (lbs.)"
-                        type="number"
-                        placeholder="Master Case Weight"
-                        register={register}
-                      />
-                    </Col>
-                  </Row>
-                </Form>
-              </Tab.Pane>
-              <Tab.Pane eventKey="listingSkus">
-                <ListingSkusModal
-                  onListingSkusDataSubmit={handleListingSkusData}
-                />
-              </Tab.Pane>
-              <Tab.Pane eventKey="vendorProducts">
-                <VendorProductsModal />
-              </Tab.Pane>
-              <Tab.Pane eventKey="customs">
-                <Customs
-                  productToEdit={productToEdit}
-                  onCustomsDataSubmit={handleCustomsData}
-                />
-              </Tab.Pane>
-              <Tab.Pane eventKey="pricing">
-                <Pricing />
-              </Tab.Pane>
-            </Tab.Content>
-          </Tab.Container>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            type="submit"
-            form="addEditProductForm"
-            disabled={isSubmitting}
-          >
-            Save
-          </Button>
-        </Modal.Footer>
-        {showGalleryModal && (
-          <GalleryModal
-            onDismiss={() => setShowGalleryModal(false)}
-            onSave={saveImageToProduct}
-          />
-        )}
-      </Modal>
-    );
   };
+
+  function saveImageToProduct(updatedImage: ProductImage | null) {
+    setSelectedImage(updatedImage);
+  }
+
+  return (
+    <Modal
+      show
+      onHide={onDismiss}
+      backdrop="static"
+      centered={true}
+      dialogClassName={`${styles.productModalWidth}`}
+    >
+      <Modal.Header closeButton>
+        <Modal.Title>
+          {productToEdit ? productToEdit.name : "Add Product"}
+        </Modal.Title>
+      </Modal.Header>
+
+      <Modal.Body className={styles.productModalBody}>
+        <Tab.Container defaultActiveKey="basicInfo">
+          <Nav variant="tabs" className={styles.productModalTabs}>
+            <Nav.Item>
+              <Nav.Link
+                className={styles.productModalTabLink}
+                eventKey="basicInfo"
+              >
+                BASIC INFO
+              </Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Nav.Link
+                className={styles.productModalTabLink}
+                eventKey="listingSkus"
+              >
+                LISTING SKUS
+              </Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Nav.Link
+                className={styles.productModalTabLink}
+                eventKey="vendorProducts"
+              >
+                VENDOR PRODUCTS
+              </Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Nav.Link
+                className={styles.productModalTabLink}
+                eventKey="customs"
+              >
+                CUSTOMS
+              </Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Nav.Link
+                className={styles.productModalTabLink}
+                eventKey="pricing"
+              >
+                PRICING
+              </Nav.Link>
+            </Nav.Item>
+          </Nav>
+          <Tab.Content>
+            <Tab.Pane eventKey="basicInfo">
+              <Form id="addEditProductForm" onSubmit={handleSubmit(onSubmit)}>
+                <Row>
+                  <Col xs={9}>
+                    <TextInputField
+                      name="name"
+                      label="Product Name*"
+                      type="text"
+                      placeholder="Product Name"
+                      register={register}
+                      registerOptions={{ required: "Required" }}
+                    />
+                    <BrandInputField
+                      name="brand"
+                      label="Brand*"
+                      type="text"
+                      placeholder="Brand"
+                      register={register}
+                      registerOptions={{ required: "Required" }}
+                    />
+                    <CategoryInputField
+                      name="category"
+                      label="Category"
+                      type="text"
+                      placeholder="Category"
+                      register={register}
+                    />
+                  </Col>
+                  <Col>
+                    <button
+                      type="button"
+                      className={styles.productPreviewContainer}
+                      onClick={() => setShowGalleryModal(true)}
+                    >
+                      {imageLoading ? (
+                        <Spinner />
+                      ) : (
+                        <img
+                          src={
+                            selectedImage
+                              ? `data:${selectedImage.contentType};base64,${selectedImage.imageFileBase64}`
+                              : addImageIcon
+                          }
+                          alt={selectedImage?._id}
+                          className={styles.productPreviewImage}
+                        />
+                      )}
+                    </button>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col>
+                    <TextInputField
+                      name="productSku"
+                      label="Product Sku*"
+                      type="text"
+                      placeholder="Product Sku"
+                      register={register}
+                      registerOptions={{ required: "Required" }}
+                    />
+                  </Col>
+                  <Col>
+                    <TextInputField
+                      name="barcodeUpc"
+                      label="UPC Barcode*"
+                      type="text"
+                      placeholder="UPC Barcode"
+                      register={register}
+                      registerOptions={{ required: "Required" }}
+                    />
+                  </Col>
+                </Row>
+                <Row>
+                  <Col>
+                    <DimensionsInputField
+                      name="dimensions"
+                      label="Dimensions*"
+                      register={register}
+                      registerOptions={{ required: "Required" }}
+                    />
+                  </Col>
+                  <Col>
+                    <TextInputField
+                      name="weight"
+                      label="Weight (grams)*"
+                      type="text"
+                      placeholder="Weight"
+                      register={register}
+                      registerOptions={{ required: "Required" }}
+                    />
+                  </Col>
+                </Row>
+                <Row>
+                  <Col>
+                    <TextInputField
+                      name="cogs"
+                      label="Cost of Goods Sold*"
+                      type="text"
+                      placeholder="COGS"
+                      register={register}
+                      registerOptions={{ required: "Required" }}
+                    />
+                  </Col>
+                  <Col>
+                    <PackageTypeInputField
+                      name="packageTypeId"
+                      label="Shipping Package"
+                      type="select"
+                      register={register}
+                    />
+                  </Col>
+                </Row>
+                <Row>
+                  <Col>
+                    <TextInputField
+                      name="domesticShippingCosts"
+                      label="Domestic Shipping Costs"
+                      type="text"
+                      placeholder="Domestic Shipping Costs"
+                      register={register}
+                    />
+                  </Col>
+                  <Col>
+                    <TextInputField
+                      name="internationalShippingCosts"
+                      label="International Shipping Costs"
+                      type="text"
+                      placeholder="International Shipping Costs"
+                      register={register}
+                    />
+                  </Col>
+                </Row>
+                <Row>
+                  <Col>
+                    <TextInputField
+                      name="dutiesAndTariffs"
+                      label="Duties And Tariffs"
+                      type="text"
+                      placeholder="Duties And Tariffs"
+                      register={register}
+                    />
+                  </Col>
+                  <Col>
+                    <TextInputField
+                      name="pickAndPackFee"
+                      label="Pick And Pack Fee"
+                      type="text"
+                      placeholder="Pick And Pack Fee"
+                      register={register}
+                    />
+                  </Col>
+                </Row>
+                <Row>
+                  <Col>
+                    <TextInputField
+                      name="amazonReferralFee"
+                      label="Amazon Referral Fee"
+                      type="text"
+                      placeholder="Amazon Referral Fee"
+                      register={register}
+                    />
+                  </Col>
+                  <Col>
+                    <TextInputField
+                      name="description"
+                      label="Description"
+                      type="text"
+                      placeholder="Description"
+                      register={register}
+                    />
+                  </Col>
+                </Row>
+                <Row>
+                  <Col>
+                    <MasterCaseDimensionsInputField
+                      name="masterCaseDimensions"
+                      label="Master Case Dimensions"
+                      register={register}
+                    />
+                  </Col>
+                  <Col>
+                    <TextInputField
+                      name="masterCaseWeight"
+                      label="Master Case Weight (lbs.)"
+                      type="number"
+                      placeholder="Master Case Weight"
+                      register={register}
+                    />
+                  </Col>
+                </Row>
+              </Form>
+            </Tab.Pane>
+            <Tab.Pane eventKey="listingSkus">
+              <ListingSkusModal
+                onListingSkusDataSubmit={handleListingSkusData}
+              />
+            </Tab.Pane>
+            <Tab.Pane eventKey="vendorProducts">
+              <VendorProductsModal />
+            </Tab.Pane>
+            <Tab.Pane eventKey="customs">
+              <Customs
+                productToEdit={productToEdit}
+                onCustomsDataSubmit={handleCustomsData}
+              />
+            </Tab.Pane>
+            <Tab.Pane eventKey="pricing">
+              <Pricing />
+            </Tab.Pane>
+          </Tab.Content>
+        </Tab.Container>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button type="submit" form="addEditProductForm" disabled={isSubmitting}>
+          Save
+        </Button>
+      </Modal.Footer>
+      {showGalleryModal && (
+        <GalleryModal
+          onDismiss={() => setShowGalleryModal(false)}
+          onSave={saveImageToProduct}
+        />
+      )}
+    </Modal>
+  );
+};
 
 export default AddEditProductDialog;

@@ -15,6 +15,7 @@ import { useForm } from "react-hook-form";
 import { ListingSkusInput } from "../network/products_api";
 import { ProductContext } from "../contexts/ProductContext";
 import * as ProductsApi from "../network/products_api";
+import { channel } from "diagnostics_channel";
 
 const columnHelper = createColumnHelper<ListingSkusInput>();
 
@@ -57,7 +58,7 @@ const columns = [
 ];
 
 interface ListingSkusTableProps {
-  onListingSkusDataSubmit: (input: ListingSkusInput) => void;
+  onListingSkusDataSubmit: (input: ListingSkusInput, index?: number) => void;
 }
 
 export default function ListingSkusTable({
@@ -65,35 +66,54 @@ export default function ListingSkusTable({
 }: ListingSkusTableProps) {
   const rerender = useReducer(() => ({}), {})[1];
   const [showAddListingSku, setShowAddListingSku] = useState(false);
+  const [showEditListingSku, setShowEditListingSku] = useState(false);
   const productToEdit = useContext(ProductContext);
 
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
 
   const [listingSkus, setListingSkus] = useState<ListingSkusInput[]>([]);
 
-  const { register, handleSubmit } = useForm<ListingSkusInput>({
+  const { register, handleSubmit, reset } = useForm<ListingSkusInput>({
     defaultValues: {},
   });
 
   useEffect(() => {
     setListingSkus(productToEdit?.product?.productListingSkus ?? []);
-    console.log(productToEdit?.product?.productListingSkus)
-  }, [productToEdit])
+  }, [productToEdit]);
+  useEffect(() => {
+    if (showEditListingSku) {
+      reset(listingSkus[+selectedRowId!]);
+    }
+  }, [showEditListingSku]);
 
-  // useEffect(() => {
-  //   console.log(listingSkus);
-  // }, [listingSkus])
   const onSubmit = (input: ListingSkusInput) => {
-    // possibly use handleListingSku data here.
-    // on submit, set producttoedit's listingsku data to include the added listingsku
-    onListingSkusDataSubmit(input);
-    console.log(listingSkus);
-    setListingSkus((currentData) => {
-      // If the current state is not null, spread the current data and add the new input
-      return currentData ? [...currentData, input] : [input];
-    });
+    if (showEditListingSku && selectedRowId !== null) {
+      console.log("EDIT COMPLETE");
+      // If showing edit and selectedRowId is not null, pass it as a second argument
+      onListingSkusDataSubmit(input, +selectedRowId);
+      setListingSkus((currentData) => {
+        const newData = [...currentData!];
+        newData[+selectedRowId!] = input;
+        return newData;
+      });
+    } else {
+      // In all other cases, pass only the input
+      onListingSkusDataSubmit(input);
+      setListingSkus((currentData) => {
+        return currentData ? [...currentData, input] : [input];
+      });
+    }
     setShowAddListingSku(false);
+    setShowEditListingSku(false);
+    reset({
+      channel: "",
+      listingSku: "",
+      pushInventory: false,
+      latency: "",
+      status: false,
+    });
   };
+
   const table = useReactTable({
     data: listingSkus,
     columns,
@@ -113,6 +133,7 @@ export default function ListingSkusTable({
           disabled={!selectedRowId}
           variant="outline-dark"
           className={styles.grayButton}
+          onClick={() => setShowEditListingSku(true)}
         >
           <b>EDIT</b>
         </Button>
@@ -175,6 +196,65 @@ export default function ListingSkusTable({
         <Modal show onHide={() => setShowAddListingSku(false)} centered={true}>
           <Modal.Header closeButton className={styles.modalHeader}>
             Add Listing Sku
+          </Modal.Header>
+          <Modal.Body>
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className={listingSkusStyles.listingSkusForm}
+            >
+              <label>Channel</label>
+              <input type="text" {...register("channel")}></input>
+
+              <label>Listing Sku</label>
+              <input type="text" {...register("listingSku")}></input>
+
+              <label>Latency</label>
+              <input type="text" {...register("latency")}></input>
+
+              <div className={listingSkusStyles.checkboxSection}>
+                <div>
+                  <label className={listingSkusStyles.checkboxLabel}>
+                    Push Inventory
+                  </label>
+                  <input
+                    type="checkbox"
+                    {...register("pushInventory")}
+                    className={listingSkusStyles.checkboxLarge}
+                  ></input>
+                </div>
+                <div>
+                  <label className={listingSkusStyles.checkboxLabel}>
+                    Status
+                  </label>
+                  <input
+                    type="checkbox"
+                    {...register("status")}
+                    className={listingSkusStyles.checkboxLarge}
+                  ></input>
+                </div>
+              </div>
+              <button type="submit">Submit</button>
+            </form>
+          </Modal.Body>
+        </Modal>
+      )}
+      {showEditListingSku && (
+        <Modal
+          show
+          onHide={() => {
+            setShowEditListingSku(false);
+            reset({
+              channel: "",
+              listingSku: "",
+              pushInventory: false,
+              latency: "",
+              status: false,
+            });
+          }}
+          centered={true}
+        >
+          <Modal.Header closeButton className={styles.modalHeader}>
+            Edit Listing Sku
           </Modal.Header>
           <Modal.Body>
             <form

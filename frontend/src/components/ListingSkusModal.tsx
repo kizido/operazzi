@@ -4,7 +4,7 @@ import ListingSkusTable from './ListingSkusTable'
 import { ListingSkusInput } from '../network/products_api'
 
 interface ListingSkusModalProps {
-    onListingSkusDataSubmit: (input: ListingSkusInput) => void,
+    onListingSkusDataSubmit: (input: ListingSkusInput, index?: number) => void,
 }
 
 export default function ListingSkusModal({onListingSkusDataSubmit}: ListingSkusModalProps) {
