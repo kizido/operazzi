@@ -94,6 +94,7 @@ export interface ProductInput {
     opex: string,
     productImageId: string | null,
     productCustomsInfo?: CustomsInput,
+    productListingSkus?: { channel: string, listingSku: string, pushInventory: boolean, latency: string, status: boolean }[],
     activated: boolean,
 }
 

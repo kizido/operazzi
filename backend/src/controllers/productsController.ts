@@ -117,7 +117,9 @@ export const createProduct: RequestHandler<
   const activated = req.body.activated;
   const productImageId = req.body.productImageId;
   const productCustomsInfo = req.body.productCustomsInfo;
-  const productListingSkus = req.body.productListingSkus;
+  const productListingSkus = req.body.productListingSkus
+    ? req.body.productListingSkus
+    : null;
   const authenticatedUserId = req.session.userId;
 
   try {
@@ -242,7 +244,9 @@ export const updateProduct: RequestHandler<
   const newAmazonReferralFee = req.body.amazonReferralFee;
   const newOpex = req.body.opex;
   const newProductImageId = req.body.productImageId;
-  const newProductListingSkus = req.body.productListingSkus;
+  const newProductListingSkus = req.body.productListingSkus
+    ? req.body.productListingSkus
+    : null;
   const newActivated = req.body.activated;
   const authenticatedUserId = req.session.userId;
 
@@ -344,7 +348,7 @@ export const updateProduct: RequestHandler<
     product.productImageId = newProductImageId;
     product.activated = newActivated;
 
-    if (newProductListingSkus !== undefined) {
+    if (newProductListingSkus) {
       // Clear the existing DocumentArray
       product.productListingSkus.splice(0, product.productListingSkus.length);
 
@@ -435,3 +439,58 @@ export const deleteProduct: RequestHandler = async (req, res, next) => {
     next(error);
   }
 };
+
+// interface UpdateProductListingSkuBody {
+//   listingSkus: IProductListingSku[];
+// }
+
+// export const updateProductListingSkus: RequestHandler<
+//   UpdateProductParams,
+//   unknown,
+//   UpdateProductListingSkuBody,
+//   unknown
+// > = async (req, res, next) => {
+//   const productId = req.params.productId;
+//   const newListingSkus = req.body.listingSkus;
+//   const authenticatedUserId = req.session.userId;
+
+//   try {
+//     assertIsDefined(authenticatedUserId);
+
+//     if (!mongoose.isValidObjectId(productId)) {
+//       throw createHttpError(400, "Invalid product ID");
+//     }
+
+//     // Validate product body
+//     if (!newListingSkus) {
+//       throw createHttpError(400, "Product must have listing skus!");
+//     }
+
+//     const product = await ProductModel.findById(productId).exec();
+
+//     if (!product) {
+//       throw createHttpError(404, "Product not found");
+//     }
+
+//     if (!product.userId.equals(authenticatedUserId)) {
+//       throw createHttpError(401, "You cannot access this product");
+//     }
+
+//     product.productListingSkus= newListingSkus;
+
+//     if (newProductListingSkus) {
+//       // Clear the existing DocumentArray
+//       product.productListingSkus.splice(0, product.productListingSkus.length);
+
+//       // Add the new items
+//       newProductListingSkus.forEach((sku) =>
+//         product.productListingSkus.push(sku)
+//       );
+//     }
+
+//     const updatedProduct = await product.save();
+//     res.status(200).json(updatedProduct);
+//   } catch (error) {
+//     next(error);
+//   }
+// };

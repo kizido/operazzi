@@ -1,4 +1,4 @@
-import { useState, useReducer, useContext } from "react";
+import { useState, useReducer, useContext, useEffect } from "react";
 import {
   createColumnHelper,
   flexRender,
@@ -11,100 +11,12 @@ import listingSkusStyles from "../styles/ListingSkus.module.css";
 import { Button, Modal } from "react-bootstrap";
 import redToggle from "../assets/icons8-toggle-on-50.png";
 import greenToggle from "../assets/icons8-toggle-50.png";
-import { Form, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { ListingSkusInput } from "../network/products_api";
-import { Product } from "../models/product";
-import ProductContext from "../contexts/ProductContext";
+import { ProductContext } from "../contexts/ProductContext";
+import * as ProductsApi from "../network/products_api";
 
-type ListingSkusTableModel = {
-  channel: string;
-  listingSku: string;
-  pushInventory: boolean;
-  latency: number;
-  status: boolean;
-};
-
-const defaultData: ListingSkusTableModel[] = [
-  {
-    channel: "Amazon",
-    listingSku: "SC-C-QD025-08",
-    pushInventory: true,
-    latency: 7,
-    status: true,
-  },
-  {
-    channel: "Walmart",
-    listingSku: "SC-C-QD025-08",
-    pushInventory: false,
-    latency: 7,
-    status: false,
-  },
-  {
-    channel: "Amazon",
-    listingSku: "SC-C-QD025-08",
-    pushInventory: true,
-    latency: 7,
-    status: true,
-  },
-  {
-    channel: "Walmart",
-    listingSku: "SC-C-QD025-08",
-    pushInventory: false,
-    latency: 7,
-    status: false,
-  },
-  {
-    channel: "Amazon",
-    listingSku: "SC-C-QD025-08",
-    pushInventory: true,
-    latency: 7,
-    status: true,
-  },
-  {
-    channel: "Amazon",
-    listingSku: "SC-C-QD025-08",
-    pushInventory: true,
-    latency: 7,
-    status: true,
-  },
-  {
-    channel: "Walmart",
-    listingSku: "SC-C-QD025-08",
-    pushInventory: false,
-    latency: 7,
-    status: false,
-  },
-  {
-    channel: "Amazon",
-    listingSku: "SC-C-QD025-08",
-    pushInventory: true,
-    latency: 7,
-    status: true,
-  },
-  {
-    channel: "Walmart",
-    listingSku: "SC-C-QD025-08",
-    pushInventory: false,
-    latency: 7,
-    status: false,
-  },
-  {
-    channel: "Amazon",
-    listingSku: "SC-C-QD025-08",
-    pushInventory: true,
-    latency: 7,
-    status: true,
-  },
-  {
-    channel: "Amazon",
-    listingSku: "SC-C-QD025-08",
-    pushInventory: true,
-    latency: 7,
-    status: true,
-  },
-];
-
-const columnHelper = createColumnHelper<ListingSkusTableModel>();
+const columnHelper = createColumnHelper<ListingSkusInput>();
 
 const columns = [
   columnHelper.accessor("channel", {
@@ -144,21 +56,46 @@ const columns = [
   }),
 ];
 
-export default function ListingSkusTable() {
-  const [data, setData] = useState(() => [...defaultData]);
+interface ListingSkusTableProps {
+  onListingSkusDataSubmit: (input: ListingSkusInput) => void;
+}
+
+export default function ListingSkusTable({
+  onListingSkusDataSubmit,
+}: ListingSkusTableProps) {
   const rerender = useReducer(() => ({}), {})[1];
   const [showAddListingSku, setShowAddListingSku] = useState(false);
   const productToEdit = useContext(ProductContext);
 
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
 
-  const { register } = useForm<ListingSkusInput>({
-    defaultValues: {
-    }
+  const [listingSkus, setListingSkus] = useState<ListingSkusInput[]>([]);
+
+  const { register, handleSubmit } = useForm<ListingSkusInput>({
+    defaultValues: {},
   });
 
+  useEffect(() => {
+    setListingSkus(productToEdit?.product?.productListingSkus ?? []);
+    console.log(productToEdit?.product?.productListingSkus)
+  }, [productToEdit])
+
+  // useEffect(() => {
+  //   console.log(listingSkus);
+  // }, [listingSkus])
+  const onSubmit = (input: ListingSkusInput) => {
+    // possibly use handleListingSku data here.
+    // on submit, set producttoedit's listingsku data to include the added listingsku
+    onListingSkusDataSubmit(input);
+    console.log(listingSkus);
+    setListingSkus((currentData) => {
+      // If the current state is not null, spread the current data and add the new input
+      return currentData ? [...currentData, input] : [input];
+    });
+    setShowAddListingSku(false);
+  };
   const table = useReactTable({
-    data,
+    data: listingSkus,
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
@@ -236,29 +173,45 @@ export default function ListingSkusTable() {
       </div>
       {showAddListingSku && (
         <Modal show onHide={() => setShowAddListingSku(false)} centered={true}>
-          <Modal.Header closeButton className={styles.modalHeader}>Add Listing Sku</Modal.Header>
+          <Modal.Header closeButton className={styles.modalHeader}>
+            Add Listing Sku
+          </Modal.Header>
           <Modal.Body>
-            <form className={listingSkusStyles.listingSkusForm}>
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className={listingSkusStyles.listingSkusForm}
+            >
               <label>Channel</label>
-              <input type="text"{...register("channel")}></input>
+              <input type="text" {...register("channel")}></input>
 
               <label>Listing Sku</label>
-              <input type="text"{...register("listingSku")}></input>
+              <input type="text" {...register("listingSku")}></input>
 
               <label>Latency</label>
-              <input type="text"{...register("latency")}></input>
+              <input type="text" {...register("latency")}></input>
 
               <div className={listingSkusStyles.checkboxSection}>
-                  <div>
-                      <label className={listingSkusStyles.checkboxLabel}>Push Inventory</label>
-                      <input type="checkbox"{...register("pushInventory")} className={listingSkusStyles.checkboxLarge}></input>
-                  </div>
-                  <div>
-                      <label className={listingSkusStyles.checkboxLabel}>Status</label>
-                      <input type="checkbox"{...register("status")} className={listingSkusStyles.checkboxLarge}></input>
-                  </div>
+                <div>
+                  <label className={listingSkusStyles.checkboxLabel}>
+                    Push Inventory
+                  </label>
+                  <input
+                    type="checkbox"
+                    {...register("pushInventory")}
+                    className={listingSkusStyles.checkboxLarge}
+                  ></input>
+                </div>
+                <div>
+                  <label className={listingSkusStyles.checkboxLabel}>
+                    Status
+                  </label>
+                  <input
+                    type="checkbox"
+                    {...register("status")}
+                    className={listingSkusStyles.checkboxLarge}
+                  ></input>
+                </div>
               </div>
-
               <button type="submit">Submit</button>
             </form>
           </Modal.Body>

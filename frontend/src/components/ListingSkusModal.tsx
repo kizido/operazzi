@@ -1,8 +1,13 @@
 import React from 'react'
 import styles from '../styles/Modal.module.css'
 import ListingSkusTable from './ListingSkusTable'
+import { ListingSkusInput } from '../network/products_api'
 
-export default function ListingSkusModal() {
+interface ListingSkusModalProps {
+    onListingSkusDataSubmit: (input: ListingSkusInput) => void,
+}
+
+export default function ListingSkusModal({onListingSkusDataSubmit}: ListingSkusModalProps) {
     return (
         <div>
             <p className={styles.smallDescriptionText}>
@@ -12,7 +17,7 @@ export default function ListingSkusModal() {
                 If a sales channel supports refreshing the connection for your listing and
                 corresponding duplciates, highlight the row and click Refresh Connection.
             </p>
-            <ListingSkusTable/>
+            <ListingSkusTable onListingSkusDataSubmit={onListingSkusDataSubmit}/>
         </div>
     )
 }
