@@ -4,7 +4,7 @@ import styles from '../styles/Modal.module.css'
 import tableStyles from '../styles/Table.module.css'
 import { Button } from 'react-bootstrap'
 
-type VendorProductsTableModel = {
+type VendorProductsModel = {
     vendor: string
     vendorSku: string
     minOrderQuantity: number
@@ -17,147 +17,6 @@ type PriceRange = {
     price: number,
 }
 
-const defaultData: VendorProductsTableModel[] = [
-    {
-        vendor: 'Davy',
-        vendorSku: 'SC-C-QD025-08',
-        minOrderQuantity: 100,
-        leadTime: 30,
-        vendorRangePrice: [
-            { minUnits: 1, maxUnits: 499, price: 2.20 },
-            { minUnits: 500, maxUnits: 999, price: 2.10 },
-            { minUnits: 1000, maxUnits: 2000, price: 2.00 },
-        ],
-    },
-    {
-        vendor: 'Sally',
-        vendorSku: 'SC-C-QD025-08',
-        minOrderQuantity: 100,
-        leadTime: 30,
-        vendorRangePrice: [
-            { minUnits: 1, maxUnits: 999, price: 3.50 },
-            { minUnits: 1000, maxUnits: 4999, price: 3.20 },
-            { minUnits: 5000, maxUnits: 9999, price: 2.80 },
-        ],
-    },
-    {
-        vendor: 'Peter',
-        vendorSku: 'SC-C-QD025-08',
-        minOrderQuantity: 100,
-        leadTime: 30,
-        vendorRangePrice: [
-            { minUnits: 1, maxUnits: 500, price: 2.20 }
-        ],
-    },
-    {
-        vendor: 'Chris',
-        vendorSku: 'SC-C-QD025-08',
-        minOrderQuantity: 100,
-        leadTime: 30,
-        vendorRangePrice: [
-            { minUnits: 1, maxUnits: 500, price: 2.20 }
-        ],
-    },
-    {
-        vendor: 'Michael',
-        vendorSku: 'SC-C-QD025-08',
-        minOrderQuantity: 100,
-        leadTime: 30,
-        vendorRangePrice: [
-            { minUnits: 1, maxUnits: 500, price: 2.20 }
-        ],
-    },
-    {
-        vendor: 'Davy',
-        vendorSku: 'SC-C-QD025-08',
-        minOrderQuantity: 100,
-        leadTime: 30,
-        vendorRangePrice: [
-            { minUnits: 1, maxUnits: 500, price: 2.20 }
-        ],
-    },
-    {
-        vendor: 'Sally',
-        vendorSku: 'SC-C-QD025-08',
-        minOrderQuantity: 100,
-        leadTime: 30,
-        vendorRangePrice: [
-            { minUnits: 1, maxUnits: 500, price: 2.20 }
-        ],
-    },
-    {
-        vendor: 'Peter',
-        vendorSku: 'SC-C-QD025-08',
-        minOrderQuantity: 100,
-        leadTime: 30,
-        vendorRangePrice: [
-            { minUnits: 1, maxUnits: 500, price: 2.20 }
-        ],
-    },
-    {
-        vendor: 'Chris',
-        vendorSku: 'SC-C-QD025-08',
-        minOrderQuantity: 100,
-        leadTime: 30,
-        vendorRangePrice: [
-            { minUnits: 1, maxUnits: 500, price: 2.20 }
-        ],
-    },
-    {
-        vendor: 'Michael',
-        vendorSku: 'SC-C-QD025-08',
-        minOrderQuantity: 100,
-        leadTime: 30,
-        vendorRangePrice: [
-            { minUnits: 1, maxUnits: 500, price: 2.20 }
-        ],
-    },
-    {
-        vendor: 'Davy',
-        vendorSku: 'SC-C-QD025-08',
-        minOrderQuantity: 100,
-        leadTime: 30,
-        vendorRangePrice: [
-            { minUnits: 1, maxUnits: 500, price: 2.20 }
-        ],
-    },
-    {
-        vendor: 'Sally',
-        vendorSku: 'SC-C-QD025-08',
-        minOrderQuantity: 100,
-        leadTime: 30,
-        vendorRangePrice: [
-            { minUnits: 1, maxUnits: 500, price: 2.20 }
-        ],
-    },
-    {
-        vendor: 'Peter',
-        vendorSku: 'SC-C-QD025-08',
-        minOrderQuantity: 100,
-        leadTime: 30,
-        vendorRangePrice: [
-            { minUnits: 1, maxUnits: 500, price: 2.20 }
-        ],
-    },
-    {
-        vendor: 'Chris',
-        vendorSku: 'SC-C-QD025-08',
-        minOrderQuantity: 100,
-        leadTime: 30,
-        vendorRangePrice: [
-            { minUnits: 1, maxUnits: 500, price: 2.20 }
-        ],
-    },
-    {
-        vendor: 'Michael',
-        vendorSku: 'SC-C-QD025-08',
-        minOrderQuantity: 100,
-        leadTime: 30,
-        vendorRangePrice: [
-            { minUnits: 1, maxUnits: 500, price: 2.20 }
-        ],
-    },
-]
 interface ExpandedRowContentProps {
     vendorRangePrice: PriceRange[],
 }
@@ -187,7 +46,8 @@ const ExpandedRowContent = ({ vendorRangePrice }: ExpandedRowContentProps) => {
     );
 };
 
-const columnHelper = createColumnHelper<VendorProductsTableModel>();
+
+const columnHelper = createColumnHelper<VendorProductsModel>();
 
 const columns = [
     columnHelper.display({
@@ -222,13 +82,13 @@ const columns = [
 
 export default function VendorProductsTable() {
 
-    const [data, setData] = useState(() => [...defaultData]);
+    const [vendorProducts, setVendorProducts] = useState<VendorProductsModel[]>([]);
     const rerender = useReducer(() => ({}), {})[1];
 
     const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
 
     const table = useReactTable({
-        data,
+        data: vendorProducts,
         columns,
         getCoreRowModel: getCoreRowModel(),
         getExpandedRowModel: getExpandedRowModel(),
