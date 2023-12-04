@@ -129,7 +129,7 @@
     border-color: #f0f0f0;
 }
 
-.grayButton:active, .grayButton:focus {
+.grayButton:active {
     background-color: #dddddd !important;
     color: #4fa2a8 !important;
     border-color: #f0f0f0 !important;
