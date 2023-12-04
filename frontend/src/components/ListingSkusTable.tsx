@@ -1,8 +1,9 @@
-import { useState, useReducer, useContext, useEffect } from "react";
+import { useState, useReducer, useContext, useEffect, useMemo } from "react";
 import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
+  getFilteredRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 import styles from "../styles/Modal.module.css";
@@ -72,6 +73,7 @@ export default function ListingSkusTable({
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
 
   const [listingSkus, setListingSkus] = useState<ListingSkusInput[]>([]);
+  const [showInactive, setShowInactive] = useState(false);
 
   const { register, handleSubmit, reset } = useForm<ListingSkusInput>({
     defaultValues: {},
@@ -85,6 +87,12 @@ export default function ListingSkusTable({
       reset(listingSkus[+selectedRowId!]);
     }
   }, [showEditListingSku]);
+
+  const filteredSkus = useMemo(() => {
+    return showInactive
+      ? listingSkus.filter((sku) => !sku.status || sku.status)
+      : listingSkus.filter((sku) => sku.status);
+  }, [listingSkus, showInactive]);
 
   const onSubmit = (input: ListingSkusInput) => {
     if (showEditListingSku && selectedRowId !== null) {
@@ -115,7 +123,7 @@ export default function ListingSkusTable({
   };
 
   const table = useReactTable({
-    data: listingSkus,
+    data: filteredSkus,
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
@@ -138,17 +146,42 @@ export default function ListingSkusTable({
           <b>EDIT</b>
         </Button>
         <Button
+          onClick={() => {
+            const modifiedIndex = listingSkus.findIndex(
+              (sku, idx) => sku === filteredSkus[+selectedRowId!]
+            );
+            onListingSkusDataSubmit({...listingSkus[modifiedIndex], status: !listingSkus[modifiedIndex].status}, modifiedIndex);
+            setListingSkus(
+              listingSkus.map((sku, idx) =>
+                sku === filteredSkus[+selectedRowId!]
+                  ? { ...sku, status: !sku.status }
+                  : sku
+              )
+            );
+            if (!showInactive) setSelectedRowId(null);
+          }}
           disabled={!selectedRowId}
           variant="outline-dark"
           className={styles.grayButton}
         >
-          <b>DEACTIVATE</b>
+          <b>
+            {selectedRowId && !filteredSkus[+selectedRowId!].status
+              ? "ACTIVATE"
+              : "DEACTIVATE"}
+          </b>
         </Button>
-        <Button variant="outline-dark" className={styles.grayButton}>
+        {/* <Button variant="outline-dark" className={styles.grayButton}>
           <b>REFRESH CONN.</b>
-        </Button>
-        <Button variant="outline-dark" className={styles.grayButton}>
-          <b>SHOW INACTIVE</b>
+        </Button> */}
+        <Button
+          onClick={() => {
+            setShowInactive(!showInactive);
+            setSelectedRowId(null);
+          }}
+          variant="outline-dark"
+          className={styles.grayButton}
+        >
+          <b>{showInactive ? "HIDE INACTIVE" : "SHOW INACTIVE"}</b>
         </Button>
       </div>
       <div className={styles.scrollableTableContainer}>
