@@ -1,0 +1,42 @@
+.vendorProductForm {
+    display: flex;
+    flex-direction: column;
+}
+.vendorProductForm input {
+    margin-bottom: 1rem;
+    max-width: 7rem;
+}
+
+.vendorProductGridContainer {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    padding: 10px;
+    gap: 1rem;
+}
+
+.item1 {
+    border: 1px dashed gray;
+    padding: 1rem;
+}
+.item2 {
+    border: 1px dashed gray;
+}
+
+.priceRangeContainer {
+    padding: 10px;
+    display: inline-block;
+}
+.priceRangeContainer label {
+    font-size: small;
+}
+.priceRangeContainer input {
+    max-width: 2.5rem;
+    max-height: 1.5rem;
+}
+.priceRangeContainer label, input {
+    margin-right: 0.3rem;
+}
+.priceRangeContainer button {
+    font-size: 12px;
+}
+
