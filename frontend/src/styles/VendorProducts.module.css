@@ -40,3 +40,58 @@
     font-size: 12px;
 }
 
+.priceRangeTableContainer {
+    border: 1px solid black;
+    margin-top: 1rem;
+    height: 18rem;
+    overflow-y: auto;
+}
+.priceRangeTableContainer th {
+    margin: 0 30px;
+}
+
+/* styles.css */
+.priceRangeTable {
+    border-collapse: collapse;
+    border-spacing: 0;
+    width: 100%;
+    display: table;
+    border: 1px solid #ccc;
+}
+
+.priceRangeTable tr {
+    border-bottom: 1px solid #ddd
+}
+.pricerange
+.priceRangeTable td {
+    padding: 8px 8px;
+    display: table-cell;
+    text-align: center;
+    vertical-align: top
+}
+.priceRangeTable th {
+    padding: 8px 8px;
+    display: table-cell;
+    text-align: left;
+    vertical-align: top;
+    font-size: 0.8em;
+    border: solid black 1px;
+    background-color: #f8f8f8;
+}
+.priceRangeTable th:last-child, td:last-child {
+    text-align: right;
+}
+.priceRangeTable th:first-child,
+.priceRangeTable td:first-child {
+    padding-left: 16px
+}
+.tableRow:nth-child(even) {
+    background-color: #f8f8f8;
+    /* Light gray */
+}
+
+.tableRow:hover {
+    background-color: rgb(223, 223, 223);
+    /* Darker gray */
+}
+
