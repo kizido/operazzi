@@ -1,12 +1,15 @@
 import React from 'react'
-import VendorProductsTable from './VendorProductsTable'
+import VendorProductsTable, { VendorProductsModel } from './VendorProductsTable'
 import styles from '../styles/Modal.module.css'
 
-export default function VendorProductsModal() {
+interface VendorProductsModalProps {
+    vendorProductsDataSubmit: (input: VendorProductsModel) => void,
+}
+export default function VendorProductsModal({vendorProductsDataSubmit}: VendorProductsModalProps) {
     return (
         <div><p className={styles.smallDescriptionText}>
             Add vendor SKUs associated with this product.
         </p>
-            <VendorProductsTable /></div>
+            <VendorProductsTable vendorProductsDataSubmit={vendorProductsDataSubmit}/></div>
     )
 }

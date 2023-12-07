@@ -29,6 +29,7 @@ import Customs from "./Customs";
 import { CustomsInput } from "../network/products_api";
 import Pricing from "./Pricing";
 import { ProductContext } from "../contexts/ProductContext";
+import { VendorProductsModel } from "./VendorProductsTable";
 
 interface AddEditProductDialogProps {
   productToEdit?: Product;
@@ -119,6 +120,7 @@ const AddEditProductDialog = ({
   const [listingSkusInputData, setListingSkusInputData] = useState<
     ProductsApi.ListingSkusInput[] | null
   >(null);
+  const [vendorProductsInputData, setVendorProductsInputData] = useState<VendorProductsModel[]>([]);
 
   async function onSubmit(input: ProductInput) {
     selectedImage && (input.productImageId = selectedImage?._id);
@@ -173,6 +175,9 @@ const AddEditProductDialog = ({
       });
     }
   };
+  const handleVendorProductsData = (input: VendorProductsModel) => {
+    setVendorProductsInputData([...vendorProductsInputData, input]);
+  }
 
   function saveImageToProduct(updatedImage: ProductImage | null) {
     setSelectedImage(updatedImage);
@@ -435,7 +440,7 @@ const AddEditProductDialog = ({
               />
             </Tab.Pane>
             <Tab.Pane eventKey="vendorProducts">
-              <VendorProductsModal />
+              <VendorProductsModal vendorProductsDataSubmit={handleVendorProductsData}/>
             </Tab.Pane>
             <Tab.Pane eventKey="customs">
               <Customs
