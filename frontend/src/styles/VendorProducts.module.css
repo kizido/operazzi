@@ -62,12 +62,12 @@
 .priceRangeTable tr {
     border-bottom: 1px solid #ddd
 }
-.pricerange
 .priceRangeTable td {
     padding: 8px 8px;
     display: table-cell;
     text-align: center;
-    vertical-align: top
+    vertical-align: top;
+    font-size: 0.7em;
 }
 .priceRangeTable th {
     padding: 8px 8px;
@@ -75,7 +75,6 @@
     text-align: left;
     vertical-align: top;
     font-size: 0.8em;
-    border: solid black 1px;
     background-color: #f8f8f8;
 }
 .priceRangeTable th:last-child, td:last-child {
@@ -93,5 +92,8 @@
 .tableRow:hover {
     background-color: rgb(223, 223, 223);
     /* Darker gray */
+}
+.removeButton {
+    font-size: 0.8em !important;
 }
 

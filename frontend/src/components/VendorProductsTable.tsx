@@ -12,7 +12,7 @@ import tableStyles from "../styles/Table.module.css";
 import vendorProductStyles from "../styles/VendorProducts.module.css";
 import { Button, Modal } from "react-bootstrap";
 
-type VendorProductsModel = {
+export type VendorProductsModel = {
   vendor: string;
   vendorSku: string;
   minOrderQuantity: number;
@@ -90,23 +90,11 @@ const columns = [
   }),
 ];
 
-const priceRangeColumnHelper = createColumnHelper<PriceRange>();
-const priceRangeColumns = [
-  priceRangeColumnHelper.accessor("minUnits", {
-    header: () => <span>From Qty</span>,
-    cell: (info) => <i>{info.getValue()}</i>,
-  }),
-  priceRangeColumnHelper.accessor("maxUnits", {
-    header: () => <span>To Qty</span>,
-    cell: (info) => <i>{info.getValue()}</i>,
-  }),
-  priceRangeColumnHelper.accessor("price", {
-    header: () => <span>Cost</span>,
-    cell: (info) => <i>{info.getValue()}</i>,
-  }),
-];
+interface VendorProductsTableProps {
+    vendorProductsDataSubmit: (input: VendorProductsModel) => void,
+}
 
-export default function VendorProductsTable() {
+export default function VendorProductsTable({vendorProductsDataSubmit}: VendorProductsTableProps) {
   const [vendorProducts, setVendorProducts] = useState<VendorProductsModel[]>(
     []
   );
@@ -132,6 +120,35 @@ export default function VendorProductsTable() {
     getExpandedRowModel: getExpandedRowModel(),
   });
 
+  const priceRangeColumnHelper = createColumnHelper<PriceRange>();
+const priceRangeColumns = [
+  priceRangeColumnHelper.accessor("minUnits", {
+    header: () => <span>From Qty</span>,
+    cell: (info) => <i>{info.getValue()}</i>,
+  }),
+  priceRangeColumnHelper.accessor("maxUnits", {
+    header: () => <span>To Qty</span>,
+    cell: (info) => <i>{info.getValue()}</i>,
+  }),
+  priceRangeColumnHelper.accessor("price", {
+    header: () => <span>Cost</span>,
+    cell: (info) => <i>{info.getValue()}</i>,
+  }),
+  priceRangeColumnHelper.display({
+    id: "remove",
+    cell: ({ row }) => (
+      <button
+        className={vendorProductStyles.removeButton}
+        type="button"
+        onClick={() => remove(row.index)}
+        aria-label="Toggle Row Expanded"
+      >
+        X
+      </button>
+    ),
+  }),
+];
+
   const priceRangeTable = useReactTable({
     data: fields,
     columns: priceRangeColumns,
@@ -139,7 +156,8 @@ export default function VendorProductsTable() {
   });
 
   const onSubmit = (input: VendorProductsModel) => {
-    console.log(input.vendorRangePrice);
+    vendorProductsDataSubmit(input);
+    setVendorProducts([...vendorProducts, input]);
   };
 
   const [newPriceRange, setNewPriceRange] = useState<PriceRange>({
@@ -291,26 +309,28 @@ export default function VendorProductsTable() {
                     <table className={vendorProductStyles.priceRangeTable}>
                       <thead>
                         {/* Render headers */}
-                        {priceRangeTable.getHeaderGroups().map((headerGroup) => (
-                          <tr key={headerGroup.id}>
-                            {headerGroup.headers.map((header) => (
-                              <th
-                                key={header.id}
-                                onClick={header.column.getToggleSortingHandler()}
-                              >
-                                {flexRender(
-                                  header.column.columnDef.header,
-                                  header.getContext()
-                                )}
-                                {header.column.getIsSorted() === "asc"
-                                  ? "🔼"
-                                  : header.column.getIsSorted() === "desc"
-                                  ? "🔽"
-                                  : null}
-                              </th>
-                            ))}
-                          </tr>
-                        ))}
+                        {priceRangeTable
+                          .getHeaderGroups()
+                          .map((headerGroup) => (
+                            <tr key={headerGroup.id}>
+                              {headerGroup.headers.map((header) => (
+                                <th
+                                  key={header.id}
+                                  onClick={header.column.getToggleSortingHandler()}
+                                >
+                                  {flexRender(
+                                    header.column.columnDef.header,
+                                    header.getContext()
+                                  )}
+                                  {header.column.getIsSorted() === "asc"
+                                    ? "🔼"
+                                    : header.column.getIsSorted() === "desc"
+                                    ? "🔽"
+                                    : null}
+                                </th>
+                              ))}
+                            </tr>
+                          ))}
                       </thead>
                       <tbody>
                         {/* Render the rows of the table and their bodies */}
