@@ -7,6 +7,7 @@ import { ProductBrand } from "../models/productBrand";
 import { ProductPackageType } from "../models/productPackageType";
 import { ProductImage } from "../models/productImage";
 import { ProductCustoms } from "../models/productCustoms";
+import { PriceRange } from "../components/VendorProductsTable";
 
 async function fetchData(input: RequestInfo, init?: RequestInit) {
     const response = await fetch(input, init);
@@ -95,6 +96,7 @@ export interface ProductInput {
     productImageId: string | null,
     productCustomsInfo?: CustomsInput,
     productListingSkus?: { channel: string, listingSku: string, pushInventory: boolean, latency: string, status: boolean }[],
+    vendorProducts?: { vendor: string, vendorSku: string, minOrderQty: string, leadTime: string, vendorRangePrice: PriceRange[]}
     activated: boolean,
 }
 

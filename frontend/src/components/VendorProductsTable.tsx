@@ -15,11 +15,11 @@ import { Button, Modal } from "react-bootstrap";
 export type VendorProductsModel = {
   vendor: string;
   vendorSku: string;
-  minOrderQuantity: number;
-  leadTime: number;
+  minOrderQuantity: string;
+  leadTime: string;
   vendorRangePrice: PriceRange[];
 };
-type PriceRange = {
+export type PriceRange = {
   minUnits: string;
   maxUnits: string;
   price: string;
@@ -104,9 +104,15 @@ export default function VendorProductsTable({vendorProductsDataSubmit}: VendorPr
 
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
 
-  const { register, control, handleSubmit, setValue } =
+  const { register, control, handleSubmit, reset } =
     useForm<VendorProductsModel>({
-      defaultValues: {},
+      defaultValues: {
+        vendor: '',
+        vendorSku: '',
+        minOrderQuantity: '',
+        leadTime: '',
+        vendorRangePrice: [],
+      },
     });
   const { fields, append, remove } = useFieldArray({
     control,
@@ -158,6 +164,8 @@ const priceRangeColumns = [
   const onSubmit = (input: VendorProductsModel) => {
     vendorProductsDataSubmit(input);
     setVendorProducts([...vendorProducts, input]);
+    setShowAddVendorProduct(false);
+    reset();
   };
 
   const [newPriceRange, setNewPriceRange] = useState<PriceRange>({

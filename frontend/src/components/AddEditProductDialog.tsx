@@ -128,6 +128,7 @@ const AddEditProductDialog = ({
 
     if (customsData) input.productCustomsInfo = customsData;
     if (listingSkusInputData) input.productListingSkus = listingSkusInputData;
+  
 
     try {
       let productResponse: Product;
