@@ -170,9 +170,6 @@ export default function ListingSkusTable({
               : "DEACTIVATE"}
           </b>
         </Button>
-        {/* <Button variant="outline-dark" className={styles.grayButton}>
-          <b>REFRESH CONN.</b>
-        </Button> */}
         <Button
           onClick={() => {
             setShowInactive(!showInactive);

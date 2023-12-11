@@ -93,7 +93,7 @@ const columns = [
 ];
 
 interface VendorProductsTableProps {
-  vendorProductsDataSubmit: (input: VendorProductsModel) => void;
+  vendorProductsDataSubmit: (input: VendorProductsModel, index?: number) => void;
 }
 
 export default function VendorProductsTable({
@@ -106,7 +106,7 @@ export default function VendorProductsTable({
 
   const [showAddVendorProduct, setShowAddVendorProduct] = useState(false);
   const [showEditVendorProduct, setShowEditVendorProduct] = useState(false);
-  
+
   const productToEdit = useContext(ProductContext);
 
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
@@ -127,7 +127,12 @@ export default function VendorProductsTable({
   });
   useEffect(() => {
     setVendorProducts(productToEdit?.product?.productVendorProducts ?? []);
-  }, [productToEdit])
+  }, [productToEdit]);
+  useEffect(() => {
+    if (showEditVendorProduct) {
+      reset(vendorProducts[+selectedRowId!]);
+    }
+  }, [showEditVendorProduct]);
 
   const table = useReactTable({
     data: vendorProducts,
@@ -172,10 +177,28 @@ export default function VendorProductsTable({
   });
 
   const onSubmit = (input: VendorProductsModel) => {
-    vendorProductsDataSubmit(input);
-    setVendorProducts([...vendorProducts, input]);
+    if (showEditVendorProduct && selectedRowId !== null) {
+      vendorProductsDataSubmit(input, +selectedRowId);
+      setVendorProducts((currentData) => {
+        const newData = [...currentData!];
+        newData[+selectedRowId!] = input;
+        return newData;
+      });
+    } else {
+      vendorProductsDataSubmit(input);
+      setVendorProducts((currentData) => {
+        return currentData ? [...currentData, input] : [input];
+      });
+    }
     setShowAddVendorProduct(false);
-    reset();
+    setShowEditVendorProduct(false);
+    reset({
+      vendor: "",
+      vendorSku: "",
+      minOrderQuantity: "",
+      leadTime: "",
+      vendorRangePrice: [],
+    });
   };
 
   const [newPriceRange, setNewPriceRange] = useState<PriceRange>({
@@ -199,6 +222,7 @@ export default function VendorProductsTable({
           <b>NEW VENDOR PRODUCT</b>
         </Button>
         <Button
+          onClick={() => setShowEditVendorProduct(true)}
           disabled={!selectedRowId}
           variant="outline-dark"
           className={styles.grayButton}
@@ -270,6 +294,138 @@ export default function VendorProductsTable({
         >
           <Modal.Header closeButton className={styles.modalHeader}>
             <Modal.Title>Add Vendor Product</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <form className={vendorProductStyles.vendorProductForm}>
+              <div className={vendorProductStyles.vendorProductGridContainer}>
+                <div className={vendorProductStyles.item1}>
+                  <label>Vendor</label>
+                  <input type="text" {...register("vendor")}></input>
+                  <label>Vendor Sku</label>
+                  <input type="text" {...register("vendorSku")}></input>
+                  <label>Min Order Quantity</label>
+                  <input type="text" {...register("minOrderQuantity")}></input>
+                  <label>Lead Time</label>
+                  <input type="text" {...register("leadTime")}></input>
+                </div>
+                <div
+                  className={`${vendorProductStyles.item2} ${vendorProductStyles.priceRangeContainer}`}
+                >
+                  <label>From:</label>
+                  <input
+                    type="text"
+                    value={newPriceRange.minUnits}
+                    onChange={(e) =>
+                      setNewPriceRange((prevState) => ({
+                        ...prevState,
+                        minUnits: e.target.value,
+                      }))
+                    }
+                  />
+                  <label>To:</label>
+                  <input
+                    type="text"
+                    value={newPriceRange.maxUnits}
+                    onChange={(e) =>
+                      setNewPriceRange((prevState) => ({
+                        ...prevState,
+                        maxUnits: e.target.value,
+                      }))
+                    }
+                  />
+                  <label>Price:</label>
+                  <input
+                    type="text"
+                    value={newPriceRange.price}
+                    onChange={(e) =>
+                      setNewPriceRange((prevState) => ({
+                        ...prevState,
+                        price: e.target.value,
+                      }))
+                    }
+                  />
+                  <button type="button" onClick={addPriceRange}>
+                    Add
+                  </button>
+                  <div className={vendorProductStyles.priceRangeTableContainer}>
+                    <table className={vendorProductStyles.priceRangeTable}>
+                      <thead>
+                        {/* Render headers */}
+                        {priceRangeTable
+                          .getHeaderGroups()
+                          .map((headerGroup) => (
+                            <tr key={headerGroup.id}>
+                              {headerGroup.headers.map((header) => (
+                                <th
+                                  key={header.id}
+                                  onClick={header.column.getToggleSortingHandler()}
+                                >
+                                  {flexRender(
+                                    header.column.columnDef.header,
+                                    header.getContext()
+                                  )}
+                                  {header.column.getIsSorted() === "asc"
+                                    ? "🔼"
+                                    : header.column.getIsSorted() === "desc"
+                                    ? "🔽"
+                                    : null}
+                                </th>
+                              ))}
+                            </tr>
+                          ))}
+                      </thead>
+                      <tbody>
+                        {/* Render the rows of the table and their bodies */}
+                        {priceRangeTable.getRowModel().rows.map((row) => (
+                          <tr
+                            key={row.id}
+                            className={`${vendorProductStyles.tableRow} ${
+                              row.id === selectedRowId ? styles.selected : ""
+                            }`}
+                            onClick={() =>
+                              setSelectedRowId(
+                                row.id === selectedRowId ? null : row.id
+                              )
+                            }
+                          >
+                            {row.getVisibleCells().map((cell) => (
+                              <td key={cell.id}>
+                                {flexRender(
+                                  cell.column.columnDef.cell,
+                                  cell.getContext()
+                                )}
+                              </td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              <button onClick={handleSubmit(onSubmit)}>Submit</button>
+            </form>
+          </Modal.Body>
+        </Modal>
+      )}
+      {showEditVendorProduct && (
+        <Modal
+          show
+          onHide={() => {
+            setShowEditVendorProduct(false);
+            reset({
+              vendor: "",
+              vendorSku: "",
+              minOrderQuantity: "",
+              leadTime: "",
+              vendorRangePrice: [],
+            });
+          }}
+          centered
+          className={vendorProductStyles.vendorProductModal}
+        >
+          <Modal.Header closeButton className={styles.modalHeader}>
+            <Modal.Title>Edit Vendor Product</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <form className={vendorProductStyles.vendorProductForm}>

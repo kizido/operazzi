@@ -3,7 +3,7 @@ import VendorProductsTable, { VendorProductsModel } from './VendorProductsTable'
 import styles from '../styles/Modal.module.css'
 
 interface VendorProductsModalProps {
-    vendorProductsDataSubmit: (input: VendorProductsModel) => void,
+    vendorProductsDataSubmit: (input: VendorProductsModel, index?: number) => void,
 }
 export default function VendorProductsModal({vendorProductsDataSubmit}: VendorProductsModalProps) {
     return (

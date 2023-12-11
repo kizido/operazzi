@@ -180,10 +180,21 @@ const AddEditProductDialog = ({
       });
     }
   };
-  const handleVendorProductsData = (input: VendorProductsModel) => {
-    setVendorProductsInputData((currentData) => {
-      return currentData ? [...currentData, input] : [input];
-    });
+  const handleVendorProductsData = (
+    input: VendorProductsModel,
+    index?: number
+  ) => {
+    if (index !== undefined) {
+      setVendorProductsInputData((currentData) => {
+        const newData = [...currentData!];
+        newData[index] = input;
+        return newData;
+      });
+    } else {
+      setVendorProductsInputData((currentData) => {
+        return currentData ? [...currentData, input] : [input];
+      });
+    }
   };
 
   function saveImageToProduct(updatedImage: ProductImage | null) {
