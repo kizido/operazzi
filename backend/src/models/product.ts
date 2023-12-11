@@ -7,6 +7,18 @@ const productListingSkuSchema = new Schema({
   latency: { type: String, required: true },
   status: { type: Boolean, required: true },
 });
+const vendorRangePriceSchema = new Schema({
+  minUnits: { type: String, required: true },
+  maxUnits: { type: String, required: true },
+  price: { type: String, required: true }
+});
+const productVendorProductSchema = new Schema({
+  vendor: { type: String, required: true },
+  vendorSku: { type: String, required: true },
+  minOrderQuantity: { type: String, required: true },
+  leadTime: { type: String, required: true },
+  vendorRangePrice: [vendorRangePriceSchema],
+})
 
 export interface IProductListingSku {
   channel: string,
@@ -14,6 +26,18 @@ export interface IProductListingSku {
   pushInventory: boolean,
   latency: string,
   status: boolean,
+}
+
+export interface IProductVendorProduct {
+  vendor: string,
+  vendorSku: string,
+  minOrderQuantity: string,
+  leadTime: string,
+  vendorRangePrice: {
+    minUnits: string,
+    maxUnits: string,
+    price: string,
+  }[],
 }
 
 const productSchema = new Schema(
@@ -56,6 +80,7 @@ const productSchema = new Schema(
     }, // Reference to the ProductImage
     productCustomsId: { type: Schema.Types.ObjectId, ref: "ProductCustoms" },
     productListingSkus: [productListingSkuSchema],
+    productVendorProducts: [productVendorProductSchema],
     activated: { type: Boolean },
   },
   { timestamps: true }

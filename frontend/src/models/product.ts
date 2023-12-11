@@ -39,6 +39,17 @@ export interface Product {
     latency: string;
     status: boolean;
   }[];
+  productVendorProducts: {
+    vendor: string;
+    vendorSku: string;
+    minOrderQuantity: string;
+    leadTime: string;
+    vendorRangePrice: {
+      minUnits: string;
+      maxUnits: string;
+      price: string;
+    }[];
+  }[];
   activated: boolean;
   createdAt: string;
   updatedAt: string;

@@ -91,6 +91,7 @@ const AddEditProductDialog = ({
     if (productToEdit) {
       productContext?.setProduct(productToEdit);
       setListingSkusInputData(productToEdit.productListingSkus);
+      setVendorProductsInputData(productToEdit.productVendorProducts);
     } else {
       productContext?.setProduct(null);
     }
@@ -120,7 +121,9 @@ const AddEditProductDialog = ({
   const [listingSkusInputData, setListingSkusInputData] = useState<
     ProductsApi.ListingSkusInput[] | null
   >(null);
-  const [vendorProductsInputData, setVendorProductsInputData] = useState<VendorProductsModel[]>([]);
+  const [vendorProductsInputData, setVendorProductsInputData] = useState<
+    VendorProductsModel[] | null
+  >([]);
 
   async function onSubmit(input: ProductInput) {
     selectedImage && (input.productImageId = selectedImage?._id);
@@ -128,7 +131,8 @@ const AddEditProductDialog = ({
 
     if (customsData) input.productCustomsInfo = customsData;
     if (listingSkusInputData) input.productListingSkus = listingSkusInputData;
-  
+    if (vendorProductsInputData)
+      input.productVendorProducts = vendorProductsInputData;
 
     try {
       let productResponse: Product;
@@ -177,8 +181,10 @@ const AddEditProductDialog = ({
     }
   };
   const handleVendorProductsData = (input: VendorProductsModel) => {
-    setVendorProductsInputData([...vendorProductsInputData, input]);
-  }
+    setVendorProductsInputData((currentData) => {
+      return currentData ? [...currentData, input] : [input];
+    });
+  };
 
   function saveImageToProduct(updatedImage: ProductImage | null) {
     setSelectedImage(updatedImage);
@@ -441,7 +447,9 @@ const AddEditProductDialog = ({
               />
             </Tab.Pane>
             <Tab.Pane eventKey="vendorProducts">
-              <VendorProductsModal vendorProductsDataSubmit={handleVendorProductsData}/>
+              <VendorProductsModal
+                vendorProductsDataSubmit={handleVendorProductsData}
+              />
             </Tab.Pane>
             <Tab.Pane eventKey="customs">
               <Customs

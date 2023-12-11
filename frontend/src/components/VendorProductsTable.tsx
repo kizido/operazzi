@@ -1,4 +1,4 @@
-import React, { useState, useReducer, useEffect } from "react";
+import React, { useState, useReducer, useEffect, useContext } from "react";
 import {
   createColumnHelper,
   flexRender,
@@ -11,6 +11,8 @@ import styles from "../styles/Modal.module.css";
 import tableStyles from "../styles/Table.module.css";
 import vendorProductStyles from "../styles/VendorProducts.module.css";
 import { Button, Modal } from "react-bootstrap";
+import * as ProductsApi from "../network/products_api";
+import { ProductContext } from "../contexts/ProductContext";
 
 export type VendorProductsModel = {
   vendor: string;
@@ -36,7 +38,7 @@ const ExpandedRowContent = ({ vendorRangePrice }: ExpandedRowContentProps) => {
     >
       <thead>
         <tr>
-          <th className={styles.listingSkuTableH}></th>
+          {/* <th className={styles.listingSkuTableH}></th> */}
           <th className={styles.listingSkuTableH}>From</th>
           <th className={styles.listingSkuTableH}>To</th>
           <th className={styles.listingSkuTableH}>Price</th>
@@ -45,7 +47,7 @@ const ExpandedRowContent = ({ vendorRangePrice }: ExpandedRowContentProps) => {
       <tbody className={styles.listingSkuTableBody}>
         {vendorRangePrice.map((priceRange, index) => (
           <tr key={index} className={tableStyles.tableRow}>
-            <td>{index + 1}</td>
+            {/* <td>{index + 1}</td> */}
             <td>{priceRange.minUnits}</td>
             <td>{priceRange.maxUnits}</td>
             <td>${priceRange.price}</td>
@@ -91,26 +93,31 @@ const columns = [
 ];
 
 interface VendorProductsTableProps {
-    vendorProductsDataSubmit: (input: VendorProductsModel) => void,
+  vendorProductsDataSubmit: (input: VendorProductsModel) => void;
 }
 
-export default function VendorProductsTable({vendorProductsDataSubmit}: VendorProductsTableProps) {
+export default function VendorProductsTable({
+  vendorProductsDataSubmit,
+}: VendorProductsTableProps) {
   const [vendorProducts, setVendorProducts] = useState<VendorProductsModel[]>(
     []
   );
   const rerender = useReducer(() => ({}), {})[1];
 
   const [showAddVendorProduct, setShowAddVendorProduct] = useState(false);
+  const [showEditVendorProduct, setShowEditVendorProduct] = useState(false);
+  
+  const productToEdit = useContext(ProductContext);
 
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
 
   const { register, control, handleSubmit, reset } =
     useForm<VendorProductsModel>({
       defaultValues: {
-        vendor: '',
-        vendorSku: '',
-        minOrderQuantity: '',
-        leadTime: '',
+        vendor: "",
+        vendorSku: "",
+        minOrderQuantity: "",
+        leadTime: "",
         vendorRangePrice: [],
       },
     });
@@ -118,6 +125,9 @@ export default function VendorProductsTable({vendorProductsDataSubmit}: VendorPr
     control,
     name: "vendorRangePrice",
   });
+  useEffect(() => {
+    setVendorProducts(productToEdit?.product?.productVendorProducts ?? []);
+  }, [productToEdit])
 
   const table = useReactTable({
     data: vendorProducts,
@@ -127,33 +137,33 @@ export default function VendorProductsTable({vendorProductsDataSubmit}: VendorPr
   });
 
   const priceRangeColumnHelper = createColumnHelper<PriceRange>();
-const priceRangeColumns = [
-  priceRangeColumnHelper.accessor("minUnits", {
-    header: () => <span>From Qty</span>,
-    cell: (info) => <i>{info.getValue()}</i>,
-  }),
-  priceRangeColumnHelper.accessor("maxUnits", {
-    header: () => <span>To Qty</span>,
-    cell: (info) => <i>{info.getValue()}</i>,
-  }),
-  priceRangeColumnHelper.accessor("price", {
-    header: () => <span>Cost</span>,
-    cell: (info) => <i>{info.getValue()}</i>,
-  }),
-  priceRangeColumnHelper.display({
-    id: "remove",
-    cell: ({ row }) => (
-      <button
-        className={vendorProductStyles.removeButton}
-        type="button"
-        onClick={() => remove(row.index)}
-        aria-label="Toggle Row Expanded"
-      >
-        X
-      </button>
-    ),
-  }),
-];
+  const priceRangeColumns = [
+    priceRangeColumnHelper.accessor("minUnits", {
+      header: () => <span>From Qty</span>,
+      cell: (info) => <i>{info.getValue()}</i>,
+    }),
+    priceRangeColumnHelper.accessor("maxUnits", {
+      header: () => <span>To Qty</span>,
+      cell: (info) => <i>{info.getValue()}</i>,
+    }),
+    priceRangeColumnHelper.accessor("price", {
+      header: () => <span>Cost</span>,
+      cell: (info) => <i>{info.getValue()}</i>,
+    }),
+    priceRangeColumnHelper.display({
+      id: "remove",
+      cell: ({ row }) => (
+        <button
+          className={vendorProductStyles.removeButton}
+          type="button"
+          onClick={() => remove(row.index)}
+          aria-label="Toggle Row Expanded"
+        >
+          X
+        </button>
+      ),
+    }),
+  ];
 
   const priceRangeTable = useReactTable({
     data: fields,

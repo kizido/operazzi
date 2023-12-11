@@ -1,5 +1,8 @@
 import { RequestHandler } from "express";
-import ProductModel, { IProductListingSku } from "../models/product";
+import ProductModel, {
+  IProductListingSku,
+  IProductVendorProduct,
+} from "../models/product";
 import createHttpError from "http-errors";
 import mongoose, { Types, isValidObjectId } from "mongoose";
 import { assertIsDefined } from "../util/assertIsDefined";
@@ -87,6 +90,7 @@ interface CreateProductBody {
     declaredValue?: string;
   };
   productListingSkus?: IProductListingSku[];
+  productVendorProducts?: IProductVendorProduct[];
   activated?: boolean;
 }
 
@@ -117,9 +121,8 @@ export const createProduct: RequestHandler<
   const activated = req.body.activated;
   const productImageId = req.body.productImageId;
   const productCustomsInfo = req.body.productCustomsInfo;
-  const productListingSkus = req.body.productListingSkus
-    ? req.body.productListingSkus
-    : null;
+  const productListingSkus = req.body.productListingSkus ?? null;
+  const productVendorProducts = req.body.productVendorProducts ?? null;
   const authenticatedUserId = req.session.userId;
 
   try {
@@ -171,6 +174,7 @@ export const createProduct: RequestHandler<
       productImageId: productImageId,
       productCustomsId: productCustoms._id,
       productListingSkus: productListingSkus,
+      productVendorProducts: productVendorProducts,
       activated: activated,
     });
 
@@ -215,6 +219,7 @@ interface UpdateProductBody {
   opex?: string;
   productImageId?: Types.ObjectId;
   productListingSkus?: IProductListingSku[];
+  productVendorProducts?: IProductVendorProduct[];
   activated?: boolean;
 }
 
@@ -244,9 +249,8 @@ export const updateProduct: RequestHandler<
   const newAmazonReferralFee = req.body.amazonReferralFee;
   const newOpex = req.body.opex;
   const newProductImageId = req.body.productImageId;
-  const newProductListingSkus = req.body.productListingSkus
-    ? req.body.productListingSkus
-    : null;
+  const newProductListingSkus = req.body.productListingSkus ?? null;
+  const newProductVendorProducts = req.body.productVendorProducts ?? null;
   const newActivated = req.body.activated;
   const authenticatedUserId = req.session.userId;
 
@@ -355,6 +359,16 @@ export const updateProduct: RequestHandler<
       // Add the new items
       newProductListingSkus.forEach((sku) =>
         product.productListingSkus.push(sku)
+      );
+    }
+    if (newProductVendorProducts) {
+      product.productVendorProducts.splice(
+        0,
+        product.productVendorProducts.length
+      );
+
+      newProductVendorProducts.forEach((vProduct) =>
+        product.productVendorProducts.push(vProduct)
       );
     }
 
