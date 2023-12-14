@@ -93,11 +93,16 @@ const columns = [
 ];
 
 interface VendorProductsTableProps {
-  vendorProductsDataSubmit: (input: VendorProductsModel, index?: number) => void;
+  vendorProductsDataSubmit: (
+    input: VendorProductsModel,
+    index?: number
+  ) => void,
+  deleteVendorProduct: (index: number) => void,
 }
 
 export default function VendorProductsTable({
   vendorProductsDataSubmit,
+  deleteVendorProduct,
 }: VendorProductsTableProps) {
   const [vendorProducts, setVendorProducts] = useState<VendorProductsModel[]>(
     []
@@ -229,8 +234,18 @@ export default function VendorProductsTable({
         >
           <b>EDIT</b>
         </Button>
-        <Button variant="outline-dark" className={styles.grayButton}>
-          <b>SHOW INACTIVE</b>
+        <Button
+          onClick={() => {
+            setVendorProducts((vProducts) =>
+              vProducts.filter((_, idx) => idx !== +selectedRowId!)
+            );
+            deleteVendorProduct(+selectedRowId!);
+          }}
+          disabled={!selectedRowId}
+          variant="outline-dark"
+          className={styles.grayButton}
+        >
+          <b>DELETE</b>
         </Button>
       </div>
       <div className={styles.scrollableTableContainer}>

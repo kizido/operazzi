@@ -196,6 +196,12 @@ const AddEditProductDialog = ({
       });
     }
   };
+  const handleVendorProductDelete = (index: number) => {
+    if(vendorProductsInputData) {
+      setVendorProductsInputData(vProducts =>
+        vProducts!.filter((_, idx) => idx !== index));
+    }
+  }
 
   function saveImageToProduct(updatedImage: ProductImage | null) {
     setSelectedImage(updatedImage);
@@ -459,7 +465,7 @@ const AddEditProductDialog = ({
             </Tab.Pane>
             <Tab.Pane eventKey="vendorProducts">
               <VendorProductsModal
-                vendorProductsDataSubmit={handleVendorProductsData}
+                vendorProductsDataSubmit={handleVendorProductsData} deleteVendorProduct={handleVendorProductDelete}
               />
             </Tab.Pane>
             <Tab.Pane eventKey="customs">
