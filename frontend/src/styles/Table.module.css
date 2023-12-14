@@ -1,4 +1,8 @@
 /* styles.css */
+.productTableControls {
+    display: flex;
+    justify-content: space-between;
+}
 .productTable {
     border-collapse: collapse;
     border-spacing: 0;
@@ -47,7 +51,8 @@
 .activatedCheckbox {
     width: 2rem;
     height: 2rem;
-    text-align: right;
+    margin-bottom: 1px;
+    margin-right: 0;
 }
 
 .listingSkuTable {

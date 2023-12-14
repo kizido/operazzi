@@ -14,3 +14,7 @@
 .width100 {
     width: 100%;
 }
+
+.loginForm input {
+    margin-bottom: 0.5rem;
+}

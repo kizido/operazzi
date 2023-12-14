@@ -58,7 +58,7 @@ const LoginModal = ({ onDismiss, onLoginSuccessful }: LoginModalProps) => {
                         error={errors.username}
                     />
                 </Form>
-                <Form onSubmit={handleSubmit(onSubmit)}>
+                <Form className={styleUtils.loginForm} onSubmit={handleSubmit(onSubmit)}>
                     <TextInputField
                         name="password"
                         label="Password"

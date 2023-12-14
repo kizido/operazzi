@@ -48,7 +48,7 @@ const SignUpModal = ({ onDismiss, onSignUpSuccessful }: SignUpModalProps) => {
                     <Alert variant='danger'>
                         {errorText}
                     </Alert>}
-                <Form onSubmit={handleSubmit(onSubmit)}>
+                <Form className={styleUtils.loginForm} onSubmit={handleSubmit(onSubmit)}>
                     <TextInputField
                         name="username"
                         label="Username"
