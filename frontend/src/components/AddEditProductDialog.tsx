@@ -30,6 +30,7 @@ import { CustomsInput } from "../network/products_api";
 import Pricing from "./Pricing";
 import { ProductContext } from "../contexts/ProductContext";
 import { VendorProductsModel } from "./VendorProductsTable";
+import PackagingModal from "./PackagingModal";
 
 interface AddEditProductDialogProps {
   productToEdit?: Product;
@@ -197,11 +198,12 @@ const AddEditProductDialog = ({
     }
   };
   const handleVendorProductDelete = (index: number) => {
-    if(vendorProductsInputData) {
-      setVendorProductsInputData(vProducts =>
-        vProducts!.filter((_, idx) => idx !== index));
+    if (vendorProductsInputData) {
+      setVendorProductsInputData((vProducts) =>
+        vProducts!.filter((_, idx) => idx !== index)
+      );
     }
-  }
+  };
 
   function saveImageToProduct(updatedImage: ProductImage | null) {
     setSelectedImage(updatedImage);
@@ -230,6 +232,14 @@ const AddEditProductDialog = ({
                 eventKey="basicInfo"
               >
                 BASIC INFO
+              </Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Nav.Link
+                className={styles.productModalTabLink}
+                eventKey="packaging"
+              >
+                PACKAGING
               </Nav.Link>
             </Nav.Item>
             <Nav.Item>
@@ -458,6 +468,9 @@ const AddEditProductDialog = ({
                 </Row>
               </Form>
             </Tab.Pane>
+            <Tab.Pane eventKey="packaging">
+              <PackagingModal/>
+            </Tab.Pane>
             <Tab.Pane eventKey="listingSkus">
               <ListingSkusModal
                 onListingSkusDataSubmit={handleListingSkusData}
@@ -465,7 +478,8 @@ const AddEditProductDialog = ({
             </Tab.Pane>
             <Tab.Pane eventKey="vendorProducts">
               <VendorProductsModal
-                vendorProductsDataSubmit={handleVendorProductsData} deleteVendorProduct={handleVendorProductDelete}
+                vendorProductsDataSubmit={handleVendorProductsData}
+                deleteVendorProduct={handleVendorProductDelete}
               />
             </Tab.Pane>
             <Tab.Pane eventKey="customs">

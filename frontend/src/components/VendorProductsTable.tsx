@@ -11,7 +11,6 @@ import styles from "../styles/Modal.module.css";
 import tableStyles from "../styles/Table.module.css";
 import vendorProductStyles from "../styles/VendorProducts.module.css";
 import { Button, Modal } from "react-bootstrap";
-import * as ProductsApi from "../network/products_api";
 import { ProductContext } from "../contexts/ProductContext";
 
 export type VendorProductsModel = {
