@@ -30,8 +30,12 @@ const columns = [
     cell: (info) => <i>{info.getValue()}</i>,
   }),
 ];
+interface PackagingTableProps {
+  packagingDataSubmit: (input: PackagingModel, index?: number) => void,
+  deletePackaging: (index: number) => void,
+}
 
-export default function VendorProductsTable() {
+export default function PackagingTable({packagingDataSubmit, deletePackaging}: PackagingTableProps) {
   const [packagingCosts, setPackagingCosts] = useState<PackagingModel[]>([]);
   const rerender = useReducer(() => ({}), {})[1];
 
@@ -49,11 +53,11 @@ export default function VendorProductsTable() {
     },
   });
   useEffect(() => {
-    // setPackagingCosts(productToEdit?.product?.productVendorProducts ?? []);
+    setPackagingCosts(productToEdit?.product?.productPackaging ?? []);
   }, [productToEdit]);
   useEffect(() => {
     if (showEditPackaging) {
-      //   reset(vendorProducts[+selectedRowId!]);
+      reset(packagingCosts[+selectedRowId!]);
     }
   }, [showEditPackaging]);
 
@@ -65,32 +69,20 @@ export default function VendorProductsTable() {
   });
 
   const onSubmit = (input: PackagingModel) => {
-    setPackagingCosts([...packagingCosts, input]);
+    if (showEditPackaging && selectedRowId) {
+      setPackagingCosts((pkgs) => {
+        const newPkgs = [...packagingCosts];
+        newPkgs[+selectedRowId!] = input;
+        return newPkgs;
+      });
+      packagingDataSubmit(input, +selectedRowId!)
+    } else {
+      setPackagingCosts([...packagingCosts, input]);
+      packagingDataSubmit(input);
+    }
     setShowAddPackaging(false);
-
+    setShowEditPackaging(false);
     reset();
-    // if (showEditVendorProduct && selectedRowId !== null) {
-    //   vendorProductsDataSubmit(input, +selectedRowId);
-    //   setVendorProducts((currentData) => {
-    //     const newData = [...currentData!];
-    //     newData[+selectedRowId!] = input;
-    //     return newData;
-    //   });
-    // } else {
-    //   vendorProductsDataSubmit(input);
-    //   setVendorProducts((currentData) => {
-    //     return currentData ? [...currentData, input] : [input];
-    //   });
-    // }
-    // setShowAddVendorProduct(false);
-    // setShowEditVendorProduct(false);
-    // reset({
-    //   vendor: "",
-    //   vendorSku: "",
-    //   minOrderQuantity: "",
-    //   leadTime: "",
-    //   vendorRangePrice: [],
-    // });
   };
 
   return (
@@ -116,6 +108,7 @@ export default function VendorProductsTable() {
             setPackagingCosts((pkgs) =>
               pkgs.filter((_, idx) => idx !== +selectedRowId!)
             );
+            deletePackaging(+selectedRowId!);
           }}
           disabled={!selectedRowId}
           variant="outline-dark"
@@ -170,7 +163,10 @@ export default function VendorProductsTable() {
       {showAddPackaging && (
         <Modal
           show
-          onHide={() => {setShowAddPackaging(false); reset();}}
+          onHide={() => {
+            setShowAddPackaging(false);
+            reset();
+          }}
           centered
           className={vendorProductStyles.vendorProductModal}
         >
@@ -210,8 +206,8 @@ export default function VendorProductsTable() {
           </Modal.Header>
           <Modal.Body>
             <form className={vendorProductStyles.vendorProductForm}>
-              <div className={vendorProductStyles.vendorProductGridContainer}>
-                <div className={vendorProductStyles.item1}>
+              <div>
+                <div>
                   <label>Item Name</label>
                   <input type="text" {...register("itemName")}></input>
                   <label>Per Unit Cost</label>

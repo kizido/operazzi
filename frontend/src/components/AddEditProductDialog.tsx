@@ -31,6 +31,7 @@ import Pricing from "./Pricing";
 import { ProductContext } from "../contexts/ProductContext";
 import { VendorProductsModel } from "./VendorProductsTable";
 import PackagingModal from "./PackagingModal";
+import { PackagingModel } from "./PackagingTable";
 
 interface AddEditProductDialogProps {
   productToEdit?: Product;
@@ -93,6 +94,7 @@ const AddEditProductDialog = ({
       productContext?.setProduct(productToEdit);
       setListingSkusInputData(productToEdit.productListingSkus);
       setVendorProductsInputData(productToEdit.productVendorProducts);
+      setPackagingInputData(productToEdit.productPackaging);
     } else {
       productContext?.setProduct(null);
     }
@@ -125,6 +127,9 @@ const AddEditProductDialog = ({
   const [vendorProductsInputData, setVendorProductsInputData] = useState<
     VendorProductsModel[] | null
   >([]);
+  const [packagingInputData, setPackagingInputData] = useState<
+    PackagingModel[]
+  >([]);
 
   async function onSubmit(input: ProductInput) {
     selectedImage && (input.productImageId = selectedImage?._id);
@@ -134,6 +139,7 @@ const AddEditProductDialog = ({
     if (listingSkusInputData) input.productListingSkus = listingSkusInputData;
     if (vendorProductsInputData)
       input.productVendorProducts = vendorProductsInputData;
+    if (packagingInputData) input.productPackaging = packagingInputData;
 
     try {
       let productResponse: Product;
@@ -201,6 +207,27 @@ const AddEditProductDialog = ({
     if (vendorProductsInputData) {
       setVendorProductsInputData((vProducts) =>
         vProducts!.filter((_, idx) => idx !== index)
+      );
+    }
+  };
+  const handlePackagingData = (input: PackagingModel, index?: number) => {
+    if (index !== undefined) {
+      setPackagingInputData((currentData) => {
+        const newData = [...currentData!];
+        newData[index] = input;
+        return newData;
+      });
+    } else {
+      console.log(input);
+      setPackagingInputData((currentData) => {
+        return currentData ? [...currentData, input] : [input];
+      });
+    }
+  };
+  const handlePackagingDelete = (index: number) => {
+    if (packagingInputData) {
+      setPackagingInputData(
+        packagingInputData.filter((_, idx) => idx !== index)
       );
     }
   };
@@ -469,7 +496,10 @@ const AddEditProductDialog = ({
               </Form>
             </Tab.Pane>
             <Tab.Pane eventKey="packaging">
-              <PackagingModal/>
+              <PackagingModal
+                packagingDataSubmit={handlePackagingData}
+                deletePackaging={handlePackagingDelete}
+              />
             </Tab.Pane>
             <Tab.Pane eventKey="listingSkus">
               <ListingSkusModal

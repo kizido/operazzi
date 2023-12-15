@@ -1,6 +1,7 @@
 import { RequestHandler } from "express";
 import ProductModel, {
   IProductListingSku,
+  IProductPackaging,
   IProductVendorProduct,
 } from "../models/product";
 import createHttpError from "http-errors";
@@ -91,6 +92,7 @@ interface CreateProductBody {
   };
   productListingSkus?: IProductListingSku[];
   productVendorProducts?: IProductVendorProduct[];
+  productPackaging?: IProductPackaging[];
   activated?: boolean;
 }
 
@@ -123,6 +125,7 @@ export const createProduct: RequestHandler<
   const productCustomsInfo = req.body.productCustomsInfo;
   const productListingSkus = req.body.productListingSkus ?? null;
   const productVendorProducts = req.body.productVendorProducts ?? null;
+  const productPackaging = req.body.productPackaging ?? null;
   const authenticatedUserId = req.session.userId;
 
   try {
@@ -175,6 +178,7 @@ export const createProduct: RequestHandler<
       productCustomsId: productCustoms._id,
       productListingSkus: productListingSkus,
       productVendorProducts: productVendorProducts,
+      productPackaging: productPackaging,
       activated: activated,
     });
 
@@ -220,6 +224,7 @@ interface UpdateProductBody {
   productImageId?: Types.ObjectId;
   productListingSkus?: IProductListingSku[];
   productVendorProducts?: IProductVendorProduct[];
+  productPackaging?: IProductPackaging[];
   activated?: boolean;
 }
 
@@ -251,6 +256,7 @@ export const updateProduct: RequestHandler<
   const newProductImageId = req.body.productImageId;
   const newProductListingSkus = req.body.productListingSkus ?? null;
   const newProductVendorProducts = req.body.productVendorProducts ?? null;
+  const newProductPackaging = req.body.productPackaging ?? null;
   const newActivated = req.body.activated;
   const authenticatedUserId = req.session.userId;
 
@@ -369,6 +375,15 @@ export const updateProduct: RequestHandler<
 
       newProductVendorProducts.forEach((vProduct) =>
         product.productVendorProducts.push(vProduct)
+      );
+    }
+    if (newProductPackaging) {
+      // Clear the existing DocumentArray
+      product.productPackaging.splice(0, product.productPackaging.length);
+
+      // Add the new items
+      newProductPackaging.forEach((sku) =>
+        product.productPackaging.push(sku)
       );
     }
 

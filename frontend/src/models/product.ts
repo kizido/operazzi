@@ -50,6 +50,10 @@ export interface Product {
       price: string;
     }[];
   }[];
+  productPackaging: {
+    itemName: string,
+    perUnitCost: string,
+  }[];
   activated: boolean;
   createdAt: string;
   updatedAt: string;

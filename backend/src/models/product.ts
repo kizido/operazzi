@@ -19,6 +19,10 @@ const productVendorProductSchema = new Schema({
   leadTime: { type: String, required: true },
   vendorRangePrice: [vendorRangePriceSchema],
 })
+const productPackagingSchema = new Schema({
+  itemName: { type: String, required: true },
+  perUnitCost: { type: String, required: true },
+})
 
 export interface IProductListingSku {
   channel: string,
@@ -38,6 +42,11 @@ export interface IProductVendorProduct {
     maxUnits: string,
     price: string,
   }[],
+}
+
+export interface IProductPackaging {
+  itemName: string,
+  perUnitCost: string,
 }
 
 const productSchema = new Schema(
@@ -81,6 +90,7 @@ const productSchema = new Schema(
     productCustomsId: { type: Schema.Types.ObjectId, ref: "ProductCustoms" },
     productListingSkus: [productListingSkuSchema],
     productVendorProducts: [productVendorProductSchema],
+    productPackaging: [productPackagingSchema],
     activated: { type: Boolean },
   },
   { timestamps: true }

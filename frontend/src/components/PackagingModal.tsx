@@ -1,12 +1,16 @@
 import React from 'react'
 import styles from '../styles/Modal.module.css'
-import PackagingTable from './PackagingTable'
+import PackagingTable, { PackagingModel } from './PackagingTable'
 
-export default function PackagingModal() {
+interface PackagingModalProps {
+  packagingDataSubmit: (input: PackagingModel, index?: number) => void,
+  deletePackaging: (index: number) => void,
+}
+export default function PackagingModal({packagingDataSubmit, deletePackaging}: PackagingModalProps) {
   return (
     <div>
         <p className={styles.smallDescriptionText}>Adjust packaging information</p>
-        <PackagingTable/>
+        <PackagingTable packagingDataSubmit={packagingDataSubmit} deletePackaging={deletePackaging}/>
     </div>
   )
 }

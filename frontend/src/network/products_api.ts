@@ -123,6 +123,10 @@ export interface ProductInput {
     leadTime: string;
     vendorRangePrice: PriceRange[];
   }[];
+  productPackaging?: {
+    itemName: string;
+    perUnitCost: string;
+  }[];
   activated: boolean;
 }
 
