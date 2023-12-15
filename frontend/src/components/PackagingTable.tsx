@@ -65,7 +65,10 @@ export default function VendorProductsTable() {
   });
 
   const onSubmit = (input: PackagingModel) => {
-    console.log(input);
+    setPackagingCosts([...packagingCosts, input]);
+    setShowAddPackaging(false);
+
+    reset();
     // if (showEditVendorProduct && selectedRowId !== null) {
     //   vendorProductsDataSubmit(input, +selectedRowId);
     //   setVendorProducts((currentData) => {
@@ -167,7 +170,7 @@ export default function VendorProductsTable() {
       {showAddPackaging && (
         <Modal
           show
-          onHide={() => setShowAddPackaging(false)}
+          onHide={() => {setShowAddPackaging(false); reset();}}
           centered
           className={vendorProductStyles.vendorProductModal}
         >
@@ -176,8 +179,8 @@ export default function VendorProductsTable() {
           </Modal.Header>
           <Modal.Body>
             <form className={vendorProductStyles.vendorProductForm}>
-              <div className={vendorProductStyles.vendorProductGridContainer}>
-                <div className={vendorProductStyles.item1}>
+              <div>
+                <div>
                   <label>Item Name</label>
                   <input type="text" {...register("itemName")}></input>
                   <label>Per Unit Cost</label>
