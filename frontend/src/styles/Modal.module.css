@@ -123,6 +123,10 @@
     background-color: #f8f8f8;
 }
 
+.grayButton:enabled {
+    border: none;
+}
+
 .grayButton:hover {
     background-color: #dddddd;
     color: #4fa2a8;

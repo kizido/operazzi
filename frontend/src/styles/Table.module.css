@@ -121,9 +121,33 @@
     width: 4rem;
 }
 
-
-
-
+.packagingTable {
+    border-collapse: collapse;
+    border-spacing: 0;
+    width: 100%;
+    display: table;
+    border: 1px solid #ccc;
+}
+.packagingTable tr {
+    border-bottom: 1px solid #ddd
+}
+.packagingTable td {
+    padding: 8px 8px;
+    display: table-cell;
+}
+.packagingTable th {
+    padding: 8px 8px;
+    display: table-cell;
+    vertical-align: top;
+    width: 50%;
+}
+.packagingTable td,
+.packagingTable th {
+    text-align: left !important;
+}
+.packagingTable td:nth-child(2) {
+    
+}
 .expandedRowTable {
     border-collapse: collapse;
     border-spacing: 0;
