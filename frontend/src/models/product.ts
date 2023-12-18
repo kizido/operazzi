@@ -42,6 +42,7 @@ export interface Product {
   productVendorProducts: {
     vendor: string;
     vendorSku: string;
+    perUnitCogs: string;
     minOrderQuantity: string;
     leadTime: string;
     vendorRangePrice: {

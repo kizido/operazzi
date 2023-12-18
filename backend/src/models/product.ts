@@ -15,6 +15,7 @@ const vendorRangePriceSchema = new Schema({
 const productVendorProductSchema = new Schema({
   vendor: { type: String, required: true },
   vendorSku: { type: String, required: true },
+  perUnitCogs: { type: String, required: true },
   minOrderQuantity: { type: String, required: true },
   leadTime: { type: String, required: true },
   vendorRangePrice: [vendorRangePriceSchema],
@@ -35,6 +36,7 @@ export interface IProductListingSku {
 export interface IProductVendorProduct {
   vendor: string,
   vendorSku: string,
+  perUnitCogs: string,
   minOrderQuantity: string,
   leadTime: string,
   vendorRangePrice: {

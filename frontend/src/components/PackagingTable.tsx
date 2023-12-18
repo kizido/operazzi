@@ -93,7 +93,7 @@ export default function PackagingTable({packagingDataSubmit, deletePackaging}: P
           variant="outline-dark"
           className={styles.grayButton}
         >
-          <b>NEW VENDOR PRODUCT</b>
+          <b>NEW PACKAGING</b>
         </Button>
         <Button
           onClick={() => setShowEditPackaging(true)}
@@ -118,7 +118,7 @@ export default function PackagingTable({packagingDataSubmit, deletePackaging}: P
         </Button>
       </div>
       <div className={styles.scrollableTableContainer}>
-        <table className={`${tableStyles.vendorProductTable}`}>
+        <table className={tableStyles.packagingTable}>
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
               <tr className={styles.tableRow} key={headerGroup.id}>
@@ -135,7 +135,7 @@ export default function PackagingTable({packagingDataSubmit, deletePackaging}: P
               </tr>
             ))}
           </thead>
-          <tbody className={styles.listingSkuTableBody}>
+          <tbody>
             {table.getRowModel().rows.map((row) => (
               <React.Fragment key={row.id}>
                 <tr

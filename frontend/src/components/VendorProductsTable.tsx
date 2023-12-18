@@ -16,6 +16,7 @@ import { ProductContext } from "../contexts/ProductContext";
 export type VendorProductsModel = {
   vendor: string;
   vendorSku: string;
+  perUnitCogs: string;
   minOrderQuantity: string;
   leadTime: string;
   vendorRangePrice: PriceRange[];
@@ -37,7 +38,6 @@ const ExpandedRowContent = ({ vendorRangePrice }: ExpandedRowContentProps) => {
     >
       <thead>
         <tr>
-          {/* <th className={styles.listingSkuTableH}></th> */}
           <th className={styles.listingSkuTableH}>From</th>
           <th className={styles.listingSkuTableH}>To</th>
           <th className={styles.listingSkuTableH}>Price</th>
@@ -81,6 +81,10 @@ const columns = [
     header: () => <span>Vendor Sku</span>,
     cell: (info) => <i>{info.getValue()}</i>,
   }),
+  columnHelper.accessor("perUnitCogs", {
+    header: () => <span>Cost of Goods Sold (COGS)</span>,
+    cell: (info) => <i>{info.getValue()}</i>,
+  }),
   columnHelper.accessor("minOrderQuantity", {
     header: () => <span>Min Order Qty</span>,
     cell: (info) => <i>{info.getValue()}</i>,
@@ -114,8 +118,9 @@ export default function VendorProductsTable({
   const productToEdit = useContext(ProductContext);
 
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
+  const [editRowId, setEditRowId] = useState<string | null>(null);
 
-  const { register, control, handleSubmit, reset } =
+  const { register, control, handleSubmit, reset, watch, setValue } =
     useForm<VendorProductsModel>({
       defaultValues: {
         vendor: "",
@@ -129,6 +134,13 @@ export default function VendorProductsTable({
     control,
     name: "vendorRangePrice",
   });
+  const priceRanges = watch('vendorRangePrice');
+  useEffect(() => {
+    if(priceRanges.length > 0) {
+      const maxPrice = Math.max(...priceRanges.map(priceRange => parseFloat(priceRange.price) || 0)).toString();
+      setValue('perUnitCogs', maxPrice);
+    }
+  }, [priceRanges])
   useEffect(() => {
     setVendorProducts(productToEdit?.product?.productVendorProducts ?? []);
   }, [productToEdit]);
@@ -181,13 +193,14 @@ export default function VendorProductsTable({
   });
 
   const onSubmit = (input: VendorProductsModel) => {
-    if (showEditVendorProduct && selectedRowId !== null) {
-      vendorProductsDataSubmit(input, +selectedRowId);
+    if (showEditVendorProduct && editRowId !== null) {
+      vendorProductsDataSubmit(input, +editRowId);
       setVendorProducts((currentData) => {
         const newData = [...currentData!];
-        newData[+selectedRowId!] = input;
+        newData[+editRowId!] = input;
         return newData;
       });
+      setEditRowId(null);
     } else {
       vendorProductsDataSubmit(input);
       setVendorProducts((currentData) => {
@@ -226,7 +239,7 @@ export default function VendorProductsTable({
           <b>NEW VENDOR PRODUCT</b>
         </Button>
         <Button
-          onClick={() => setShowEditVendorProduct(true)}
+          onClick={() => {setShowEditVendorProduct(true); setEditRowId(selectedRowId)}}
           disabled={!selectedRowId}
           variant="outline-dark"
           className={styles.grayButton}
