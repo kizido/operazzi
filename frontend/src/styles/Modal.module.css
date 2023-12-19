@@ -167,3 +167,11 @@
     font-weight: 600;
     font-size: 1.5em;
 }
+
+.packagingInputsContainer {
+    display: flex;
+    justify-content: space-between;
+}
+.packagingInputsContainer label {
+    padding-right: 0.7rem;
+}

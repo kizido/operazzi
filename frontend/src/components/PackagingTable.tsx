@@ -31,11 +31,14 @@ const columns = [
   }),
 ];
 interface PackagingTableProps {
-  packagingDataSubmit: (input: PackagingModel, index?: number) => void,
-  deletePackaging: (index: number) => void,
+  packagingDataSubmit: (input: PackagingModel, index?: number) => void;
+  deletePackaging: (index: number) => void;
 }
 
-export default function PackagingTable({packagingDataSubmit, deletePackaging}: PackagingTableProps) {
+export default function PackagingTable({
+  packagingDataSubmit,
+  deletePackaging,
+}: PackagingTableProps) {
   const [packagingCosts, setPackagingCosts] = useState<PackagingModel[]>([]);
   const rerender = useReducer(() => ({}), {})[1];
 
@@ -75,7 +78,7 @@ export default function PackagingTable({packagingDataSubmit, deletePackaging}: P
         newPkgs[+selectedRowId!] = input;
         return newPkgs;
       });
-      packagingDataSubmit(input, +selectedRowId!)
+      packagingDataSubmit(input, +selectedRowId!);
     } else {
       setPackagingCosts([...packagingCosts, input]);
       packagingDataSubmit(input);
@@ -176,11 +179,15 @@ export default function PackagingTable({packagingDataSubmit, deletePackaging}: P
           <Modal.Body>
             <form className={vendorProductStyles.vendorProductForm}>
               <div>
-                <div>
-                  <label>Item Name</label>
-                  <input type="text" {...register("itemName")}></input>
-                  <label>Per Unit Cost</label>
-                  <input type="text" {...register("perUnitCost")}></input>
+                <div className={styles.packagingInputsContainer}>
+                  <div>
+                    <label>Item Name:</label>
+                    <input type="text" {...register("itemName")}></input>
+                  </div>
+                  <div>
+                    <label>Per Unit Cost:</label>
+                    <input type="text" {...register("perUnitCost")}></input>
+                  </div>
                 </div>
               </div>
               <button onClick={handleSubmit(onSubmit)}>Submit</button>
