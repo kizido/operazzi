@@ -51,6 +51,7 @@ export interface Product {
       price: string;
     }[];
   }[];
+  vendorProductCogsDefaultRow: string | null;
   productPackaging: {
     itemName: string,
     perUnitCost: string,

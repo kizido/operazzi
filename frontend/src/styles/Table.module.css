@@ -45,7 +45,9 @@
 
 .selected {
     background-color: lavender !important;
-    /* Blue */
+}
+.cogsDefaultSelected {
+    background-color: rgb(213, 255, 213) !important;
 }
 
 .activatedCheckbox {

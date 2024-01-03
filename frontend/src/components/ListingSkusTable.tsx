@@ -238,7 +238,7 @@ export default function ListingSkusTable({
               <label>Listing Sku</label>
               <input type="text" {...register("listingSku")}></input>
 
-              <label>Latency</label>
+              <label>Latency (ms)</label>
               <input type="text" {...register("latency")}></input>
 
               <div className={listingSkusStyles.checkboxSection}>

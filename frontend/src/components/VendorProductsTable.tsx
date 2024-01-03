@@ -99,8 +99,8 @@ interface VendorProductsTableProps {
   vendorProductsDataSubmit: (
     input: VendorProductsModel,
     index?: number
-  ) => void,
-  deleteVendorProduct: (index: number) => void,
+  ) => void;
+  deleteVendorProduct: (index: number) => void;
 }
 
 export default function VendorProductsTable({
@@ -119,6 +119,7 @@ export default function VendorProductsTable({
 
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
   const [editRowId, setEditRowId] = useState<string | null>(null);
+  const [cogsDefaultRowId, setCogsDefaultRowId] = useState<string | null>(null);
 
   const { register, control, handleSubmit, reset, watch, setValue } =
     useForm<VendorProductsModel>({
@@ -134,15 +135,34 @@ export default function VendorProductsTable({
     control,
     name: "vendorRangePrice",
   });
-  const priceRanges = watch('vendorRangePrice');
+  const priceRanges = watch("vendorRangePrice");
+
   useEffect(() => {
-    if(priceRanges.length > 0) {
-      const maxPrice = Math.max(...priceRanges.map(priceRange => parseFloat(priceRange.price) || 0)).toString();
-      setValue('perUnitCogs', maxPrice);
+    if (priceRanges.length > 0) {
+      const maxPrice = Math.max(
+        ...priceRanges.map((priceRange) => parseFloat(priceRange.price) || 0)
+      ).toString();
+      setValue("perUnitCogs", maxPrice);
     }
-  }, [priceRanges])
+  }, [priceRanges]);
   useEffect(() => {
-    setVendorProducts(productToEdit?.product?.productVendorProducts ?? []);
+    setCogsDefaultRowId(productToEdit?.product?.vendorProductCogsDefaultRow ?? null);
+    setVendorProducts(
+      productToEdit?.product?.productVendorProducts
+        ? productToEdit?.product?.productVendorProducts.map((vp) => {
+            if (vp.vendorRangePrice.length > 0) {
+              const maxPrice = Math.max(
+                ...vp.vendorRangePrice.map(
+                  (priceRange) => parseFloat(priceRange.price) || 0
+                )
+              ).toString();
+
+              vp.perUnitCogs = maxPrice;
+            }
+            return vp;
+          })
+        : []
+    );
   }, [productToEdit]);
   useEffect(() => {
     if (showEditVendorProduct) {
@@ -227,6 +247,15 @@ export default function VendorProductsTable({
     append(newPriceRange);
     setNewPriceRange({ minUnits: "", maxUnits: "", price: "" });
   };
+  const swapCogsDefaultRow = () => {
+    if(productToEdit && productToEdit.product) {
+      const updatedProduct = {
+        ...productToEdit.product,
+        cogsDefaultRowId: selectedRowId,
+      }
+      productToEdit?.setProduct(updatedProduct);
+    }
+  }
 
   return (
     <div>
@@ -239,7 +268,10 @@ export default function VendorProductsTable({
           <b>NEW VENDOR PRODUCT</b>
         </Button>
         <Button
-          onClick={() => {setShowEditVendorProduct(true); setEditRowId(selectedRowId)}}
+          onClick={() => {
+            setShowEditVendorProduct(true);
+            setEditRowId(selectedRowId);
+          }}
           disabled={!selectedRowId}
           variant="outline-dark"
           className={styles.grayButton}
@@ -258,6 +290,14 @@ export default function VendorProductsTable({
           className={styles.grayButton}
         >
           <b>DELETE</b>
+        </Button>
+        <Button
+          onClick={swapCogsDefaultRow}
+          disabled={!selectedRowId}
+          variant="outline-dark"
+          className={styles.grayButton}
+        >
+          <b>Set as Default COGS</b>
         </Button>
       </div>
       <div className={styles.scrollableTableContainer}>
@@ -283,7 +323,7 @@ export default function VendorProductsTable({
               <React.Fragment key={row.id}>
                 <tr
                   className={`${tableStyles.tableRow} ${
-                    row.id === selectedRowId ? tableStyles.selected : ""
+                    row.id === cogsDefaultRowId ? tableStyles.cogsDefaultSelected : row.id === selectedRowId ? tableStyles.selected : ""
                   }`}
                   onClick={() =>
                     setSelectedRowId(row.id === selectedRowId ? null : row.id)

@@ -92,6 +92,7 @@ const productSchema = new Schema(
     productCustomsId: { type: Schema.Types.ObjectId, ref: "ProductCustoms" },
     productListingSkus: [productListingSkuSchema],
     productVendorProducts: [productVendorProductSchema],
+    vendorProductCogsDefaultRow: { type: String },
     productPackaging: [productPackagingSchema],
     activated: { type: Boolean },
   },

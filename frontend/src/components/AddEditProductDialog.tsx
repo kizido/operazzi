@@ -123,7 +123,7 @@ const AddEditProductDialog = ({
   const [customsData, setCustomsData] = useState<CustomsInput | null>(null);
   const [listingSkusInputData, setListingSkusInputData] = useState<
     ProductsApi.ListingSkusInput[] | null
-  >(null);
+  >([]);
   const [vendorProductsInputData, setVendorProductsInputData] = useState<
     VendorProductsModel[] | null
   >([]);

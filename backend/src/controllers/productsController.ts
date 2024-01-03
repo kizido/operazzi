@@ -92,6 +92,7 @@ interface CreateProductBody {
   };
   productListingSkus?: IProductListingSku[];
   productVendorProducts?: IProductVendorProduct[];
+  vendorProductCogsDefaultRow?: string | null;
   productPackaging?: IProductPackaging[];
   activated?: boolean;
 }
@@ -125,6 +126,7 @@ export const createProduct: RequestHandler<
   const productCustomsInfo = req.body.productCustomsInfo;
   const productListingSkus = req.body.productListingSkus ?? null;
   const productVendorProducts = req.body.productVendorProducts ?? null;
+  const vendorProductCogsDefaultRow = req.body.vendorProductCogsDefaultRow;
   const productPackaging = req.body.productPackaging ?? null;
   const authenticatedUserId = req.session.userId;
 
@@ -178,6 +180,7 @@ export const createProduct: RequestHandler<
       productCustomsId: productCustoms._id,
       productListingSkus: productListingSkus,
       productVendorProducts: productVendorProducts,
+      vendorProductCogsDefaultRow: vendorProductCogsDefaultRow,
       productPackaging: productPackaging,
       activated: activated,
     });
@@ -224,6 +227,7 @@ interface UpdateProductBody {
   productImageId?: Types.ObjectId;
   productListingSkus?: IProductListingSku[];
   productVendorProducts?: IProductVendorProduct[];
+  vendorProductCogsDefaultRow?: string | null;
   productPackaging?: IProductPackaging[];
   activated?: boolean;
 }
@@ -256,6 +260,7 @@ export const updateProduct: RequestHandler<
   const newProductImageId = req.body.productImageId;
   const newProductListingSkus = req.body.productListingSkus ?? null;
   const newProductVendorProducts = req.body.productVendorProducts ?? null;
+  const newVendorProductCogsDefaultRow = req.body.vendorProductCogsDefaultRow;
   const newProductPackaging = req.body.productPackaging ?? null;
   const newActivated = req.body.activated;
   const authenticatedUserId = req.session.userId;
@@ -357,16 +362,23 @@ export const updateProduct: RequestHandler<
     product.opex = newOpex;
     product.productImageId = newProductImageId;
     product.activated = newActivated;
+    product.vendorProductCogsDefaultRow =
+      newVendorProductCogsDefaultRow ?? undefined;
 
     if (newProductListingSkus) {
       // Clear the existing DocumentArray
       product.productListingSkus.splice(0, product.productListingSkus.length);
 
       // Add the new items
-      newProductListingSkus.forEach((sku) =>
+      try {
+        newProductListingSkus.forEach((sku) =>
         product.productListingSkus.push(sku)
-      );
+      ); 
+      } catch (error) {
+        console.log(error);
+      }
     }
+
     if (newProductVendorProducts) {
       product.productVendorProducts.splice(
         0,
@@ -382,9 +394,7 @@ export const updateProduct: RequestHandler<
       product.productPackaging.splice(0, product.productPackaging.length);
 
       // Add the new items
-      newProductPackaging.forEach((sku) =>
-        product.productPackaging.push(sku)
-      );
+      newProductPackaging.forEach((sku) => product.productPackaging.push(sku));
     }
 
     const updatedProduct = await product.save();
