@@ -45,11 +45,13 @@ export default function PackagingTable({
   const [showAddPackaging, setShowAddPackaging] = useState(false);
   const [showEditPackaging, setShowEditPackaging] = useState(false);
 
+  const [totalPackagingCost, setTotalPackagingCost] = useState<string | null>(null);
+
   const productToEdit = useContext(ProductContext);
 
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
 
-  const { register, control, handleSubmit, reset } = useForm<PackagingModel>({
+  const { register, handleSubmit, reset } = useForm<PackagingModel>({
     defaultValues: {
       itemName: "",
       perUnitCost: "",
@@ -63,6 +65,14 @@ export default function PackagingTable({
       reset(packagingCosts[+selectedRowId!]);
     }
   }, [showEditPackaging]);
+  useEffect(() => {
+    const totalCost = packagingCosts.reduce((acc, curr) => {
+      const cleanedCost = curr.perUnitCost.replace(/[^\d.-]/g, '');
+      const cost = parseFloat(cleanedCost) || 0;
+      return acc + cost;
+    }, 0);
+    setTotalPackagingCost(totalCost.toFixed(2));
+  }, [packagingCosts]);
 
   const table = useReactTable({
     data: packagingCosts,
@@ -163,6 +173,7 @@ export default function PackagingTable({
           </tbody>
         </table>
       </div>
+      <h5>Total Packaging Cost: {totalPackagingCost ? "$" + totalPackagingCost : "N/A"}</h5>
       {showAddPackaging && (
         <Modal
           show
