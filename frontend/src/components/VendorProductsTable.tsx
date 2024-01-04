@@ -1,4 +1,10 @@
-import React, { useState, useReducer, useEffect, useContext } from "react";
+import React, {
+  useState,
+  useReducer,
+  useEffect,
+  useContext,
+  useRef,
+} from "react";
 import {
   createColumnHelper,
   flexRender,
@@ -121,6 +127,8 @@ export default function VendorProductsTable({
   const [editRowId, setEditRowId] = useState<string | null>(null);
   const [cogsDefaultRowId, setCogsDefaultRowId] = useState<string | null>(null);
 
+  const vendorProductsLoaded = useRef(true);
+
   const { register, control, handleSubmit, reset, watch, setValue } =
     useForm<VendorProductsModel>({
       defaultValues: {
@@ -139,30 +147,49 @@ export default function VendorProductsTable({
 
   useEffect(() => {
     if (priceRanges.length > 0) {
-      const maxPrice = Math.max(
-        ...priceRanges.map((priceRange) => parseFloat(priceRange.price) || 0)
-      ).toString();
-      setValue("perUnitCogs", maxPrice);
+      const indexOfMaxValue = priceRanges.reduce(
+        (maxIndex, currentElement, currentIndex) => {
+          // Parse the price of the current element and the element at maxIndex to floats
+          const currentFloat = parseFloat(currentElement.price);
+          const maxFloat = parseFloat(priceRanges[maxIndex].price);
+
+          // Compare the parsed floats and return the index of the larger one
+          return currentFloat > maxFloat ? currentIndex : maxIndex;
+        },
+        0
+      );
+      setValue("perUnitCogs", priceRanges[indexOfMaxValue].price);
     }
   }, [priceRanges]);
   useEffect(() => {
-    setCogsDefaultRowId(productToEdit?.product?.vendorProductCogsDefaultRow ?? null);
-    setVendorProducts(
-      productToEdit?.product?.productVendorProducts
-        ? productToEdit?.product?.productVendorProducts.map((vp) => {
-            if (vp.vendorRangePrice.length > 0) {
-              const maxPrice = Math.max(
-                ...vp.vendorRangePrice.map(
-                  (priceRange) => parseFloat(priceRange.price) || 0
-                )
-              ).toString();
+    console.log(cogsDefaultRowId);
+    console.log("COGS DISPLAYING");
+    // When Product is loaded/changed, set the vendor products state to its value
+    if (vendorProductsLoaded) {
+      setVendorProducts(
+        productToEdit?.product?.productVendorProducts
+          ? productToEdit?.product?.productVendorProducts.map((vp) => {
+              if (vp.vendorRangePrice.length > 0) {
+                // Get the perUnitCogs for each vendor product by finding the max price
+                const indexOfMax = vp.vendorRangePrice.reduce(
+                  (maxIndex, currentElement, currentIndex) => {
+                    // Parse the price of the current element and the element at maxIndex to floats
+                    const currentFloat = parseFloat(currentElement.price);
+                    const maxFloat = parseFloat(vp.vendorRangePrice[maxIndex].price);
 
-              vp.perUnitCogs = maxPrice;
-            }
-            return vp;
-          })
-        : []
-    );
+                    // Compare the parsed floats and return the index of the larger one
+                    return currentFloat > maxFloat ? currentIndex : maxIndex;
+                  },
+                  0
+                );
+                vp.perUnitCogs = vp.vendorRangePrice[indexOfMax].price;
+              }
+              return vp;
+            })
+          : []
+      );
+      vendorProductsLoaded.current = false;
+    }
   }, [productToEdit]);
   useEffect(() => {
     if (showEditVendorProduct) {
@@ -247,15 +274,45 @@ export default function VendorProductsTable({
     append(newPriceRange);
     setNewPriceRange({ minUnits: "", maxUnits: "", price: "" });
   };
+  const handlePriceInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    if (/^\d*(\.\d{0,2})?$/.test(value)) {
+      // Checks if the input is all digits
+      setNewPriceRange((prevState) => ({
+        ...prevState,
+        price: value,
+      }));
+    }
+  };
+  const handlePriceInputBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    let value = e.target.value;
+
+    // If there's no decimal or not exactly two digits after the decimal, format it
+    if (!/\.\d{2}$/.test(value)) {
+      const [whole = "", fractional = ""] = value.split(".");
+      const paddedFractional = fractional.padEnd(2, "0");
+      value = `${whole}.${paddedFractional}`;
+    }
+
+    // If the value starts with a decimal, add a '0' before it
+    if (/^\./.test(value)) {
+      value = `0${value}`;
+    }
+
+    setNewPriceRange((prevState) => ({
+      ...prevState,
+      price: value,
+    }));
+  };
   const swapCogsDefaultRow = () => {
-    if(productToEdit && productToEdit.product) {
+    if (productToEdit && productToEdit.product) {
       const updatedProduct = {
         ...productToEdit.product,
         cogsDefaultRowId: selectedRowId,
-      }
+      };
       productToEdit?.setProduct(updatedProduct);
     }
-  }
+  };
 
   return (
     <div>
@@ -323,7 +380,11 @@ export default function VendorProductsTable({
               <React.Fragment key={row.id}>
                 <tr
                   className={`${tableStyles.tableRow} ${
-                    row.id === cogsDefaultRowId ? tableStyles.cogsDefaultSelected : row.id === selectedRowId ? tableStyles.selected : ""
+                    row.id === cogsDefaultRowId
+                      ? tableStyles.cogsDefaultSelected
+                      : row.id === selectedRowId
+                      ? tableStyles.selected
+                      : ""
                   }`}
                   onClick={() =>
                     setSelectedRowId(row.id === selectedRowId ? null : row.id)
@@ -382,34 +443,38 @@ export default function VendorProductsTable({
                   <input
                     type="text"
                     value={newPriceRange.minUnits}
-                    onChange={(e) =>
-                      setNewPriceRange((prevState) => ({
-                        ...prevState,
-                        minUnits: e.target.value,
-                      }))
-                    }
+                    onChange={(e) => {
+                      const newValue = e.target.value;
+                      if (/^\d*$/.test(newValue)) {
+                        // Checks if the input is all digits
+                        setNewPriceRange((prevState) => ({
+                          ...prevState,
+                          minUnits: newValue,
+                        }));
+                      }
+                    }}
                   />
                   <label>To:</label>
                   <input
                     type="text"
                     value={newPriceRange.maxUnits}
-                    onChange={(e) =>
-                      setNewPriceRange((prevState) => ({
-                        ...prevState,
-                        maxUnits: e.target.value,
-                      }))
-                    }
+                    onChange={(e) => {
+                      const newValue = e.target.value;
+                      if (/^\d*$/.test(newValue)) {
+                        // Checks if the input is all digits
+                        setNewPriceRange((prevState) => ({
+                          ...prevState,
+                          maxUnits: newValue,
+                        }));
+                      }
+                    }}
                   />
                   <label>Price:</label>
                   <input
                     type="text"
                     value={newPriceRange.price}
-                    onChange={(e) =>
-                      setNewPriceRange((prevState) => ({
-                        ...prevState,
-                        price: e.target.value,
-                      }))
-                    }
+                    onChange={handlePriceInputChange}
+                    onBlur={handlePriceInputBlur}
                   />
                   <button type="button" onClick={addPriceRange}>
                     Add
@@ -514,34 +579,38 @@ export default function VendorProductsTable({
                   <input
                     type="text"
                     value={newPriceRange.minUnits}
-                    onChange={(e) =>
-                      setNewPriceRange((prevState) => ({
-                        ...prevState,
-                        minUnits: e.target.value,
-                      }))
-                    }
+                    onChange={(e) => {
+                      const newValue = e.target.value;
+                      if (/^\d*$/.test(newValue)) {
+                        // Checks if the input is all digits
+                        setNewPriceRange((prevState) => ({
+                          ...prevState,
+                          minUnits: newValue,
+                        }));
+                      }
+                    }}
                   />
                   <label>To:</label>
                   <input
                     type="text"
                     value={newPriceRange.maxUnits}
-                    onChange={(e) =>
-                      setNewPriceRange((prevState) => ({
-                        ...prevState,
-                        maxUnits: e.target.value,
-                      }))
-                    }
+                    onChange={(e) => {
+                      const newValue = e.target.value;
+                      if (/^\d*$/.test(newValue)) {
+                        // Checks if the input is all digits
+                        setNewPriceRange((prevState) => ({
+                          ...prevState,
+                          maxUnits: newValue,
+                        }));
+                      }
+                    }}
                   />
                   <label>Price:</label>
                   <input
                     type="text"
                     value={newPriceRange.price}
-                    onChange={(e) =>
-                      setNewPriceRange((prevState) => ({
-                        ...prevState,
-                        price: e.target.value,
-                      }))
-                    }
+                    onChange={handlePriceInputChange}
+                    onBlur={handlePriceInputBlur}
                   />
                   <button type="button" onClick={addPriceRange}>
                     Add

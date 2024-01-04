@@ -76,7 +76,9 @@ export default function ListingSkusTable({
   const [showInactive, setShowInactive] = useState(false);
 
   const { register, handleSubmit, reset } = useForm<ListingSkusInput>({
-    defaultValues: {},
+    defaultValues: {
+      status: true,
+    },
   });
 
   useEffect(() => {
@@ -118,7 +120,7 @@ export default function ListingSkusTable({
       listingSku: "",
       pushInventory: false,
       latency: "",
-      status: false,
+      status: true,
     });
   };
 
@@ -278,7 +280,7 @@ export default function ListingSkusTable({
               listingSku: "",
               pushInventory: false,
               latency: "",
-              status: false,
+              status: true,
             });
           }}
           centered={true}
