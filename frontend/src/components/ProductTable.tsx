@@ -100,12 +100,7 @@ export default function ProductTable() {
       footer: "Amazon Referral Fee",
     },
     {
-      header: "OPEX",
-      accessorKey: "opex",
-      footer: "OPEX",
-    },
-    {
-      header: "Activated",
+      header: "",
       accessorKey: "active",
       cell: (
         { row }: { row: any } // TypeScript type annotation added here

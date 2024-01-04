@@ -419,9 +419,9 @@ const AddEditProductDialog = ({
                   <Col>
                     <TextInputField
                       name="domesticShippingCosts"
-                      label="Domestic Shipping Costs"
+                      label="Ship to Amazon FBA Cost"
                       type="text"
-                      placeholder="Domestic Shipping Costs"
+                      placeholder="Ship to Amazon FBA Cost"
                       register={register}
                     />
                   </Col>
