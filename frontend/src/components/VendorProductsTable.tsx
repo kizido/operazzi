@@ -125,7 +125,7 @@ export default function VendorProductsTable({
 
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
   const [editRowId, setEditRowId] = useState<string | null>(null);
-  const [cogsDefaultRowId, setCogsDefaultRowId] = useState<string | null>(null);
+  // const [cogsDefaultRowId, setCogsDefaultRowId] = useState<string | null>(null);
 
   const vendorProductsLoaded = useRef(true);
 
@@ -162,7 +162,7 @@ export default function VendorProductsTable({
     }
   }, [priceRanges]);
   useEffect(() => {
-    console.log(cogsDefaultRowId);
+    console.log(productToEdit?.product?.vendorProductCogsDefaultRow);
     console.log("COGS DISPLAYING");
     // When Product is loaded/changed, set the vendor products state to its value
     if (vendorProductsLoaded) {
@@ -308,7 +308,7 @@ export default function VendorProductsTable({
     if (productToEdit && productToEdit.product) {
       const updatedProduct = {
         ...productToEdit.product,
-        cogsDefaultRowId: selectedRowId,
+        vendorProductCogsDefaultRow: selectedRowId,
       };
       productToEdit?.setProduct(updatedProduct);
     }
@@ -380,7 +380,7 @@ export default function VendorProductsTable({
               <React.Fragment key={row.id}>
                 <tr
                   className={`${tableStyles.tableRow} ${
-                    row.id === cogsDefaultRowId
+                    row.id === productToEdit?.product?.vendorProductCogsDefaultRow
                       ? tableStyles.cogsDefaultSelected
                       : row.id === selectedRowId
                       ? tableStyles.selected
