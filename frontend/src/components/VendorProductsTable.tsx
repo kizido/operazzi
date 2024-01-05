@@ -107,11 +107,13 @@ interface VendorProductsTableProps {
     index?: number
   ) => void;
   deleteVendorProduct: (index: number) => void;
+  defaultCogsRowIdSubmit: (defaultRowId: string | null) => void;
 }
 
 export default function VendorProductsTable({
   vendorProductsDataSubmit,
   deleteVendorProduct,
+  defaultCogsRowIdSubmit,
 }: VendorProductsTableProps) {
   const [vendorProducts, setVendorProducts] = useState<VendorProductsModel[]>(
     []
@@ -125,7 +127,7 @@ export default function VendorProductsTable({
 
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
   const [editRowId, setEditRowId] = useState<string | null>(null);
-  // const [cogsDefaultRowId, setCogsDefaultRowId] = useState<string | null>(null);
+  const [cogsDefaultRowId, setCogsDefaultRowId] = useState<string | null>(null);
 
   const vendorProductsLoaded = useRef(true);
 
@@ -145,6 +147,7 @@ export default function VendorProductsTable({
   });
   const priceRanges = watch("vendorRangePrice");
 
+  // Recalculate COGS everytime price ranges change (max of prices)
   useEffect(() => {
     if (priceRanges.length > 0) {
       const indexOfMaxValue = priceRanges.reduce(
@@ -162,8 +165,9 @@ export default function VendorProductsTable({
     }
   }, [priceRanges]);
   useEffect(() => {
-    console.log(productToEdit?.product?.vendorProductCogsDefaultRow);
-    console.log("COGS DISPLAYING");
+    setCogsDefaultRowId(
+      productToEdit?.product?.vendorProductCogsDefaultRow ?? null
+    );
     // When Product is loaded/changed, set the vendor products state to its value
     if (vendorProductsLoaded) {
       setVendorProducts(
@@ -175,7 +179,9 @@ export default function VendorProductsTable({
                   (maxIndex, currentElement, currentIndex) => {
                     // Parse the price of the current element and the element at maxIndex to floats
                     const currentFloat = parseFloat(currentElement.price);
-                    const maxFloat = parseFloat(vp.vendorRangePrice[maxIndex].price);
+                    const maxFloat = parseFloat(
+                      vp.vendorRangePrice[maxIndex].price
+                    );
 
                     // Compare the parsed floats and return the index of the larger one
                     return currentFloat > maxFloat ? currentIndex : maxIndex;
@@ -196,6 +202,12 @@ export default function VendorProductsTable({
       reset(vendorProducts[+selectedRowId!]);
     }
   }, [showEditVendorProduct]);
+  useEffect(() => {
+    defaultCogsRowIdSubmit(cogsDefaultRowId);
+  }, [cogsDefaultRowId]);
+  useEffect(() => {
+    resetCogsDefaultRowId();
+  }, [vendorProducts]);
 
   const table = useReactTable({
     data: vendorProducts,
@@ -240,6 +252,9 @@ export default function VendorProductsTable({
   });
 
   const onSubmit = (input: VendorProductsModel) => {
+    if (vendorProducts.length === 0) {
+      setCogsDefaultRowId("0");
+    }
     if (showEditVendorProduct && editRowId !== null) {
       vendorProductsDataSubmit(input, +editRowId);
       setVendorProducts((currentData) => {
@@ -305,12 +320,24 @@ export default function VendorProductsTable({
     }));
   };
   const swapCogsDefaultRow = () => {
-    if (productToEdit && productToEdit.product) {
-      const updatedProduct = {
-        ...productToEdit.product,
-        vendorProductCogsDefaultRow: selectedRowId,
-      };
-      productToEdit?.setProduct(updatedProduct);
+    setCogsDefaultRowId(selectedRowId);
+  };
+  // If current cogs default row is deleted, set cogs default row to lowest COGS
+  // If no rows left, set to null
+  const resetCogsDefaultRowId = () => {
+    if (vendorProducts.length === 0) {
+      setCogsDefaultRowId(null);
+    } else if (vendorProducts.length === 1) {
+      setCogsDefaultRowId("0");
+    } else {
+      const newRowId = vendorProducts.reduce(
+        (minIndex, currentElement, currentIndex) => {
+          const currentFloat = parseFloat(currentElement.perUnitCogs);
+          const minFloat = parseFloat(vendorProducts[minIndex].perUnitCogs);
+          return currentFloat < minFloat ? currentIndex : minIndex;
+        }, 0
+      );
+      setCogsDefaultRowId(newRowId.toString());
     }
   };
 
@@ -341,6 +368,10 @@ export default function VendorProductsTable({
               vProducts.filter((_, idx) => idx !== +selectedRowId!)
             );
             deleteVendorProduct(+selectedRowId!);
+            if (cogsDefaultRowId && cogsDefaultRowId === selectedRowId) {
+              resetCogsDefaultRowId();
+            }
+            setSelectedRowId(null);
           }}
           disabled={!selectedRowId}
           variant="outline-dark"
@@ -380,7 +411,7 @@ export default function VendorProductsTable({
               <React.Fragment key={row.id}>
                 <tr
                   className={`${tableStyles.tableRow} ${
-                    row.id === productToEdit?.product?.vendorProductCogsDefaultRow
+                    row.id === cogsDefaultRowId
                       ? tableStyles.cogsDefaultSelected
                       : row.id === selectedRowId
                       ? tableStyles.selected

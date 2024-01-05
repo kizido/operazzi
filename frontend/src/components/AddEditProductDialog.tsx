@@ -121,6 +121,7 @@ const AddEditProductDialog = ({
   const [imageLoading, setImageLoading] = useState(true);
 
   const [customsData, setCustomsData] = useState<CustomsInput | null>(null);
+  const [cogsDefaultRowId, setCogsDefaultRowId] = useState<string | null>(null);
   const [listingSkusInputData, setListingSkusInputData] = useState<
     ProductsApi.ListingSkusInput[] | null
   >([]);
@@ -134,12 +135,13 @@ const AddEditProductDialog = ({
   async function onSubmit(input: ProductInput) {
     selectedImage && (input.productImageId = selectedImage?._id);
     if (input.packageTypeId === "") input.packageTypeId = null;
-
     if (customsData) input.productCustomsInfo = customsData;
     if (listingSkusInputData) input.productListingSkus = listingSkusInputData;
     if (vendorProductsInputData)
       input.productVendorProducts = vendorProductsInputData;
     if (packagingInputData) input.productPackaging = packagingInputData;
+    input.vendorProductCogsDefaultRow = cogsDefaultRowId;
+    console.log(input.vendorProductCogsDefaultRow);
 
     try {
       let productResponse: Product;
@@ -230,6 +232,9 @@ const AddEditProductDialog = ({
         packagingInputData.filter((_, idx) => idx !== index)
       );
     }
+  };
+  const handleDefaultCogsRowData = (rowId: string | null) => {
+    setCogsDefaultRowId(rowId);
   };
 
   function saveImageToProduct(updatedImage: ProductImage | null) {
@@ -421,7 +426,7 @@ const AddEditProductDialog = ({
                       name="domesticShippingCosts"
                       label="Ship to Amazon FBA Cost"
                       type="text"
-                      placeholder="Ship to Amazon FBA Cost"
+                      placeholder="Ship to Amazon FBA Cost  "
                       register={register}
                     />
                   </Col>
@@ -510,6 +515,7 @@ const AddEditProductDialog = ({
               <VendorProductsModal
                 vendorProductsDataSubmit={handleVendorProductsData}
                 deleteVendorProduct={handleVendorProductDelete}
+                defaultCogsRowIdSubmit={handleDefaultCogsRowData}
               />
             </Tab.Pane>
             <Tab.Pane eventKey="customs">
