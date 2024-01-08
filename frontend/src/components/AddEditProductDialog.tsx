@@ -140,6 +140,7 @@ const AddEditProductDialog = ({
     if (vendorProductsInputData)
       input.productVendorProducts = vendorProductsInputData;
     if (packagingInputData) input.productPackaging = packagingInputData;
+    console.log("COGS ROW: " + cogsDefaultRowId);
     input.vendorProductCogsDefaultRow = cogsDefaultRowId;
     console.log(input.vendorProductCogsDefaultRow);
 

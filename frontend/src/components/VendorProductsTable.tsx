@@ -165,6 +165,7 @@ export default function VendorProductsTable({
     }
   }, [priceRanges]);
   useEffect(() => {
+    console.log("PRODCUT ROW RETRIEVED: " + productToEdit?.product?.vendorProductCogsDefaultRow)
     setCogsDefaultRowId(
       productToEdit?.product?.vendorProductCogsDefaultRow ?? null
     );
@@ -203,11 +204,9 @@ export default function VendorProductsTable({
     }
   }, [showEditVendorProduct]);
   useEffect(() => {
+    console.log("CURRENT DEFAULT ROW ID: " + cogsDefaultRowId);
     defaultCogsRowIdSubmit(cogsDefaultRowId);
   }, [cogsDefaultRowId]);
-  useEffect(() => {
-    resetCogsDefaultRowId();
-  }, [vendorProducts]);
 
   const table = useReactTable({
     data: vendorProducts,
