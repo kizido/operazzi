@@ -89,14 +89,14 @@ const columns = [
   }),
   columnHelper.accessor("perUnitCogs", {
     header: () => <span>Cost of Goods Sold (COGS)</span>,
-    cell: (info) => <i>{info.getValue()}</i>,
+    cell: (info) => <i>${info.getValue()}</i>,
   }),
   columnHelper.accessor("minOrderQuantity", {
     header: () => <span>Min Order Qty</span>,
     cell: (info) => <i>{info.getValue()}</i>,
   }),
   columnHelper.accessor("leadTime", {
-    header: () => <span>Lead Time</span>,
+    header: () => <span>Lead Time (days)</span>,
     cell: (info) => <i>{info.getValue()}</i>,
   }),
 ];
