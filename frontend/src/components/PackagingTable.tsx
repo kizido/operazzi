@@ -1,4 +1,10 @@
-import React, { useState, useReducer, useEffect, useContext } from "react";
+import React, {
+  useState,
+  useReducer,
+  useEffect,
+  useContext,
+  ChangeEvent,
+} from "react";
 import {
   createColumnHelper,
   flexRender,
@@ -6,7 +12,7 @@ import {
   getExpandedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm, useFieldArray, Controller } from "react-hook-form";
 import styles from "../styles/Modal.module.css";
 import tableStyles from "../styles/Table.module.css";
 import vendorProductStyles from "../styles/VendorProducts.module.css";
@@ -27,7 +33,7 @@ const columns = [
   }),
   columnHelper.accessor("perUnitCost", {
     header: () => <span>Per Unit Cost</span>,
-    cell: (info) => <i>{info.getValue()}</i>,
+    cell: (info) => <i>${info.getValue()}</i>,
   }),
 ];
 interface PackagingTableProps {
@@ -45,18 +51,21 @@ export default function PackagingTable({
   const [showAddPackaging, setShowAddPackaging] = useState(false);
   const [showEditPackaging, setShowEditPackaging] = useState(false);
 
-  const [totalPackagingCost, setTotalPackagingCost] = useState<string | null>(null);
+  const [totalPackagingCost, setTotalPackagingCost] = useState<string | null>(
+    null
+  );
 
   const productToEdit = useContext(ProductContext);
 
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
 
-  const { register, handleSubmit, reset } = useForm<PackagingModel>({
-    defaultValues: {
-      itemName: "",
-      perUnitCost: "",
-    },
-  });
+  const { register, handleSubmit, reset, setValue, control } =
+    useForm<PackagingModel>({
+      defaultValues: {
+        itemName: "",
+        perUnitCost: "",
+      },
+    });
   useEffect(() => {
     setPackagingCosts(productToEdit?.product?.productPackaging ?? []);
   }, [productToEdit]);
@@ -64,10 +73,16 @@ export default function PackagingTable({
     if (showEditPackaging) {
       reset(packagingCosts[+selectedRowId!]);
     }
-  }, [showEditPackaging]);
+    if (showAddPackaging) {
+      reset({
+        itemName: "",
+        perUnitCost: "",
+      });
+    }
+  }, [showEditPackaging, showAddPackaging]);
   useEffect(() => {
     const totalCost = packagingCosts.reduce((acc, curr) => {
-      const cleanedCost = curr.perUnitCost.replace(/[^\d.-]/g, '');
+      const cleanedCost = curr.perUnitCost.replace(/[^\d.-]/g, "");
       const cost = parseFloat(cleanedCost) || 0;
       return acc + cost;
     }, 0);
@@ -80,6 +95,31 @@ export default function PackagingTable({
     getCoreRowModel: getCoreRowModel(),
     getExpandedRowModel: getExpandedRowModel(),
   });
+
+  const handleUnitCostChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    if (/^\d*(\.\d{0,2})?$/.test(value)) {
+      // Checks if the input is all digits
+      setValue("perUnitCost", value);
+    }
+  };
+  const handleUnitCostBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    let value = e.target.value;
+
+    // If there's no decimal or not exactly two digits after the decimal, format it
+    if (!/\.\d{2}$/.test(value)) {
+      const [whole = "", fractional = ""] = value.split(".");
+      const paddedFractional = fractional.padEnd(2, "0");
+      value = `${whole}.${paddedFractional}`;
+    }
+
+    // If the value starts with a decimal, add a '0' before it
+    if (/^\./.test(value)) {
+      value = `0${value}`;
+    }
+
+    setValue("perUnitCost", value);
+  };
 
   const onSubmit = (input: PackagingModel) => {
     if (showEditPackaging && selectedRowId) {
@@ -173,7 +213,10 @@ export default function PackagingTable({
           </tbody>
         </table>
       </div>
-      <h5>Total Packaging Cost: {totalPackagingCost ? "$" + totalPackagingCost : "N/A"}</h5>
+      <h5>
+        Total Packaging Cost:{" "}
+        {totalPackagingCost ? "$" + totalPackagingCost : "N/A"}
+      </h5>
       {showAddPackaging && (
         <Modal
           show
@@ -197,7 +240,19 @@ export default function PackagingTable({
                   </div>
                   <div>
                     <label>Per Unit Cost:</label>
-                    <input type="text" {...register("perUnitCost")}></input>
+                    <Controller
+                      name="perUnitCost"
+                      control={control}
+                      defaultValue=""
+                      render={({ field }) => (
+                        <input
+                          type="text"
+                          {...field}
+                          onChange={handleUnitCostChange}
+                          onBlur={handleUnitCostBlur}
+                        />
+                      )}
+                    />
                   </div>
                 </div>
               </div>
@@ -229,7 +284,19 @@ export default function PackagingTable({
                   <label>Item Name</label>
                   <input type="text" {...register("itemName")}></input>
                   <label>Per Unit Cost</label>
-                  <input type="text" {...register("perUnitCost")}></input>
+                  <Controller
+                    name="perUnitCost"
+                    control={control}
+                    defaultValue=""
+                    render={({ field }) => (
+                      <input
+                        type="text"
+                        {...field}
+                        onChange={handleUnitCostChange}
+                        onBlur={handleUnitCostBlur}
+                      />
+                    )}
+                  />
                 </div>
               </div>
               <button onClick={handleSubmit(onSubmit)}>Submit</button>
