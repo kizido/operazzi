@@ -370,13 +370,9 @@ export const updateProduct: RequestHandler<
       product.productListingSkus.splice(0, product.productListingSkus.length);
 
       // Add the new items
-      try {
-        newProductListingSkus.forEach((sku) =>
+      newProductListingSkus.forEach((sku) =>
         product.productListingSkus.push(sku)
-      ); 
-      } catch (error) {
-        console.log(error);
-      }
+      );
     }
 
     if (newProductVendorProducts) {

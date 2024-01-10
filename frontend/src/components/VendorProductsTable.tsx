@@ -463,7 +463,7 @@ export default function VendorProductsTable({
                   <input type="text" {...register("vendorSku")}></input>
                   <label>Min Order Quantity</label>
                   <input type="text" {...register("minOrderQuantity")}></input>
-                  <label>Lead Time</label>
+                  <label>Lead Time (Days)</label>
                   <input type="text" {...register("leadTime")}></input>
                 </div>
                 <div
@@ -599,7 +599,7 @@ export default function VendorProductsTable({
                   <input type="text" {...register("vendorSku")}></input>
                   <label>Min Order Quantity</label>
                   <input type="text" {...register("minOrderQuantity")}></input>
-                  <label>Lead Time</label>
+                  <label>Lead Time (Days)</label>
                   <input type="text" {...register("leadTime")}></input>
                 </div>
                 <div

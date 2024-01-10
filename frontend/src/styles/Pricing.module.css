@@ -1,0 +1,10 @@
+.pricingInputContainer {
+    display: flex;
+    justify-content: space-between;
+}
+.pricingInputContainer label {
+    width: 10rem;
+}
+.pricingInputContainer input {
+    width: 10rem;
+}
