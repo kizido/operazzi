@@ -6,9 +6,10 @@ interface TextDisplayFieldProps {
     name: string,
     label: string,
     [x: string]: any,
+    value: string,
 }
 
-const TextDisplayField = ({ name, label, ...props }: TextDisplayFieldProps) => {
+const TextDisplayField = ({ name, label, value, ...props }: TextDisplayFieldProps) => {
     return (
         <Form.Group controlId={name + "-input"}>
             <Form.Label className={styles.formLabel}>{label}</Form.Label>
@@ -17,6 +18,7 @@ const TextDisplayField = ({ name, label, ...props }: TextDisplayFieldProps) => {
                 step={0.1}
                 {...props}
                 readOnly
+                value={value}
             />
         </Form.Group>
     );

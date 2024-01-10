@@ -409,6 +409,7 @@ const AddEditProductDialog = ({
                       label="Cost of Goods Sold*"
                       type="text"
                       placeholder='N/A'
+                      value={productToEdit !== undefined && cogsDefaultRowId !== null ? productToEdit?.productVendorProducts[+cogsDefaultRowId].perUnitCogs : ""}
                     />
                   </Col>
                   <Col>
