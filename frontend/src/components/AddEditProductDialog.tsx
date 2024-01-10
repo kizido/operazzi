@@ -32,6 +32,7 @@ import { ProductContext } from "../contexts/ProductContext";
 import { VendorProductsModel } from "./VendorProductsTable";
 import PackagingModal from "./PackagingModal";
 import { PackagingModel } from "./PackagingTable";
+import TextDisplayField from "./form/TextDisplayField";
 
 interface AddEditProductDialogProps {
   productToEdit?: Product;
@@ -403,13 +404,11 @@ const AddEditProductDialog = ({
                 </Row>
                 <Row>
                   <Col>
-                    <TextInputField
+                    <TextDisplayField
                       name="cogs"
                       label="Cost of Goods Sold*"
                       type="text"
-                      placeholder="COGS"
-                      register={register}
-                      registerOptions={{ required: "Required" }}
+                      placeholder='N/A'
                     />
                   </Col>
                   <Col>
