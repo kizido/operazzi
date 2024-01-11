@@ -98,8 +98,9 @@ export default function PackagingTable({
 
   const handleUnitCostChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
+
+    // Checks if the input is all digits
     if (/^\d*(\.\d{0,2})?$/.test(value)) {
-      // Checks if the input is all digits
       setValue("perUnitCost", value);
     }
   };
