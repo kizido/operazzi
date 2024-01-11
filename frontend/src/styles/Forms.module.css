@@ -28,6 +28,14 @@
 .formControl {
     height: 2.5rem;
 }
+.displayControl {
+    background-color: rgb(233, 233, 233) !important;
+}
+.displayControl:active, .displayControl:focus {
+    outline: none;
+    box-shadow: none;
+    border: 1px solid darkgray;
+}
 
 .formButton {
     height: 29.2px;

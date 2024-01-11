@@ -19,6 +19,7 @@ const TextDisplayField = ({ name, label, value, ...props }: TextDisplayFieldProp
                 {...props}
                 readOnly
                 value={value}
+                className={styles.displayControl}
             />
         </Form.Group>
     );

@@ -33,6 +33,7 @@ import { VendorProductsModel } from "./VendorProductsTable";
 import PackagingModal from "./PackagingModal";
 import { PackagingModel } from "./PackagingTable";
 import TextDisplayField from "./form/TextDisplayField";
+import PercentageInputField from "./form/PercentageInputField";
 
 interface AddEditProductDialogProps {
   productToEdit?: Product;
@@ -48,6 +49,9 @@ const AddEditProductDialog = ({
   const {
     register,
     handleSubmit,
+    getValues,
+    setValue,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<ProductInput>({
     defaultValues: {
@@ -80,7 +84,7 @@ const AddEditProductDialog = ({
       domesticShippingCosts: productToEdit?.domesticShippingCosts || "",
       internationalShippingCosts:
         productToEdit?.internationalShippingCosts || "",
-      dutiesAndTariffs: productToEdit?.dutiesAndTariffs || "",
+      dutiesAndTariffs: productToEdit?.dutiesAndTariffs || "25.00",
       pickAndPackFee: productToEdit?.pickAndPackFee || "",
       amazonReferralFee: productToEdit?.amazonReferralFee || "",
       opex: productToEdit?.opex || "",
@@ -96,6 +100,8 @@ const AddEditProductDialog = ({
       setListingSkusInputData(productToEdit.productListingSkus);
       setVendorProductsInputData(productToEdit.productVendorProducts);
       setPackagingInputData(productToEdit.productPackaging);
+
+      calculateISC();
     } else {
       productContext?.setProduct(null);
     }
@@ -132,6 +138,7 @@ const AddEditProductDialog = ({
   const [packagingInputData, setPackagingInputData] = useState<
     PackagingModel[]
   >([]);
+  const [calculatedISC, setCalculatedISC] = useState("");
 
   async function onSubmit(input: ProductInput) {
     selectedImage && (input.productImageId = selectedImage?._id);
@@ -238,6 +245,15 @@ const AddEditProductDialog = ({
   const handleDefaultCogsRowData = (rowId: string | null) => {
     setCogsDefaultRowId(rowId);
   };
+  const calculateISC = () => {
+    const currentWeight = parseFloat(getValues('weight'));
+    console.log(currentWeight);
+    if(isNaN(currentWeight)) {
+      return "";
+    }
+    const iscPerGram = 0.004;
+    setCalculatedISC((currentWeight * iscPerGram).toFixed(2).toString());
+  }
 
   function saveImageToProduct(updatedImage: ProductImage | null) {
     setSelectedImage(updatedImage);
@@ -398,7 +414,7 @@ const AddEditProductDialog = ({
                       type="text"
                       placeholder="Weight"
                       register={register}
-                      registerOptions={{ required: "Required" }}
+                      registerOptions={{ required: "Required", onBlur: calculateISC}}
                     />
                   </Col>
                 </Row>
@@ -432,23 +448,25 @@ const AddEditProductDialog = ({
                     />
                   </Col>
                   <Col>
-                    <TextInputField
+                    <TextDisplayField
                       name="internationalShippingCosts"
                       label="International Shipping Costs"
                       type="text"
-                      placeholder="International Shipping Costs"
-                      register={register}
+                      placeholder="N/A"
+                      value={calculatedISC}
                     />
                   </Col>
                 </Row>
                 <Row>
                   <Col>
-                    <TextInputField
+                    <PercentageInputField
                       name="dutiesAndTariffs"
                       label="Duties And Tariffs"
                       type="text"
                       placeholder="Duties And Tariffs"
                       register={register}
+                      setValue={setValue}
+                      control={control}
                     />
                   </Col>
                   <Col>
