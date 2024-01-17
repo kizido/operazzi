@@ -31,9 +31,9 @@ type TransposedRow = {
 };
 
 const defaultData: UnitCostModel = {
-  packagingCosts: "5.00", // retrieve from packaging page
-  lcogs: "3.50", // cogs + packaging costs + isc + int. duties & taxes + fbacost
-  shippingWeight: "6.00", // product weight + shipping box weight
+  packagingCosts: "5.00", // retrieve from packaging page                                   DONE
+  lcogs: "3.50", // cogs + packaging costs + isc + int. duties & taxes + fbacost            DONE
+  shippingWeight: "6.00", // product weight + shipping box weight                           DONE but need fix lbs. to g. mismatch
   amazonFees: "7.00", // pick & pack + referral fee
   growthFund: "3.00", // cogs * growth %
   marketingBudget: "10.00", // sum of other headers * PPC SPEND %
@@ -144,6 +144,7 @@ export default function Pricing() {
         // Handle default case or throw an error
         break;
     }
+    recalculatePricingData();
   };
 
   const getPackageWeight = async () => {
@@ -161,40 +162,48 @@ export default function Pricing() {
     return responseWeight;
   };
 
+  const recalculatePricingData = async () => {
+    if (product != null) {
+      const packagingData = product.product?.productPackaging
+        .reduce((acc, curr) => {
+          const cleanedCost = curr.perUnitCost.replace(/[^\d.-]/g, "");
+          const cost = parseFloat(cleanedCost) || 0;
+          return acc + cost;
+        }, 0)
+        .toFixed(2);
+      const lcogsData = (
+        parseFloat(packagingData ?? "0") +
+        parseFloat(product.product?.cogs ?? "0") +
+        parseFloat(product.product?.internationalShippingCosts ?? "0") +
+        parseFloat(product.product?.dutiesAndTariffs ?? "0") +
+        parseFloat(product.product?.domesticShippingCosts ?? "0")
+      ).toFixed(2);
+      const shippingWeight = (
+        parseFloat(product.product?.weight ?? "0") +
+        parseFloat(await getPackageWeight())
+      ).toFixed(2);
+      const amazonFees = (
+        parseFloat(product.product?.pickAndPackFee ?? "0") +
+        parseFloat(product.product?.amazonReferralFee ?? "0")
+      ).toFixed(2);
+      const growthFund = (
+        parseFloat(product.product?.cogs ?? "0") * parseFloat(growth)
+      ).toFixed(2);
+      const newPricingData: UnitCostModel = {
+        packagingCosts: packagingData ?? "N/A",
+        lcogs: lcogsData, // cogs + packaging costs + isc + int. duties & taxes + fbacost
+        shippingWeight: shippingWeight, // product weight + shipping box weight
+        amazonFees: amazonFees, // pick & pack + referral fee
+        growthFund: "3.00", // cogs * growth %
+        marketingBudget: "10.00", // sum of other headers * PPC SPEND %
+        amazonPrice: "CALCULATED", // lcogs + opex + amazon fees + PPC + net profit + growth
+        websitePrice: "CALCULATED", // lcogs + opex + shipping fees + PPC + net profit + growth
+      };
+      setPricingData(transposeData(newPricingData));
+    }
+  };
+
   useEffect(() => {
-    const recalculatePricingData = async () => {
-      if (product != null) {
-        const packagingData = product.product?.productPackaging
-          .reduce((acc, curr) => {
-            const cleanedCost = curr.perUnitCost.replace(/[^\d.-]/g, "");
-            const cost = parseFloat(cleanedCost) || 0;
-            return acc + cost;
-          }, 0)
-          .toFixed(2);
-        const lcogsData = (
-          parseFloat(packagingData ?? "0") +
-          parseFloat(product.product?.cogs ?? "0") +
-          parseFloat(product.product?.internationalShippingCosts ?? "0") +
-          parseFloat(product.product?.dutiesAndTariffs ?? "0") +
-          parseFloat(product.product?.domesticShippingCosts ?? "0")
-        ).toFixed(2);
-        const shippingWeight = (
-          parseFloat(product.product?.weight ?? "0") +
-          parseFloat(await getPackageWeight())
-        ).toFixed(2);
-        const newPricingData: UnitCostModel = {
-          packagingCosts: packagingData ?? "N/A",
-          lcogs: lcogsData, // cogs + packaging costs + isc + int. duties & taxes + fbacost
-          shippingWeight: shippingWeight, // product weight + shipping box weight
-          amazonFees: "7.00", // pick & pack + referral fee
-          growthFund: "3.00", // cogs * growth %
-          marketingBudget: "10.00", // sum of other headers * PPC SPEND %
-          amazonPrice: "CALCULATED", // lcogs + opex + amazon fees + PPC + net profit + growth
-          websitePrice: "CALCULATED", // lcogs + opex + shipping fees + PPC + net profit + growth
-        };
-        setPricingData(transposeData(newPricingData));
-      }
-    };
     recalculatePricingData();
   }, [product]);
 
