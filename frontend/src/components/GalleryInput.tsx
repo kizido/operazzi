@@ -15,7 +15,6 @@ const GalleryInput: FC<GalleryInputProps> = ({ onFileSelect }) => {
         if (files && files.length > 0) {
             const file = files[0];
             const validFileTypes = ['image/jpeg', 'image/png', 'image/svg+xml', 'image/webp']; // Include SVG type
-            console.log('Selected file:', file);
 
             if (validFileTypes.includes(file.type)) {
                 const reader = new FileReader();
@@ -61,7 +60,6 @@ const GalleryInput: FC<GalleryInputProps> = ({ onFileSelect }) => {
                 setValidFileUploaded(false);
             }
         } else {
-            console.log('No file selected or browser canceled selection.');
             setValidFileUploaded(false);
         }
     };

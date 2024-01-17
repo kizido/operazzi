@@ -98,7 +98,6 @@ export default function ListingSkusTable({
 
   const onSubmit = (input: ListingSkusInput) => {
     if (showEditListingSku && selectedRowId !== null) {
-      console.log("EDIT COMPLETE");
       // If showing edit and selectedRowId is not null, pass it as a second argument
       onListingSkusDataSubmit(input, +selectedRowId);
       setListingSkus((currentData) => {

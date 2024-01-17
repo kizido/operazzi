@@ -225,7 +225,15 @@ export interface ProductPackageTypeInput {
   packageHeight: number | null;
   packageWeight: number | null;
 }
-
+export async function fetchProductPackageType(
+  packageTypeId: string
+): Promise<ProductPackageType> {
+  const response = await fetchData("/api/productPackageTypes/" + packageTypeId, {
+    method: "GET",
+  });
+  const productPackageType: ProductPackageType = await response.json();
+  return productPackageType;
+}
 export async function fetchProductPackageTypes(): Promise<
   ProductPackageType[]
 > {

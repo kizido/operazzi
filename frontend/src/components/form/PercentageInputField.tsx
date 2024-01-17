@@ -35,7 +35,6 @@ const PercentageInputField: React.FC<PercentageInputFieldProps> = ({
     const { value } = e.target;
     // Checks if the input is all digits
     if (/^\d*(\.\d{0,2})?$/.test(value)) {
-      console.log(value);
       // Set the control's value to value
       setValue(name, value);
     }

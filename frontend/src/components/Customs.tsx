@@ -20,7 +20,6 @@ export default function Customs({
   const [customsData, setCustomsData] = useState<ProductCustoms | null>(null);
 
   useEffect(() => {
-    console.log("CUSTOMS MODAL STARTING");
     async function getCustoms() {
       if (productToEdit) {
         const customs = await ProductsApi.fetchProductCustoms(

@@ -122,6 +122,13 @@ const AddEditProductDialog = ({
     };
     loadImage();
   }, []);
+  useEffect(() => {
+    if (productToEdit != null && cogsDefaultRowId != null) {
+      setRetrievedUnitCogs(
+        productToEdit.productVendorProducts[+cogsDefaultRowId].perUnitCogs
+      );
+    }
+  }, [productToEdit]);
 
   const [showGalleryModal, setShowGalleryModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState<ProductImage | null>(null);
@@ -139,6 +146,10 @@ const AddEditProductDialog = ({
     PackagingModel[]
   >([]);
   const [calculatedISC, setCalculatedISC] = useState("");
+  const [retrievedUnitCogs, setRetrievedUnitCogs] = useState("");
+
+  // useEffect(() => {
+  // }, [listingSkusInputData, vendorProductsInputData, packagingInputData])
 
   async function onSubmit(input: ProductInput) {
     selectedImage && (input.productImageId = selectedImage?._id);
@@ -148,9 +159,7 @@ const AddEditProductDialog = ({
     if (vendorProductsInputData)
       input.productVendorProducts = vendorProductsInputData;
     if (packagingInputData) input.productPackaging = packagingInputData;
-    console.log("COGS ROW: " + cogsDefaultRowId);
     input.vendorProductCogsDefaultRow = cogsDefaultRowId;
-    console.log(input.vendorProductCogsDefaultRow);
 
     try {
       let productResponse: Product;
@@ -160,7 +169,6 @@ const AddEditProductDialog = ({
           input
         );
       } else {
-        console.log(input.packageTypeId);
         productResponse = await ProductsApi.createProduct(input);
       }
       onProductSaved(productResponse);
@@ -184,7 +192,7 @@ const AddEditProductDialog = ({
     index?: number
   ) => {
     if (index !== undefined) {
-      console.log("INDEX PASSED");
+
       setListingSkusInputData((currentData) => {
         const newData = [...currentData!];
         newData[index] = input;
@@ -192,7 +200,6 @@ const AddEditProductDialog = ({
       });
       // setListingSkusInputData([]);
     } else {
-      console.log("INDEX NOT PASSED");
       setListingSkusInputData((currentData) => {
         return currentData ? [...currentData, input] : [input];
       });
@@ -229,7 +236,6 @@ const AddEditProductDialog = ({
         return newData;
       });
     } else {
-      console.log(input);
       setPackagingInputData((currentData) => {
         return currentData ? [...currentData, input] : [input];
       });
@@ -246,14 +252,13 @@ const AddEditProductDialog = ({
     setCogsDefaultRowId(rowId);
   };
   const calculateISC = () => {
-    const currentWeight = parseFloat(getValues('weight'));
-    console.log(currentWeight);
-    if(isNaN(currentWeight)) {
+    const currentWeight = parseFloat(getValues("weight"));
+    if (isNaN(currentWeight)) {
       return "";
     }
     const iscPerGram = 0.004;
     setCalculatedISC((currentWeight * iscPerGram).toFixed(2).toString());
-  }
+  };
 
   function saveImageToProduct(updatedImage: ProductImage | null) {
     setSelectedImage(updatedImage);
@@ -414,26 +419,10 @@ const AddEditProductDialog = ({
                       type="text"
                       placeholder="Weight"
                       register={register}
-                      registerOptions={{ required: "Required", onBlur: calculateISC}}
-                    />
-                  </Col>
-                </Row>
-                <Row>
-                  <Col>
-                    <TextDisplayField
-                      name="cogs"
-                      label="Cost of Goods Sold*"
-                      type="text"
-                      placeholder='N/A'
-                      value={productToEdit !== undefined && cogsDefaultRowId !== null ? productToEdit?.productVendorProducts[+cogsDefaultRowId].perUnitCogs : ""}
-                    />
-                  </Col>
-                  <Col>
-                    <PackageTypeInputField
-                      name="packageTypeId"
-                      label="Shipping Package"
-                      type="select"
-                      register={register}
+                      registerOptions={{
+                        required: "Required",
+                        onBlur: calculateISC,
+                      }}
                     />
                   </Col>
                 </Row>
@@ -448,12 +437,12 @@ const AddEditProductDialog = ({
                     />
                   </Col>
                   <Col>
-                    <TextDisplayField
-                      name="internationalShippingCosts"
-                      label="International Shipping Costs"
-                      type="text"
-                      placeholder="N/A"
-                      value={calculatedISC}
+                    <PackageTypeInputField
+                      name="packageTypeId"
+                      label="Shipping Package"
+                      type="select"
+                      defaultValue={productToEdit?.packageTypeId || undefined}
+                      register={register}
                     />
                   </Col>
                 </Row>
@@ -514,6 +503,26 @@ const AddEditProductDialog = ({
                       type="number"
                       placeholder="Master Case Weight"
                       register={register}
+                    />
+                  </Col>
+                </Row>
+                <Row>
+                  <Col>
+                    <TextDisplayField
+                      name="cogs"
+                      label="Cost of Goods Sold*"
+                      type="text"
+                      placeholder="N/A"
+                      value={retrievedUnitCogs}
+                    />
+                  </Col>
+                  <Col>
+                    <TextDisplayField
+                      name="internationalShippingCosts"
+                      label="International Shipping Costs"
+                      type="text"
+                      placeholder="N/A"
+                      value={calculatedISC}
                     />
                   </Col>
                 </Row>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   createColumnHelper,
   flexRender,
@@ -6,9 +6,12 @@ import {
   useReactTable,
   RowData,
 } from "@tanstack/react-table";
+import * as ProductsApi from "../network/products_api";
+import { ProductContext } from "../contexts/ProductContext";
 import tableStyles from "../styles/Table.module.css";
 import modalStyles from "../styles/Modal.module.css";
 import pricingStyles from "../styles/Pricing.module.css";
+import { ProductPackageType } from "../models/productPackageType";
 
 type UnitCostModel = {
   packagingCosts: string; // total packaging cost from packaging page
@@ -46,6 +49,16 @@ const transposedData: TransposedRow[] = Object.entries(defaultData).map(
   })
 );
 
+const transposeData = (initialData: UnitCostModel) => {
+  const transposedData: TransposedRow[] = Object.entries(initialData).map(
+    ([key, value]) => ({
+      header: key, // These will be your row headers
+      value: value, // These will be your row values
+    })
+  );
+  return transposedData;
+};
+
 const columnHelper = createColumnHelper<TransposedRow>();
 
 const columns = [
@@ -58,7 +71,8 @@ const columns = [
 ];
 
 export default function Pricing() {
-  const [data, setData] = useState(transposedData);
+  // const [data, setData] = useState(transposedData);
+  const [pricingData, setPricingData] = useState<TransposedRow[]>([]);
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
 
   const [opex, setOpex] = useState("");
@@ -66,8 +80,10 @@ export default function Pricing() {
   const [growth, setGrowth] = useState("");
   const [netProfitTarget, setNetProfitTarget] = useState("");
 
+  const product = useContext(ProductContext);
+
   const table = useReactTable({
-    data: data,
+    data: pricingData,
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
@@ -129,6 +145,58 @@ export default function Pricing() {
         break;
     }
   };
+
+  const getPackageWeight = async () => {
+    let responseWeight: string = "0";
+    try {
+      if (product?.product?.packageTypeId) {
+        const response = await ProductsApi.fetchProductPackageType(
+          product?.product?.packageTypeId
+        );
+        responseWeight = response.packageWeight.toFixed(2);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+    return responseWeight;
+  };
+
+  useEffect(() => {
+    const recalculatePricingData = async () => {
+      if (product != null) {
+        const packagingData = product.product?.productPackaging
+          .reduce((acc, curr) => {
+            const cleanedCost = curr.perUnitCost.replace(/[^\d.-]/g, "");
+            const cost = parseFloat(cleanedCost) || 0;
+            return acc + cost;
+          }, 0)
+          .toFixed(2);
+        const lcogsData = (
+          parseFloat(packagingData ?? "0") +
+          parseFloat(product.product?.cogs ?? "0") +
+          parseFloat(product.product?.internationalShippingCosts ?? "0") +
+          parseFloat(product.product?.dutiesAndTariffs ?? "0") +
+          parseFloat(product.product?.domesticShippingCosts ?? "0")
+        ).toFixed(2);
+        const shippingWeight = (
+          parseFloat(product.product?.weight ?? "0") +
+          parseFloat(await getPackageWeight())
+        ).toFixed(2);
+        const newPricingData: UnitCostModel = {
+          packagingCosts: packagingData ?? "N/A",
+          lcogs: lcogsData, // cogs + packaging costs + isc + int. duties & taxes + fbacost
+          shippingWeight: shippingWeight, // product weight + shipping box weight
+          amazonFees: "7.00", // pick & pack + referral fee
+          growthFund: "3.00", // cogs * growth %
+          marketingBudget: "10.00", // sum of other headers * PPC SPEND %
+          amazonPrice: "CALCULATED", // lcogs + opex + amazon fees + PPC + net profit + growth
+          websitePrice: "CALCULATED", // lcogs + opex + shipping fees + PPC + net profit + growth
+        };
+        setPricingData(transposeData(newPricingData));
+      }
+    };
+    recalculatePricingData();
+  }, [product]);
 
   return (
     <div>
