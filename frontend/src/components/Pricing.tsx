@@ -30,30 +30,11 @@ type TransposedRow = {
   value: string;
 };
 
-const defaultData: UnitCostModel = {
-  packagingCosts: "5.00", // retrieve from packaging page                                   DONE
-  lcogs: "3.50", // cogs + packaging costs + isc + int. duties & taxes + fbacost            DONE
-  shippingWeight: "6.00", // product weight + shipping box weight                           DONE but need fix lbs. to g. mismatch
-  amazonFees: "7.00", // pick & pack + referral fee
-  growthFund: "3.00", // cogs * growth %
-  marketingBudget: "10.00", // sum of other headers * PPC SPEND %
-  amazonPrice: "CALCULATED", // lcogs + opex + amazon fees + PPC + net profit + growth
-  websitePrice: "CALCULATED", // lcogs + opex + shipping fees + PPC + net profit + growth
-};
-
-// Transform your data into the transposed structure
-const transposedData: TransposedRow[] = Object.entries(defaultData).map(
-  ([key, value]) => ({
-    header: key, // These will be your row headers
-    value: value, // These will be your row values
-  })
-);
-
 const transposeData = (initialData: UnitCostModel) => {
   const transposedData: TransposedRow[] = Object.entries(initialData).map(
     ([key, value]) => ({
       header: key, // These will be your row headers
-      value: value, // These will be your row values
+      value: '$' + value, // These will be your row values
     })
   );
   return transposedData;
@@ -193,15 +174,37 @@ export default function Pricing({ pricingDataSubmit }: PricingProps) {
       const growthFund = (
         parseFloat(product.product?.cogs ?? "0") * parseFloat(growth)
       ).toFixed(2);
+      const marketingBudget = (
+        (parseFloat(packagingData ?? "0") +
+          parseFloat(lcogsData ?? "0") +
+          parseFloat(amazonFees ?? "0")) *
+        parseFloat(ppcSpend ?? "0")
+      ).toFixed(2);
+      const amazonPrice = (
+        parseFloat(lcogsData ?? "0") +
+        parseFloat(opex ?? "0") +
+        parseFloat(amazonFees ?? "0") +
+        parseFloat(ppcSpend ?? "0") +
+        parseFloat(netProfitTarget ?? "0") +
+        parseFloat(growth ?? "0")
+      ).toFixed(2);
+      const websitePrice = (
+        parseFloat(lcogsData ?? "0") +
+        parseFloat(opex ?? "0") +
+        parseFloat(product.product?.internationalShippingCosts ?? "0") +
+        parseFloat(ppcSpend ?? "0") +
+        parseFloat(netProfitTarget ?? "0") +
+        parseFloat(growth ?? "0")
+      ).toFixed(2);
       const newPricingData: UnitCostModel = {
         packagingCosts: packagingData ?? "N/A",
         lcogs: lcogsData, // cogs + packaging costs + isc + int. duties & taxes + fbacost
-        shippingWeight: shippingWeight, // product weight + shipping box weight
-        amazonFees: amazonFees, // pick & pack + referral fee
-        growthFund: "3.00", // cogs * growth %
-        marketingBudget: "10.00", // sum of other headers * PPC SPEND %
-        amazonPrice: "CALCULATED", // lcogs + opex + amazon fees + PPC + net profit + growth
-        websitePrice: "CALCULATED", // lcogs + opex + shipping fees + PPC + net profit + growth
+        shippingWeight, // product weight + shipping box weight
+        amazonFees, // pick & pack + referral fee
+        growthFund, // cogs * growth %
+        marketingBudget, // (packagingcosts + lcogs + amazonfees) * PPC SPEND %
+        amazonPrice, // lcogs + opex + amazon fees + PPC + net profit % + growth %
+        websitePrice, // lcogs + opex + shipping fees + PPC + net profit % + growth %
       };
       setPricingData(transposeData(newPricingData));
     }
@@ -217,7 +220,7 @@ export default function Pricing({ pricingDataSubmit }: PricingProps) {
     setPpcSpend(product?.product?.ppcSpend ?? "");
     setGrowth(product?.product?.growth ?? "");
     setNetProfitTarget(product?.product?.netProfitTarget ?? "");
-  }
+  };
 
   return (
     <div>
