@@ -145,6 +145,12 @@ const AddEditProductDialog = ({
   const [packagingInputData, setPackagingInputData] = useState<
     PackagingModel[]
   >([]);
+
+  const [opexData, setOpexData] = useState("");
+  const [ppcSpendData, setPpcSpendData] = useState("");
+  const [growthData, setGrowthData] = useState("");
+  const [netProfitTargetData, setNetProfitTargetData] = useState("");
+
   const [calculatedISC, setCalculatedISC] = useState("");
   const [retrievedUnitCogs, setRetrievedUnitCogs] = useState("");
 
@@ -160,6 +166,11 @@ const AddEditProductDialog = ({
       input.productVendorProducts = vendorProductsInputData;
     if (packagingInputData) input.productPackaging = packagingInputData;
     input.vendorProductCogsDefaultRow = cogsDefaultRowId;
+
+    if (opexData) input.opex = opexData;
+    if (ppcSpendData) input.ppcSpend = ppcSpendData;
+    if (growthData) input.growth = growthData;
+    if (netProfitTargetData) input.netProfitTarget = netProfitTargetData;
 
     try {
       let productResponse: Product;
@@ -192,7 +203,6 @@ const AddEditProductDialog = ({
     index?: number
   ) => {
     if (index !== undefined) {
-
       setListingSkusInputData((currentData) => {
         const newData = [...currentData!];
         newData[index] = input;
@@ -259,7 +269,25 @@ const AddEditProductDialog = ({
     const iscPerGram = 0.004;
     setCalculatedISC((currentWeight * iscPerGram).toFixed(2).toString());
   };
-
+  const handlePricingDataSubmit = (name: string, value: string) => {
+    switch (name) {
+      case "opex":
+        setOpexData(value);
+        break;
+      case "ppcSpend":
+        setPpcSpendData(value);
+        break;
+      case "growth":
+        setGrowthData(value);
+        break;
+      case "netProfitTarget":
+        setNetProfitTargetData(value);
+        break;
+      default:
+        // Handle default case or throw an error
+        break;
+    }
+  };
   function saveImageToProduct(updatedImage: ProductImage | null) {
     setSelectedImage(updatedImage);
   }
@@ -553,7 +581,7 @@ const AddEditProductDialog = ({
               />
             </Tab.Pane>
             <Tab.Pane eventKey="pricing">
-              <Pricing />
+              <Pricing pricingDataSubmit={handlePricingDataSubmit} />
             </Tab.Pane>
           </Tab.Content>
         </Tab.Container>

@@ -80,7 +80,6 @@ interface CreateProductBody {
   dutiesAndTariffs?: string;
   pickAndPackFee?: string;
   amazonReferralFee?: string;
-  opex?: string;
   productImageId?: Types.ObjectId | null;
   productCustomsId?: Types.ObjectId;
   productCustomsInfo?: {
@@ -94,6 +93,10 @@ interface CreateProductBody {
   productVendorProducts?: IProductVendorProduct[];
   vendorProductCogsDefaultRow?: string | null;
   productPackaging?: IProductPackaging[];
+  opex?: string;
+  ppcSpend?: string;
+  growth?: string;
+  netProfitTarget?: string;
   activated?: boolean;
 }
 
@@ -120,7 +123,6 @@ export const createProduct: RequestHandler<
   const dutiesAndTariffs = req.body.dutiesAndTariffs;
   const pickAndPackFee = req.body.pickAndPackFee;
   const amazonReferralFee = req.body.amazonReferralFee;
-  const opex = req.body.opex;
   const activated = req.body.activated;
   const productImageId = req.body.productImageId;
   const productCustomsInfo = req.body.productCustomsInfo;
@@ -128,6 +130,10 @@ export const createProduct: RequestHandler<
   const productVendorProducts = req.body.productVendorProducts ?? null;
   const vendorProductCogsDefaultRow = req.body.vendorProductCogsDefaultRow;
   const productPackaging = req.body.productPackaging ?? null;
+  const opex = req.body.opex;
+  const ppcSpend = req.body.ppcSpend;
+  const growth = req.body.growth;
+  const netProfitTarget = req.body.netProfitTarget;
   const authenticatedUserId = req.session.userId;
 
   try {
@@ -175,7 +181,10 @@ export const createProduct: RequestHandler<
       dutiesAndTariffs: dutiesAndTariffs,
       pickAndPackFee: pickAndPackFee,
       amazonReferralFee: amazonReferralFee,
-      opex: opex,
+      opex,
+      ppcSpend,
+      growth,
+      netProfitTarget,
       productImageId: productImageId,
       productCustomsId: productCustoms._id,
       productListingSkus: productListingSkus,
@@ -223,12 +232,15 @@ interface UpdateProductBody {
   dutiesAndTariffs?: string;
   pickAndPackFee?: string;
   amazonReferralFee?: string;
-  opex?: string;
   productImageId?: Types.ObjectId;
   productListingSkus?: IProductListingSku[];
   productVendorProducts?: IProductVendorProduct[];
   vendorProductCogsDefaultRow?: string | null;
   productPackaging?: IProductPackaging[];
+  opex?: string;
+  ppcSpend?: string;
+  growth?: string;
+  netProfitTarget?: string;
   activated?: boolean;
 }
 
@@ -256,12 +268,15 @@ export const updateProduct: RequestHandler<
   const newDutiesAndTariffs = req.body.dutiesAndTariffs;
   const newPickAndPackFee = req.body.pickAndPackFee;
   const newAmazonReferralFee = req.body.amazonReferralFee;
-  const newOpex = req.body.opex;
   const newProductImageId = req.body.productImageId;
   const newProductListingSkus = req.body.productListingSkus ?? null;
   const newProductVendorProducts = req.body.productVendorProducts ?? null;
   const newVendorProductCogsDefaultRow = req.body.vendorProductCogsDefaultRow;
   const newProductPackaging = req.body.productPackaging ?? null;
+  const newOpex = req.body.opex;
+  const newPpcSpend = req.body.ppcSpend;
+  const newGrowth = req.body.growth;
+  const newNetProfitTarget = req.body.netProfitTarget;
   const newActivated = req.body.activated;
   const authenticatedUserId = req.session.userId;
 
@@ -360,6 +375,9 @@ export const updateProduct: RequestHandler<
     product.pickAndPackFee = newPickAndPackFee;
     product.amazonReferralFee = newAmazonReferralFee;
     product.opex = newOpex;
+    product.ppcSpend = newPpcSpend;
+    product.growth = newGrowth;
+    product.netProfitTarget = newNetProfitTarget;
     product.productImageId = newProductImageId;
     product.activated = newActivated;
     product.vendorProductCogsDefaultRow =

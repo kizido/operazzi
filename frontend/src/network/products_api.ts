@@ -106,7 +106,6 @@ export interface ProductInput {
   dutiesAndTariffs: string;
   pickAndPackFee: string;
   amazonReferralFee: string;
-  opex: string;
   productImageId: string | null;
   productCustomsInfo?: CustomsInput;
   productListingSkus?: {
@@ -128,6 +127,10 @@ export interface ProductInput {
     itemName: string;
     perUnitCost: string;
   }[];
+  opex: string;
+  ppcSpend: string;
+  growth: string;
+  netProfitTarget: string;
   activated: boolean;
 }
 

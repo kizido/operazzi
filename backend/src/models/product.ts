@@ -10,7 +10,7 @@ const productListingSkuSchema = new Schema({
 const vendorRangePriceSchema = new Schema({
   minUnits: { type: String, required: true },
   maxUnits: { type: String, required: true },
-  price: { type: String, required: true }
+  price: { type: String, required: true },
 });
 const productVendorProductSchema = new Schema({
   vendor: { type: String, required: true },
@@ -19,36 +19,36 @@ const productVendorProductSchema = new Schema({
   minOrderQuantity: { type: String, required: true },
   leadTime: { type: String, required: true },
   vendorRangePrice: [vendorRangePriceSchema],
-})
+});
 const productPackagingSchema = new Schema({
   itemName: { type: String, required: true },
   perUnitCost: { type: String, required: true },
-})
+});
 
 export interface IProductListingSku {
-  channel: string,
-  listingSku: string,
-  pushInventory: boolean,
-  latency: string,
-  status: boolean,
+  channel: string;
+  listingSku: string;
+  pushInventory: boolean;
+  latency: string;
+  status: boolean;
 }
 
 export interface IProductVendorProduct {
-  vendor: string,
-  vendorSku: string,
-  perUnitCogs: string,
-  minOrderQuantity: string,
-  leadTime: string,
+  vendor: string;
+  vendorSku: string;
+  perUnitCogs: string;
+  minOrderQuantity: string;
+  leadTime: string;
   vendorRangePrice: {
-    minUnits: string,
-    maxUnits: string,
-    price: string,
-  }[],
+    minUnits: string;
+    maxUnits: string;
+    price: string;
+  }[];
 }
 
 export interface IProductPackaging {
-  itemName: string,
-  perUnitCost: string,
+  itemName: string;
+  perUnitCost: string;
 }
 
 const productSchema = new Schema(
@@ -84,7 +84,6 @@ const productSchema = new Schema(
     dutiesAndTariffs: { type: String },
     pickAndPackFee: { type: String },
     amazonReferralFee: { type: String },
-    opex: { type: String }, // operating expenditures
     productImageId: {
       type: Schema.Types.ObjectId || null,
       ref: "ProductImage",
@@ -94,6 +93,10 @@ const productSchema = new Schema(
     productVendorProducts: [productVendorProductSchema],
     vendorProductCogsDefaultRow: { type: String },
     productPackaging: [productPackagingSchema],
+    opex: { type: String }, // operating expenditures
+    ppcSpend: { type: String },
+    growth: { type: String },
+    netProfitTarget: { type: String },
     activated: { type: Boolean },
   },
   { timestamps: true }

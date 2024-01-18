@@ -29,7 +29,6 @@ export interface Product {
   dutiesAndTariffs: string;
   pickAndPackFee: string;
   amazonReferralFee: string;
-  opex: string;
   productImageId: string | null;
   productCustomsId: string;
   productListingSkus: {
@@ -56,6 +55,10 @@ export interface Product {
     itemName: string,
     perUnitCost: string,
   }[];
+  opex: string;
+  ppcSpend: string;
+  growth: string;
+  netProfitTarget: string;
   activated: boolean;
   createdAt: string;
   updatedAt: string;

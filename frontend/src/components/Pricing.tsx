@@ -69,8 +69,11 @@ const columns = [
     cell: (info) => <span>{info.getValue()}</span>,
   }),
 ];
+interface PricingProps {
+  pricingDataSubmit: (name: string, value: string) => void;
+}
 
-export default function Pricing() {
+export default function Pricing({ pricingDataSubmit }: PricingProps) {
   // const [data, setData] = useState(transposedData);
   const [pricingData, setPricingData] = useState<TransposedRow[]>([]);
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
@@ -144,6 +147,7 @@ export default function Pricing() {
         // Handle default case or throw an error
         break;
     }
+    pricingDataSubmit(name, value);
     recalculatePricingData();
   };
 
@@ -205,7 +209,15 @@ export default function Pricing() {
 
   useEffect(() => {
     recalculatePricingData();
+    defaultPricingData();
   }, [product]);
+
+  const defaultPricingData = () => {
+    setOpex(product?.product?.opex ?? "");
+    setPpcSpend(product?.product?.ppcSpend ?? "");
+    setGrowth(product?.product?.growth ?? "");
+    setNetProfitTarget(product?.product?.netProfitTarget ?? "");
+  }
 
   return (
     <div>
