@@ -12,6 +12,7 @@ import tableStyles from "../styles/Table.module.css";
 import modalStyles from "../styles/Modal.module.css";
 import pricingStyles from "../styles/Pricing.module.css";
 import { ProductPackageType } from "../models/productPackageType";
+import { Product } from "../models/product";
 
 type UnitCostModel = {
   packagingCosts: string; // total packaging cost from packaging page
@@ -52,9 +53,10 @@ const columns = [
 ];
 interface PricingProps {
   pricingDataSubmit: (name: string, value: string) => void;
+  productToEdit?: Product;
 }
 
-export default function Pricing({ pricingDataSubmit }: PricingProps) {
+export default function Pricing({ pricingDataSubmit, productToEdit }: PricingProps) {
   // const [data, setData] = useState(transposedData);
   const [pricingData, setPricingData] = useState<TransposedRow[]>([]);
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
@@ -135,9 +137,9 @@ export default function Pricing({ pricingDataSubmit }: PricingProps) {
   const getPackageWeight = async () => {
     let responseWeight: string = "0";
     try {
-      if (product?.product?.packageTypeId) {
+      if (productToEdit?.packageTypeId) {
         const response = await ProductsApi.fetchProductPackageType(
-          product?.product?.packageTypeId
+          productToEdit?.packageTypeId
         );
         responseWeight = response.packageWeight.toFixed(2);
       }
@@ -148,8 +150,8 @@ export default function Pricing({ pricingDataSubmit }: PricingProps) {
   };
 
   const recalculatePricingData = async () => {
-    if (product != null) {
-      const packagingData = product.product?.productPackaging
+    if (productToEdit != null) {
+      const packagingData = productToEdit?.productPackaging
         .reduce((acc, curr) => {
           const cleanedCost = curr.perUnitCost.replace(/[^\d.-]/g, "");
           const cost = parseFloat(cleanedCost) || 0;
@@ -158,21 +160,21 @@ export default function Pricing({ pricingDataSubmit }: PricingProps) {
         .toFixed(2);
       const lcogsData = (
         parseFloat(packagingData ?? "0") +
-        parseFloat(product.product?.cogs ?? "0") +
-        parseFloat(product.product?.internationalShippingCosts ?? "0") +
-        parseFloat(product.product?.dutiesAndTariffs ?? "0") +
-        parseFloat(product.product?.domesticShippingCosts ?? "0")
+        parseFloat(productToEdit?.cogs ?? "0") +
+        parseFloat(productToEdit?.internationalShippingCosts ?? "0") +
+        parseFloat(productToEdit?.dutiesAndTariffs ?? "0") +
+        parseFloat(productToEdit?.domesticShippingCosts ?? "0")
       ).toFixed(2);
       const shippingWeight = (
-        parseFloat(product.product?.weight ?? "0") +
+        parseFloat(productToEdit?.weight ?? "0") +
         parseFloat(await getPackageWeight())
       ).toFixed(2);
       const amazonFees = (
-        parseFloat(product.product?.pickAndPackFee ?? "0") +
-        parseFloat(product.product?.amazonReferralFee ?? "0")
+        parseFloat(productToEdit?.pickAndPackFee ?? "0") +
+        parseFloat(productToEdit?.amazonReferralFee ?? "0")
       ).toFixed(2);
       const growthFund = (
-        parseFloat(product.product?.cogs ?? "0") * parseFloat(growth)
+        parseFloat(productToEdit?.cogs ?? "0") * parseFloat(growth)
       ).toFixed(2);
       const marketingBudget = (
         (parseFloat(packagingData ?? "0") +
@@ -191,7 +193,7 @@ export default function Pricing({ pricingDataSubmit }: PricingProps) {
       const websitePrice = (
         parseFloat(lcogsData ?? "0") +
         parseFloat(opex ?? "0") +
-        parseFloat(product.product?.internationalShippingCosts ?? "0") +
+        parseFloat(productToEdit?.internationalShippingCosts ?? "0") +
         parseFloat(ppcSpend ?? "0") +
         parseFloat(netProfitTarget ?? "0") +
         parseFloat(growth ?? "0")
@@ -216,10 +218,10 @@ export default function Pricing({ pricingDataSubmit }: PricingProps) {
   }, [product]);
 
   const defaultPricingData = () => {
-    setOpex(product?.product?.opex ?? "");
-    setPpcSpend(product?.product?.ppcSpend ?? "");
-    setGrowth(product?.product?.growth ?? "");
-    setNetProfitTarget(product?.product?.netProfitTarget ?? "");
+    setOpex(productToEdit?.opex ?? "");
+    setPpcSpend(productToEdit?.ppcSpend ?? "");
+    setGrowth(productToEdit?.growth ?? "");
+    setNetProfitTarget(productToEdit?.netProfitTarget ?? "");
   };
 
   return (

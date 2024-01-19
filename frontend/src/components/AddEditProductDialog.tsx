@@ -148,6 +148,11 @@ const AddEditProductDialog = ({
     };
     loadImage();
   }, []);
+
+  // Testing Code
+  useEffect(() => {
+    productContext?.setProduct(productToEdit ?? null);
+  }, [productToEdit])
   useEffect(() => {
     if (productToEdit != null && cogsDefaultRowId != null) {
       try {
@@ -595,7 +600,7 @@ const AddEditProductDialog = ({
               />
             </Tab.Pane>
             <Tab.Pane eventKey="pricing">
-              <Pricing pricingDataSubmit={handlePricingDataSubmit} />
+              <Pricing pricingDataSubmit={handlePricingDataSubmit} productToEdit={productToEdit} />
             </Tab.Pane>
           </Tab.Content>
         </Tab.Container>

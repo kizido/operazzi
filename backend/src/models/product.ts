@@ -60,7 +60,6 @@ const productSchema = new Schema(
     barcodeUpc: { type: String, required: true },
     category: { type: String },
     description: { type: String },
-    cogs: { type: String, required: true },
     dimensions: {
       productLength: { type: Number, required: true },
       productWidth: { type: Number, required: true },
@@ -80,7 +79,6 @@ const productSchema = new Schema(
     },
     weight: { type: String, required: true }, // in grams
     domesticShippingCosts: { type: String },
-    internationalShippingCosts: { type: String },
     dutiesAndTariffs: { type: String },
     pickAndPackFee: { type: String },
     amazonReferralFee: { type: String },
@@ -93,6 +91,8 @@ const productSchema = new Schema(
     productVendorProducts: [productVendorProductSchema],
     vendorProductCogsDefaultRow: { type: String },
     productPackaging: [productPackagingSchema],
+    cogs: { type: String },
+    internationalShippingCosts: { type: String },
     opex: { type: String }, // operating expenditures
     ppcSpend: { type: String },
     growth: { type: String },
