@@ -18,6 +18,7 @@ import tableStyles from "../styles/Table.module.css";
 import vendorProductStyles from "../styles/VendorProducts.module.css";
 import { Button, Modal } from "react-bootstrap";
 import { ProductContext } from "../contexts/ProductContext";
+import { Product } from "../models/product";
 
 export type VendorProductsModel = {
   vendor: string;
@@ -108,12 +109,14 @@ interface VendorProductsTableProps {
   ) => void;
   deleteVendorProduct: (index: number) => void;
   defaultCogsRowIdSubmit: (defaultRowId: string | null) => void;
+  productToEdit?: Product;
 }
 
 export default function VendorProductsTable({
   vendorProductsDataSubmit,
   deleteVendorProduct,
   defaultCogsRowIdSubmit,
+  productToEdit
 }: VendorProductsTableProps) {
   const [vendorProducts, setVendorProducts] = useState<VendorProductsModel[]>(
     []
@@ -122,8 +125,6 @@ export default function VendorProductsTable({
 
   const [showAddVendorProduct, setShowAddVendorProduct] = useState(false);
   const [showEditVendorProduct, setShowEditVendorProduct] = useState(false);
-
-  const productToEdit = useContext(ProductContext);
 
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
   const [editRowId, setEditRowId] = useState<string | null>(null);
@@ -166,13 +167,13 @@ export default function VendorProductsTable({
   }, [priceRanges]);
   useEffect(() => {
     setCogsDefaultRowId(
-      productToEdit?.product?.vendorProductCogsDefaultRow ?? null
+      productToEdit?.vendorProductCogsDefaultRow ?? null
     );
     // When Product is loaded/changed, set the vendor products state to its value
-    if (vendorProductsLoaded) {
+    if (vendorProductsLoaded.current) {
       setVendorProducts(
-        productToEdit?.product?.productVendorProducts
-          ? productToEdit?.product?.productVendorProducts.map((vp) => {
+        productToEdit?.productVendorProducts
+          ? productToEdit?.productVendorProducts.map((vp) => {
               if (vp.vendorRangePrice.length > 0) {
                 // Get the perUnitCogs for each vendor product by finding the max price
                 const indexOfMax = vp.vendorRangePrice.reduce(
@@ -322,9 +323,9 @@ export default function VendorProductsTable({
   // If current cogs default row is deleted, set cogs default row to lowest COGS
   // If no rows left, set to null
   const resetCogsDefaultRowId = () => {
-    if (vendorProducts.length === 0) {
+    if (vendorProducts.length <= 1) {
       setCogsDefaultRowId(null);
-    } else if (vendorProducts.length === 1) {
+    } else if (vendorProducts.length === 2) {
       setCogsDefaultRowId("0");
     } else {
       const newRowId = vendorProducts.reduce(
@@ -332,7 +333,8 @@ export default function VendorProductsTable({
           const currentFloat = parseFloat(currentElement.perUnitCogs);
           const minFloat = parseFloat(vendorProducts[minIndex].perUnitCogs);
           return currentFloat < minFloat ? currentIndex : minIndex;
-        }, 0
+        },
+        0
       );
       setCogsDefaultRowId(newRowId.toString());
     }

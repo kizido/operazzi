@@ -94,41 +94,6 @@ const AddEditProductDialog = ({
   });
 
   const productContext = useContext(ProductContext);
-  useEffect(() => {
-    if (productToEdit) {
-      productContext?.setProduct(productToEdit);
-      setListingSkusInputData(productToEdit.productListingSkus);
-      setVendorProductsInputData(productToEdit.productVendorProducts);
-      setPackagingInputData(productToEdit.productPackaging);
-
-      calculateISC();
-    } else {
-      productContext?.setProduct(null);
-    }
-    const loadImage = async () => {
-      if (productToEdit && productToEdit.productImageId) {
-        try {
-          const imageToLoad = await ProductsApi.fetchProductImage(
-            productToEdit.productImageId
-          );
-          setSelectedImage(imageToLoad);
-          setImageLoading(false);
-        } catch (error) {
-          console.log(error);
-        }
-      } else {
-        setImageLoading(false);
-      }
-    };
-    loadImage();
-  }, []);
-  useEffect(() => {
-    if (productToEdit != null && cogsDefaultRowId != null) {
-      setRetrievedUnitCogs(
-        productToEdit.productVendorProducts[+cogsDefaultRowId].perUnitCogs
-      );
-    }
-  }, [productToEdit]);
 
   const [showGalleryModal, setShowGalleryModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState<ProductImage | null>(null);
@@ -154,8 +119,53 @@ const AddEditProductDialog = ({
   const [calculatedISC, setCalculatedISC] = useState("");
   const [retrievedUnitCogs, setRetrievedUnitCogs] = useState("");
 
-  // useEffect(() => {
-  // }, [listingSkusInputData, vendorProductsInputData, packagingInputData])
+  useEffect(() => {
+    if (productToEdit) {
+      productContext?.setProduct(productToEdit);
+      setListingSkusInputData(productToEdit.productListingSkus);
+      setVendorProductsInputData(productToEdit.productVendorProducts);
+      setPackagingInputData(productToEdit.productPackaging);
+      setCogsDefaultRowId(productToEdit.vendorProductCogsDefaultRow);
+
+      calculateISC();
+    } else {
+      productContext?.setProduct(null);
+    }
+    const loadImage = async () => {
+      if (productToEdit && productToEdit.productImageId) {
+        try {
+          const imageToLoad = await ProductsApi.fetchProductImage(
+            productToEdit.productImageId
+          );
+          setSelectedImage(imageToLoad);
+          setImageLoading(false);
+        } catch (error) {
+          console.log(error);
+        }
+      } else {
+        setImageLoading(false);
+      }
+    };
+    loadImage();
+  }, []);
+  useEffect(() => {
+    if (productToEdit != null && cogsDefaultRowId != null) {
+      try {
+        setRetrievedUnitCogs(
+          productToEdit.productVendorProducts[+cogsDefaultRowId].perUnitCogs
+        );
+      } catch (error) {
+        console.error(error);
+      }
+      console.log(
+        "PER UNIT COGS: " +
+          productToEdit.productVendorProducts[+cogsDefaultRowId].perUnitCogs
+      );
+      setRetrievedUnitCogs(
+        productToEdit.productVendorProducts[+cogsDefaultRowId].perUnitCogs
+      );
+    }
+  }, [cogsDefaultRowId]);
 
   async function onSubmit(input: ProductInput) {
     selectedImage && (input.productImageId = selectedImage?._id);
@@ -259,6 +269,9 @@ const AddEditProductDialog = ({
     }
   };
   const handleDefaultCogsRowData = (rowId: string | null) => {
+    // if(rowId && cogsDefaultRowId && parseInt(rowId) < cogsDefaultRowId?.length) {
+    //   setCogsDefaultRowId(rowId);
+    // }
     setCogsDefaultRowId(rowId);
   };
   const calculateISC = () => {
@@ -569,6 +582,7 @@ const AddEditProductDialog = ({
             </Tab.Pane>
             <Tab.Pane eventKey="vendorProducts">
               <VendorProductsModal
+                productToEdit={productToEdit}
                 vendorProductsDataSubmit={handleVendorProductsData}
                 deleteVendorProduct={handleVendorProductDelete}
                 defaultCogsRowIdSubmit={handleDefaultCogsRowData}
