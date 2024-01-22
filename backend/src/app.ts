@@ -41,9 +41,6 @@ app.use("/api/productPackageTypes", requiresAuth, productPackageTypesRoutes);
 app.use("/api/productImages", requiresAuth, productImagesRoutes);
 app.use("/api/productCustoms", requiresAuth, productCustomsRoutes);
 
-app.get('/', (req, res) => {
-    res.send('Welcome to my backend server!');
-});
 app.use((req, res, next) => {
     next(createHttpError(404, "Endpoint not found"));
 });
