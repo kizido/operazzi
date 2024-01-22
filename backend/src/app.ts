@@ -44,7 +44,9 @@ app.use("/api/productCustoms", requiresAuth, productCustomsRoutes);
 app.use((req, res, next) => {
     next(createHttpError(404, "Endpoint not found"));
 });
-
+app.get('/', (req, res) => {
+    res.send('Welcome to my backend server!');
+});
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((error: unknown, req: Request, res: Response, next: NextFunction) => {
     console.error(error);

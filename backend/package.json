@@ -4,9 +4,12 @@
   "description": "",
   "main": "dist/server.js",
   "scripts": {
-    "start": "nodemon src/server.ts",
+    "start": "ts-node src/server.ts",
+    "dev": "nodemon src/server.ts",
+    "build": "tsc",
     "lint": "eslint . --ext .ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "vercel-build": "echo hello"
   },
   "keywords": [],
   "author": "",
