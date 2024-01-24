@@ -9,8 +9,10 @@ import { ProductImage } from "../models/productImage";
 import { ProductCustoms } from "../models/productCustoms";
 import { PriceRange } from "../components/VendorProductsTable";
 
+const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+
 async function fetchData(input: RequestInfo, init?: RequestInit) {
-  const response = await fetch(input, init);
+  const response = await fetch(`${apiUrl}${input}`, init);
   if (response.ok) {
     return response;
   } else {
