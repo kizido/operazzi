@@ -9,10 +9,11 @@ import { ProductImage } from "../models/productImage";
 import { ProductCustoms } from "../models/productCustoms";
 import { PriceRange } from "../components/VendorProductsTable";
 
-const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+const apiUrl = process.env.REACT_APP_API_URL || '';
 
 async function fetchData(input: RequestInfo, init?: RequestInit) {
-  const response = await fetch(`${apiUrl}${input}`, init);
+  console.log(apiUrl);
+  const response = await fetch(`${apiUrl}${apiUrl}${input}`, init);
   if (response.ok) {
     return response;
   } else {
@@ -45,7 +46,7 @@ export interface SignUpCredentials {
 }
 
 export async function signUp(credentials: SignUpCredentials): Promise<User> {
-  const response = await fetchData("api/users/signup", {
+  const response = await fetchData("/api/users/signup", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -61,7 +62,7 @@ export interface LoginCredentials {
 }
 
 export async function login(credentials: LoginCredentials): Promise<User> {
-  const response = await fetchData("api/users/login", {
+  const response = await fetchData("/api/users/login", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

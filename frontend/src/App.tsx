@@ -21,6 +21,7 @@ function App() {
 	useEffect(() => {
 		async function fetchLoggedInUser() {
 			try {
+				console.log("HELLO")
 				const user = await ProductsApi.getLoggedInUser();
 				setLoggedInUser(user);
 			} catch (error) {
