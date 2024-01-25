@@ -13,7 +13,7 @@ const apiUrl = process.env.REACT_APP_API_URL || '';
 
 async function fetchData(input: RequestInfo, init?: RequestInit) {
   console.log(apiUrl);
-  const response = await fetch(`${apiUrl}${apiUrl}${input}`, init);
+  const response = await fetch(`${apiUrl}${input}`, init);
   if (response.ok) {
     return response;
   } else {
