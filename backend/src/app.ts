@@ -27,8 +27,9 @@ app.use(
       resave: false,
       saveUninitialized: false,
       cookie: {
+        domain: ".up.railway.app",
         httpOnly: true,
-        secure: false,// process.env.NODE_ENV === "production", // Set to true in production
+        secure: true,// process.env.NODE_ENV === "production", // Set to true in production
         maxAge: 60 * 60 * 1000, // Adjust as needed
         sameSite: "none", //process.env.NODE_ENV === "production" ? "none" : "lax", // Adjust for cross-site requests in production
       },
