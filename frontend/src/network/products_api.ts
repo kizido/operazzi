@@ -10,10 +10,8 @@ import { ProductCustoms } from "../models/productCustoms";
 import { PriceRange } from "../components/VendorProductsTable";
 
 const apiUrl = process.env.REACT_APP_API_URL || '';
-
 async function fetchData(input: RequestInfo, init?: RequestInit) {
   init = {...init, credentials: 'include'};
-  console.log("API URL: " + apiUrl);
   const response = await fetch(`${apiUrl}${input}`, init);
   if (response.ok) {
     return response;
