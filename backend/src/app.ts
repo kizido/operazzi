@@ -13,27 +13,35 @@ import session from "express-session";
 import env from "./util/validateEnv";
 import MongoStore from "connect-mongo";
 import { requiresAuth } from "./middleware/auth";
-import cors from 'cors';
+import cors from "cors";
 
 const app = express();
-app.use(cors());
 
+app.use(cors({
+    origin: ["http://localhost:3000", "https://operazzi-production.up.railway.app"],
+    credentials: true,
+}));
 app.use(morgan("dev"));
 
 app.use(express.json());
 
-app.use(session({
+app.use(
+  session({
     secret: env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: {
-        maxAge: 60 * 60 * 1000,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // Set to true in production
+      maxAge: 60 * 60 * 1000, // Adjust as needed
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // Adjust for cross-site requests in production
     },
     rolling: true,
     store: MongoStore.create({
-        mongoUrl: env.MONGO_CONNECTION_STRING,
+      mongoUrl: env.MONGO_CONNECTION_STRING,
     }),
-}));
+  })
+);
 
 app.use("/api/users", userRoutes);
 app.use("/api/products", requiresAuth, productsRoutes);
@@ -44,21 +52,21 @@ app.use("/api/productImages", requiresAuth, productImagesRoutes);
 app.use("/api/productCustoms", requiresAuth, productCustomsRoutes);
 
 app.use((req, res, next) => {
-    next(createHttpError(404, "Endpoint not found"));
+  next(createHttpError(404, "Endpoint not found"));
 });
-app.get('/', (req, res) => {
-    res.send('Welcome to my backend server!');
+app.get("/", (req, res) => {
+  res.send("Welcome to my backend server!");
 });
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((error: unknown, req: Request, res: Response, next: NextFunction) => {
-    console.error(error);
-    let errorMessage = "An unknown error occurred";
-    let statusCode = 500;
-    if (isHttpError(error)) {
-        statusCode = error.status;
-        errorMessage = error.message;
-    }
-    res.status(statusCode).json({ error: errorMessage });
+  console.error(error);
+  let errorMessage = "An unknown error occurred";
+  let statusCode = 500;
+  if (isHttpError(error)) {
+    statusCode = error.status;
+    errorMessage = error.message;
+  }
+  res.status(statusCode).json({ error: errorMessage });
 });
 
 export default app;
