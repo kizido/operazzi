@@ -288,19 +288,19 @@ export async function fetchProductImages(): Promise<ProductImage[]> {
 }
 
 export async function deleteProductCategory(productCategoryId: string) {
-  await fetchData("api/productCategories/" + productCategoryId, {
+  await fetchData("/api/productCategories/" + productCategoryId, {
     method: "DELETE",
   });
 }
 
 export async function deleteProductPackageType(productPackageTypeId: string) {
-  await fetchData("api/productPackageTypes/" + productPackageTypeId, {
+  await fetchData("/api/productPackageTypes/" + productPackageTypeId, {
     method: "DELETE",
   });
 }
 
 export async function deleteProductBrand(productBrandId: string) {
-  await fetchData("api/productBrands/" + productBrandId, { method: "DELETE" });
+  await fetchData("/api/productBrands/" + productBrandId, { method: "DELETE" });
 }
 
 export async function updateProductCategory(
@@ -308,7 +308,7 @@ export async function updateProductCategory(
   productCategoryId: string
 ): Promise<ProductCategory> {
   const response = await fetchData(
-    "api/productCategories/" + productCategoryId,
+    "/api/productCategories/" + productCategoryId,
     {
       method: "PATCH",
       headers: {
@@ -323,7 +323,7 @@ export async function updateProductBrand(
   productBrand: ProductBrandInput,
   productBrandId: string
 ): Promise<ProductBrand> {
-  const response = await fetchData("api/productBrands/" + productBrandId, {
+  const response = await fetchData("/api/productBrands/" + productBrandId, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -337,7 +337,7 @@ export async function updateProductPackageType(
   productPackageTypeId: string
 ): Promise<ProductPackageType> {
   const response = await fetchData(
-    "api/productPackageTypes/" + productPackageTypeId,
+    "/api/productPackageTypes/" + productPackageTypeId,
     {
       method: "PATCH",
       headers: {
@@ -352,7 +352,7 @@ export async function updateProductPackageType(
 export async function fetchProductCustoms(
   productCustomsId: string
 ): Promise<ProductCustoms> {
-  const response = await fetchData("api/productCustoms/" + productCustomsId, {
+  const response = await fetchData("/api/productCustoms/" + productCustomsId, {
     method: "GET",
   });
   return response.json();
@@ -370,7 +370,7 @@ export async function updateProductCustoms(
   input: CustomsInput,
   productCustomsId: string
 ): Promise<ProductCustoms> {
-  const response = await fetchData("api/productCustoms/" + productCustomsId, {
+  const response = await fetchData("/api/productCustoms/" + productCustomsId, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
