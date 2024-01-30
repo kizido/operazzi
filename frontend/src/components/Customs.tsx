@@ -86,7 +86,12 @@ export default function Customs({
 
   const handleDeclaredValueBlur = (event: FocusEvent<HTMLInputElement>) => {
     // Format the value to two decimal places on blur
-    const value = parseFloat(event.target.value);
+    let value = parseFloat(event.target.value);
+    if(event.target.value === '') {
+      value = 0;
+    }
+    else {
+    }
     const formattedValue = value.toFixed(2);
     setValue("declaredValue", formattedValue);
   };
