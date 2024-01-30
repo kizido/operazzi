@@ -127,17 +127,17 @@
     border: none;
 }
 
-.grayButton:hover {
-    background-color: #dddddd;
-    color: #4fa2a8;
-    border-color: #f0f0f0;
+.grayButton:active, .grayButton:focus {
+    background-color: #f8f8f8 !important;
+    color: black !important;
+    border: 0;
+    outline: 0;
+    box-shadow: none;
 }
-
-.grayButton:active {
+.grayButton:hover {
     background-color: #dddddd !important;
     color: #4fa2a8 !important;
-    border-color: #f0f0f0 !important;
-    outline: 0 !important
+    border-color: #f0f0f0;
 }
 
 .grayButton:disabled {

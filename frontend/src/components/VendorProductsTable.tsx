@@ -2,7 +2,6 @@ import React, {
   useState,
   useReducer,
   useEffect,
-  useContext,
   useRef,
 } from "react";
 import {
@@ -17,7 +16,6 @@ import styles from "../styles/Modal.module.css";
 import tableStyles from "../styles/Table.module.css";
 import vendorProductStyles from "../styles/VendorProducts.module.css";
 import { Button, Modal } from "react-bootstrap";
-import { ProductContext } from "../contexts/ProductContext";
 import { Product } from "../models/product";
 
 export type VendorProductsModel = {
@@ -167,7 +165,7 @@ export default function VendorProductsTable({
   }, [priceRanges]);
   useEffect(() => {
     setCogsDefaultRowId(productToEdit?.vendorProductCogsDefaultRow ?? null);
-    
+
     // When Product is loaded/changed, set the vendor products state to its value
     // if (vendorProductsLoaded.current) {
     setVendorProducts(
