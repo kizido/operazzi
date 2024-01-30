@@ -123,7 +123,7 @@ export default function Pricing({ pricingDataSubmit, productToEdit }: PricingPro
       case "growth":
         setGrowth(value);
         break;
-      case "netProfitTarget":
+      case "netProfitTarget":        
         setNetProfitTarget(value);
         break;
       default:

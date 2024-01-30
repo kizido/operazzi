@@ -127,6 +127,11 @@ const AddEditProductDialog = ({
       setPackagingInputData(productToEdit.productPackaging);
       setCogsDefaultRowId(productToEdit.vendorProductCogsDefaultRow);
 
+      setOpexData(productToEdit.opex || "");
+      setPpcSpendData(productToEdit.ppcSpend || "");
+      setGrowthData(productToEdit.growth || "");
+      setNetProfitTargetData(productToEdit.netProfitTarget || "");
+
       calculateISC();
     } else {
       productContext?.setProduct(null);
@@ -154,23 +159,18 @@ const AddEditProductDialog = ({
     productContext?.setProduct(productToEdit ?? null);
   }, [productToEdit])
   useEffect(() => {
-    if (productToEdit != null && cogsDefaultRowId != null) {
+    if (productToEdit != null && cogsDefaultRowId != null && vendorProductsInputData != null && +cogsDefaultRowId < vendorProductsInputData.length) {
+      console.log("COGS DEFAULT ROW: " + cogsDefaultRowId);
+      console.log("Vendor Products Length: " + vendorProductsInputData.length)
       try {
         setRetrievedUnitCogs(
-          productToEdit.productVendorProducts[+cogsDefaultRowId].perUnitCogs
+          vendorProductsInputData[+cogsDefaultRowId].perUnitCogs
         );
       } catch (error) {
         console.error(error);
       }
-      console.log(
-        "PER UNIT COGS: " +
-          productToEdit.productVendorProducts[+cogsDefaultRowId].perUnitCogs
-      );
-      setRetrievedUnitCogs(
-        productToEdit.productVendorProducts[+cogsDefaultRowId].perUnitCogs
-      );
     }
-  }, [cogsDefaultRowId]);
+  }, [vendorProductsInputData, cogsDefaultRowId]);
 
   async function onSubmit(input: ProductInput) {
     selectedImage && (input.productImageId = selectedImage?._id);
@@ -274,9 +274,6 @@ const AddEditProductDialog = ({
     }
   };
   const handleDefaultCogsRowData = (rowId: string | null) => {
-    // if(rowId && cogsDefaultRowId && parseInt(rowId) < cogsDefaultRowId?.length) {
-    //   setCogsDefaultRowId(rowId);
-    // }
     setCogsDefaultRowId(rowId);
   };
   const calculateISC = () => {

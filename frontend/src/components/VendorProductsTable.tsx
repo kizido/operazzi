@@ -116,7 +116,7 @@ export default function VendorProductsTable({
   vendorProductsDataSubmit,
   deleteVendorProduct,
   defaultCogsRowIdSubmit,
-  productToEdit
+  productToEdit,
 }: VendorProductsTableProps) {
   const [vendorProducts, setVendorProducts] = useState<VendorProductsModel[]>(
     []
@@ -166,38 +166,37 @@ export default function VendorProductsTable({
     }
   }, [priceRanges]);
   useEffect(() => {
-    setCogsDefaultRowId(
-      productToEdit?.vendorProductCogsDefaultRow ?? null
-    );
+    setCogsDefaultRowId(productToEdit?.vendorProductCogsDefaultRow ?? null);
+    
     // When Product is loaded/changed, set the vendor products state to its value
-    if (vendorProductsLoaded.current) {
-      setVendorProducts(
-        productToEdit?.productVendorProducts
-          ? productToEdit?.productVendorProducts.map((vp) => {
-              if (vp.vendorRangePrice.length > 0) {
-                // Get the perUnitCogs for each vendor product by finding the max price
-                const indexOfMax = vp.vendorRangePrice.reduce(
-                  (maxIndex, currentElement, currentIndex) => {
-                    // Parse the price of the current element and the element at maxIndex to floats
-                    const currentFloat = parseFloat(currentElement.price);
-                    const maxFloat = parseFloat(
-                      vp.vendorRangePrice[maxIndex].price
-                    );
+    // if (vendorProductsLoaded.current) {
+    setVendorProducts(
+      productToEdit?.productVendorProducts
+        ? productToEdit?.productVendorProducts.map((vp) => {
+            if (vp.vendorRangePrice.length > 0) {
+              // Get the perUnitCogs for each vendor product by finding the max price
+              const indexOfMax = vp.vendorRangePrice.reduce(
+                (maxIndex, currentElement, currentIndex) => {
+                  // Parse the price of the current element and the element at maxIndex to floats
+                  const currentFloat = parseFloat(currentElement.price);
+                  const maxFloat = parseFloat(
+                    vp.vendorRangePrice[maxIndex].price
+                  );
 
-                    // Compare the parsed floats and return the index of the larger one
-                    return currentFloat > maxFloat ? currentIndex : maxIndex;
-                  },
-                  0
-                );
-                vp.perUnitCogs = vp.vendorRangePrice[indexOfMax].price;
-              }
-              return vp;
-            })
-          : []
-      );
-      vendorProductsLoaded.current = false;
-    }
-  }, [productToEdit]);
+                  // Compare the parsed floats and return the index of the larger one
+                  return currentFloat > maxFloat ? currentIndex : maxIndex;
+                },
+                0
+              );
+              vp.perUnitCogs = vp.vendorRangePrice[indexOfMax].price;
+            }
+            return vp;
+          })
+        : []
+    );
+    // vendorProductsLoaded.current = false;
+    // }
+  }, []);
   useEffect(() => {
     if (showEditVendorProduct) {
       reset(vendorProducts[+selectedRowId!]);

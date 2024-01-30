@@ -162,7 +162,7 @@ export async function updateProduct(
 }
 
 export async function deleteProduct(productId: string) {
-  await fetchData("api/products/" + productId, { method: "DELETE" });
+  await fetchData("/api/products/" + productId, { method: "DELETE" });
 }
 
 export async function toggleActivateProduct(product: Product) {
