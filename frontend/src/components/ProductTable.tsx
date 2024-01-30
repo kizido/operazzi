@@ -106,7 +106,16 @@ export default function ProductTable() {
         { row }: { row: any } // TypeScript type annotation added here
       ) => (
         <div>
-          <button onClick={() => setProductToEdit(row.original)}>Edit</button>
+          <button
+            onClick={(e) => {
+              if (selectedRowId !== null) {
+                e.stopPropagation();
+              }
+              setProductToEdit(row.original);
+            }}
+          >
+            Edit
+          </button>
           <button onClick={() => deleteProduct(row.original)}>Delete</button>
           <button onClick={() => toggleActivateProduct(row.original)}>
             {showOnlyActivated ? "Deactivate" : "Activate"}
