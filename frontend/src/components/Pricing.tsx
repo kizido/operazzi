@@ -13,6 +13,7 @@ import modalStyles from "../styles/Modal.module.css";
 import pricingStyles from "../styles/Pricing.module.css";
 import { ProductPackageType } from "../models/productPackageType";
 import { Product } from "../models/product";
+import { PackagingModel } from "./PackagingTable";
 
 type UnitCostModel = {
   packagingCosts: string; // total packaging cost from packaging page
@@ -35,7 +36,7 @@ const transposeData = (initialData: UnitCostModel) => {
   const transposedData: TransposedRow[] = Object.entries(initialData).map(
     ([key, value]) => ({
       header: key, // These will be your row headers
-      value: '$' + value, // These will be your row values
+      value: "$" + value, // These will be your row values
     })
   );
   return transposedData;
@@ -54,9 +55,30 @@ const columns = [
 interface PricingProps {
   pricingDataSubmit: (name: string, value: string) => void;
   productToEdit?: Product;
+  packageId: string | null,
+  cogs: string;
+  weight: string;
+  isc: string;
+  dutiesAndTariffs: string;
+  dsc: string;
+  pickAndPackFee: string;
+  amazonReferralFee: string;
+  packaging: PackagingModel[],
 }
 
-export default function Pricing({ pricingDataSubmit, productToEdit }: PricingProps) {
+export default function Pricing({
+  pricingDataSubmit,
+  productToEdit,
+  packageId,
+  cogs,
+  weight,
+  isc,
+  dutiesAndTariffs,
+  dsc,
+  pickAndPackFee,
+  amazonReferralFee,
+  packaging,
+}: PricingProps) {
   // const [data, setData] = useState(transposedData);
   const [pricingData, setPricingData] = useState<TransposedRow[]>([]);
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
@@ -66,6 +88,8 @@ export default function Pricing({ pricingDataSubmit, productToEdit }: PricingPro
   const [growth, setGrowth] = useState("");
   const [netProfitTarget, setNetProfitTarget] = useState("");
 
+  const [packageWeightData, setPackageWeightData] = useState<string>("");
+
   const product = useContext(ProductContext);
 
   const table = useReactTable({
@@ -73,6 +97,27 @@ export default function Pricing({ pricingDataSubmit, productToEdit }: PricingPro
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
+
+  useEffect(() => {
+    recalculatePricingData();
+  }, [cogs, weight, isc, dutiesAndTariffs, dsc, pickAndPackFee, amazonReferralFee, packaging])
+  useEffect(() => {
+    const updatePackageWeight = async () => {
+      let responseWeight: string = "0";
+      try {
+        if (packageId) {
+          const response = await ProductsApi.fetchProductPackageType(
+            packageId
+          );
+          responseWeight = response.packageWeight.toFixed(2);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+      setPackageWeightData(responseWeight);
+    };
+    updatePackageWeight();
+  }, [packageId])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -123,7 +168,7 @@ export default function Pricing({ pricingDataSubmit, productToEdit }: PricingPro
       case "growth":
         setGrowth(value);
         break;
-      case "netProfitTarget":        
+      case "netProfitTarget":
         setNetProfitTarget(value);
         break;
       default:
@@ -134,48 +179,37 @@ export default function Pricing({ pricingDataSubmit, productToEdit }: PricingPro
     recalculatePricingData();
   };
 
-  const getPackageWeight = async () => {
-    let responseWeight: string = "0";
-    try {
-      if (productToEdit?.packageTypeId) {
-        const response = await ProductsApi.fetchProductPackageType(
-          productToEdit?.packageTypeId
-        );
-        responseWeight = response.packageWeight.toFixed(2);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-    return responseWeight;
-  };
-
   const recalculatePricingData = async () => {
     if (productToEdit != null) {
-      const packagingData = productToEdit?.productPackaging
+      const packagingData = packaging
         .reduce((acc, curr) => {
           const cleanedCost = curr.perUnitCost.replace(/[^\d.-]/g, "");
           const cost = parseFloat(cleanedCost) || 0;
           return acc + cost;
         }, 0)
         .toFixed(2);
+      console.log("packaging: " + packagingData);
+      console.log("cogs: " + cogs);
+      console.log("isc: " + isc);
+      console.log("tariffs: " + dutiesAndTariffs);
+      console.log("dsc: " + dsc);
+      console.log("weight: " + weight);
       const lcogsData = (
         parseFloat(packagingData ?? "0") +
-        parseFloat(productToEdit?.cogs ?? "0") +
-        parseFloat(productToEdit?.internationalShippingCosts ?? "0") +
-        parseFloat(productToEdit?.dutiesAndTariffs ?? "0") +
-        parseFloat(productToEdit?.domesticShippingCosts ?? "0")
+        parseFloat(cogs !== "" ? cogs : "0") +
+        parseFloat(isc !== "" ? isc : "0") +
+        parseFloat(dutiesAndTariffs ?? "0") +
+        parseFloat(dsc ?? "0")
       ).toFixed(2);
       const shippingWeight = (
-        parseFloat(productToEdit?.weight ?? "0") +
-        parseFloat(await getPackageWeight())
+        parseFloat(weight ?? "0") + parseFloat(packageWeightData)
       ).toFixed(2);
       const amazonFees = (
-        parseFloat(productToEdit?.pickAndPackFee ?? "0") +
-        parseFloat(productToEdit?.amazonReferralFee ?? "0")
+        parseFloat(pickAndPackFee ?? "0") + parseFloat(amazonReferralFee ?? "0")
       ).toFixed(2);
-      const growthFund = (
-        parseFloat(productToEdit?.cogs ?? "0") * parseFloat(growth)
-      ).toFixed(2);
+      const growthFund = (parseFloat(cogs ?? "0") * parseFloat(growth)).toFixed(
+        2
+      );
       const marketingBudget = (
         (parseFloat(packagingData ?? "0") +
           parseFloat(lcogsData ?? "0") +
@@ -193,7 +227,7 @@ export default function Pricing({ pricingDataSubmit, productToEdit }: PricingPro
       const websitePrice = (
         parseFloat(lcogsData ?? "0") +
         parseFloat(opex ?? "0") +
-        parseFloat(productToEdit?.internationalShippingCosts ?? "0") +
+        parseFloat(isc ?? "0") +
         parseFloat(ppcSpend ?? "0") +
         parseFloat(netProfitTarget ?? "0") +
         parseFloat(growth ?? "0")
