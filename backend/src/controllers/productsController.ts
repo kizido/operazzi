@@ -303,36 +303,6 @@ export const updateProduct: RequestHandler<
     if (!newBrand) {
       throw createHttpError(400, "Product must have a brand!");
     }
-    if (!newBarcodeUpc) {
-      throw createHttpError(400, "Product must have a UPC barcode!");
-    }
-    if (
-      !newDimensions ||
-      !newDimensions.productLength ||
-      !newDimensions.productWidth ||
-      !newDimensions.productHeight ||
-      !newDimensions.productDiameter
-    ) {
-      throw createHttpError(400, "Product must have all dimensions!");
-    }
-    if (
-      !newMasterCaseDimensions ||
-      !newMasterCaseDimensions.masterCaseLength ||
-      !newMasterCaseDimensions.masterCaseWidth ||
-      !newMasterCaseDimensions.masterCaseHeight ||
-      !newMasterCaseDimensions.masterCaseQuantity
-    ) {
-      throw createHttpError(400, "Product must have master case dimensions!");
-    }
-    if (!newMasterCaseWeight) {
-      throw createHttpError(400, "Product must have a master case weight!");
-    }
-    if (!newWeight) {
-      throw createHttpError(400, "Product must have a weight!");
-    }
-    if (newActivated === undefined || newActivated === null) {
-      throw createHttpError(400, "Product must have an activation switch");
-    }
 
     const product = await ProductModel.findById(productId).exec();
 
