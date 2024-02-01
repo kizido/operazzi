@@ -306,9 +306,6 @@ export const updateProduct: RequestHandler<
     if (!newBarcodeUpc) {
       throw createHttpError(400, "Product must have a UPC barcode!");
     }
-    if (!newCogs) {
-      throw createHttpError(400, "Product must have a COGS!");
-    }
     if (
       !newDimensions ||
       !newDimensions.productLength ||
