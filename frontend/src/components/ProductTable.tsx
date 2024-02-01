@@ -108,7 +108,7 @@ export default function ProductTable() {
         <div>
           <button
             onClick={(e) => {
-              if (selectedRowId !== null) {
+              if (row.id === selectedRowId) {
                 e.stopPropagation();
               }
               setProductToEdit(row.original);
