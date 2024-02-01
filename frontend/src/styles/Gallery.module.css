@@ -7,6 +7,9 @@
 .galleryInput {
     margin: 1rem 0;
 }
+.galleryErrorText {
+    color: rgb(181, 13, 13);
+}
 
 .galleryInputAddButton {}
 

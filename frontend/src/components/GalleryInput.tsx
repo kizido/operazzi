@@ -8,6 +8,7 @@ interface GalleryInputProps {
 
 const GalleryInput: FC<GalleryInputProps> = ({ onFileSelect }) => {
     const [validFileUploaded, setValidFileUploaded] = useState<boolean>(false);
+    const [invalidFileUploaded, setInvalidFileUploaded] = useState<boolean>(false);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
     const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -30,10 +31,12 @@ const GalleryInput: FC<GalleryInputProps> = ({ onFileSelect }) => {
 
                             if (img.naturalWidth <= 600 && img.naturalHeight <= 600) {
                                 // Call the onFileSelect function with the selected file
+                                setInvalidFileUploaded(false);
                                 setValidFileUploaded(true);
                                 setSelectedFile(file);
                             } else {
                                 setValidFileUploaded(false);
+                                setInvalidFileUploaded(true);
                                 console.error('Image is too large');
                                 // alert("Image must be maximum: 600x600px. Your image is: "
                                 //     + img.naturalWidth + "x" + img.naturalHeight + "px.")
@@ -76,6 +79,9 @@ const GalleryInput: FC<GalleryInputProps> = ({ onFileSelect }) => {
                     setSelectedFile(null);
                     setValidFileUploaded(false);
                 }} className={`${styles.galleryInputAddButton} ${'btn-success'}`}>Add Image</Button>
+            )}
+            {invalidFileUploaded && (
+                <p className={`${styles.galleryInput} ${styles.galleryErrorText}`}>File is either too large (must be below 1000x1000px) or wrong file type</p>
             )}
         </div>
     );
