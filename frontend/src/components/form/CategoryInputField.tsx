@@ -8,6 +8,7 @@ import * as ProductsApi from "../../network/products_api";
 import { IconButton } from "@mui/material";
 import { IconSettings, IconPencil, IconX, IconPlus } from '@tabler/icons-react';
 import modalStyles from '../../styles/Modal.module.css';
+import { Product } from "../../models/product";
 
 
 interface CategoryInputFieldProps {
@@ -30,11 +31,14 @@ const CategoryInputField = ({ name, label, register, registerOptions, error, ...
     const [addOptionDialog, setAddOptionDialog] = useState(false);
     const [editOptionDialog, setEditOptionDialog] = useState(false);
 
+    const [categoriesLoaded, setCategoriesLoaded] = useState(false);
+
     useEffect(() => {
         async function loadCategories() {
             try {
                 const productCategories = await ProductsApi.fetchProductCategories();
                 setCategories(productCategories);
+                setCategoriesLoaded(true);
             } catch (error) {
                 console.error(error);
             }
@@ -103,17 +107,18 @@ const CategoryInputField = ({ name, label, register, registerOptions, error, ...
             <Form.Group controlId={name + "-input"}>
                 <Form.Label className={styles.formLabel}>{label}</Form.Label>
                 <InputGroup>
-                    <Form.Select size="sm"
+                    {categoriesLoaded ? (<Form.Select size="sm"
                         {...props}
                         {...register(name, registerOptions)}
                         isInvalid={!!error}
                     >
+                        {/* <option></option> */}
                         {categories?.map((category, index) => (
                             <option key={index}>
                                 {category.category}
                             </option>
                         ))}
-                    </Form.Select>
+                    </Form.Select>) : <Form.Select size="sm"></Form.Select>}
                     <Form.Control.Feedback type="invalid">
                         {error?.message}
                     </Form.Control.Feedback>
