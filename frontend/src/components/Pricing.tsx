@@ -36,7 +36,7 @@ const transposeData = (initialData: UnitCostModel) => {
   const transposedData: TransposedRow[] = Object.entries(initialData).map(
     ([key, value]) => ({
       header: key, // These will be your row headers
-      value: "$" + value, // These will be your row values
+      value: key === "shippingWeight" ? (value + "g") : ("$" + value), // These will be your row values
     })
   );
   return transposedData;
