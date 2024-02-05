@@ -52,6 +52,7 @@ const AddEditProductDialog = ({
     getValues,
     setValue,
     control,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<ProductInput>({
     defaultValues: {
@@ -119,6 +120,15 @@ const AddEditProductDialog = ({
   const [calculatedISC, setCalculatedISC] = useState("");
   const [retrievedUnitCogs, setRetrievedUnitCogs] = useState("");
 
+  // const watchedCogs = watch("cogs");
+  const watchedWeight = watch("weight");
+  // const watchedISC = watch("internationalShippingCosts");
+  const watchedPackageId = watch("packageTypeId");
+  const watchedDutiesAndTariffs = watch("dutiesAndTariffs");
+  const watchedDSC = watch("domesticShippingCosts");
+  const watchedPickAndPackFee = watch("pickAndPackFee");
+  const watchedAmazonReferralFee = watch("amazonReferralFee");
+
   useEffect(() => {
     if (productToEdit) {
       productContext?.setProduct(productToEdit);
@@ -157,11 +167,16 @@ const AddEditProductDialog = ({
   // Testing Code
   useEffect(() => {
     productContext?.setProduct(productToEdit ?? null);
-  }, [productToEdit])
+  }, [productToEdit]);
   useEffect(() => {
-    if (productToEdit != null && cogsDefaultRowId != null && vendorProductsInputData != null && +cogsDefaultRowId < vendorProductsInputData.length) {
+    if (
+      productToEdit != null &&
+      cogsDefaultRowId != null &&
+      vendorProductsInputData != null &&
+      +cogsDefaultRowId < vendorProductsInputData.length
+    ) {
       console.log("COGS DEFAULT ROW: " + cogsDefaultRowId);
-      console.log("Vendor Products Length: " + vendorProductsInputData.length)
+      console.log("Vendor Products Length: " + vendorProductsInputData.length);
       try {
         setRetrievedUnitCogs(
           vendorProductsInputData[+cogsDefaultRowId].perUnitCogs
@@ -278,6 +293,7 @@ const AddEditProductDialog = ({
   };
   const calculateISC = () => {
     const currentWeight = parseFloat(getValues("weight"));
+    console.log("CURRENT WEIGHT : " + currentWeight);
     if (isNaN(currentWeight)) {
       return "";
     }
@@ -438,11 +454,10 @@ const AddEditProductDialog = ({
                   <Col>
                     <TextInputField
                       name="barcodeUpc"
-                      label="UPC Barcode*"
+                      label="UPC Barcode"
                       type="text"
                       placeholder="UPC Barcode"
                       register={register}
-                      registerOptions={{ required: "Required" }}
                     />
                   </Col>
                 </Row>
@@ -450,20 +465,18 @@ const AddEditProductDialog = ({
                   <Col>
                     <DimensionsInputField
                       name="dimensions"
-                      label="Dimensions*"
+                      label="Dimensions"
                       register={register}
-                      registerOptions={{ required: "Required" }}
                     />
                   </Col>
                   <Col>
                     <TextInputField
                       name="weight"
-                      label="Weight (grams)*"
+                      label="Weight (grams)"
                       type="text"
                       placeholder="Weight"
                       register={register}
                       registerOptions={{
-                        required: "Required",
                         onBlur: calculateISC,
                       }}
                     />
@@ -484,8 +497,8 @@ const AddEditProductDialog = ({
                       name="packageTypeId"
                       label="Shipping Package"
                       type="select"
-                      defaultValue={productToEdit?.packageTypeId || undefined}
                       register={register}
+                      packageId={productToEdit?.packageTypeId}
                     />
                   </Col>
                 </Row>
@@ -553,7 +566,7 @@ const AddEditProductDialog = ({
                   <Col>
                     <TextDisplayField
                       name="cogs"
-                      label="Cost of Goods Sold*"
+                      label="Cost of Goods Sold"
                       type="text"
                       placeholder="N/A"
                       value={retrievedUnitCogs}
@@ -597,7 +610,19 @@ const AddEditProductDialog = ({
               />
             </Tab.Pane>
             <Tab.Pane eventKey="pricing">
-              <Pricing pricingDataSubmit={handlePricingDataSubmit} productToEdit={productToEdit} />
+              <Pricing
+                pricingDataSubmit={handlePricingDataSubmit}
+                productToEdit={productToEdit}
+                packageId={watchedPackageId}
+                cogs={retrievedUnitCogs}
+                isc={calculatedISC}
+                weight={watchedWeight}
+                dutiesAndTariffs={watchedDutiesAndTariffs}
+                dsc={watchedDSC}
+                pickAndPackFee={watchedPickAndPackFee}
+                amazonReferralFee={watchedAmazonReferralFee}
+                packaging={packagingInputData}
+              />
             </Tab.Pane>
           </Tab.Content>
         </Tab.Container>
