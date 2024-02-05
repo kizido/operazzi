@@ -14,9 +14,9 @@ interface PackageTypeInputFieldProps {
   label: string;
   register: UseFormRegister<any>;
   registerOptions?: RegisterOptions;
-  defaultValue?: string;
   error?: FieldError;
   [x: string]: any;
+  packageId?: string | null;
 }
 
 const PackageTypeInputField = ({
@@ -24,8 +24,8 @@ const PackageTypeInputField = ({
   label,
   register,
   registerOptions,
-  defaultValue,
   error,
+  packageId,
   ...props
 }: PackageTypeInputFieldProps) => {
   const [packageTypes, setPackageTypes] = useState<ProductPackageTypeModel[]>(
@@ -43,7 +43,10 @@ const PackageTypeInputField = ({
   const [packageIdToEdit, setPackageIdToEdit] = useState<string | null>(null);
   const [editOptionMenuDialog, setEditOptionMenuDialog] = useState(false);
 
-  const [selectedPackageTypeId, setSelectedPackageTypeId] = useState<string | undefined>(undefined);
+  const [selectedPackageTypeId, setSelectedPackageTypeId] = useState<
+    string | undefined
+  >(packageId || undefined);
+  const [packagesLoaded, setPackagesLoaded] = useState(false);
 
   const [errors, setErrors] = useState({
     packageName: false,
@@ -58,17 +61,21 @@ const PackageTypeInputField = ({
       try {
         const productPackageTypes =
           await ProductsApi.fetchProductPackageTypes();
-        if(productPackageTypes.length > 0 && !defaultValue) {
-            setSelectedPackageTypeId(productPackageTypes[0]._id);
-        }
+        // if(productPackageTypes.length > 0) {
+        //     setSelectedPackageTypeId(productPackageTypes[0]._id);
+        // }
         setPackageTypes(productPackageTypes);
+        setPackagesLoaded(true);
       } catch (error) {
         console.error(error);
       }
     }
     loadPackageTypes();
   }, []);
-  
+  useEffect(() => {
+    console.log(selectedPackageTypeId);
+  }, [selectedPackageTypeId]);
+
   const isFormValid = (): boolean => {
     // Create a new object to hold the updated error states
     const newErrors = {
@@ -181,30 +188,26 @@ const PackageTypeInputField = ({
       <Form.Group controlId={name + "-input"}>
         <Form.Label className={styles.formLabel}>{label}</Form.Label>
         <InputGroup>
-          {
-            <Form.Select
+          {packagesLoaded ?
+            (<Form.Select
               size="sm"
               key={packageTypes.length}
               {...props}
               {...register(name, registerOptions)}
               isInvalid={!!error}
-              
             >
               {/* Conditional rendering of the default option */}
               {(!packageTypes || packageTypes.length === 0) && (
-                <option value="">No package types available</option>
+                <option value={undefined}>No package types available</option>
               )}
 
               {/* Render packageTypes options if available */}
               {packageTypes?.map((packageType) => (
-                <option
-                  key={packageType._id}
-                  value={packageType._id}
-                >
+                <option key={packageType._id} value={packageType._id}>
                   {`${packageType.packageName} (${packageType.packageLength}" x ${packageType.packageWidth}" x ${packageType.packageHeight})`}
                 </option>
               ))}
-            </Form.Select>
+            </Form.Select>) : <Form.Select size="sm"></Form.Select>
           }
           <Form.Control.Feedback type="invalid">
             {error?.message}
@@ -290,7 +293,7 @@ const PackageTypeInputField = ({
               <Form.Control.Feedback type="invalid">
                 {errors.packageHeight && "Package height cannot be empty."}
               </Form.Control.Feedback>
-              <Form.Label>Package Weight (lbs.)</Form.Label>
+              <Form.Label>Package Weight (grams)</Form.Label>
               <Form.Control
                 name="packageWeight"
                 type="number"
