@@ -176,6 +176,12 @@
     padding-right: 0.7rem;
 }
 
+.errorMessageInline {
+    display: inline;
+    color: darkred;
+    font-size: 0.8em;
+}
 .errorMessage {
     color: darkred;
+    font-size: 0.8em;
 }

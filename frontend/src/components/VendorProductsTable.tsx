@@ -1,9 +1,4 @@
-import React, {
-  useState,
-  useReducer,
-  useEffect,
-  useRef,
-} from "react";
+import React, { useState, useReducer, useEffect, useRef } from "react";
 import {
   createColumnHelper,
   flexRender,
@@ -130,16 +125,23 @@ export default function VendorProductsTable({
 
   const vendorProductsLoaded = useRef(true);
 
-  const { register, control, handleSubmit, reset, watch, setValue } =
-    useForm<VendorProductsModel>({
-      defaultValues: {
-        vendor: "",
-        vendorSku: "",
-        minOrderQuantity: "",
-        leadTime: "",
-        vendorRangePrice: [],
-      },
-    });
+  const {
+    register,
+    control,
+    handleSubmit,
+    reset,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm<VendorProductsModel>({
+    defaultValues: {
+      vendor: "",
+      vendorSku: "",
+      minOrderQuantity: "",
+      leadTime: "",
+      vendorRangePrice: [],
+    },
+  });
   const { fields, append, remove } = useFieldArray({
     control,
     name: "vendorRangePrice",
@@ -443,7 +445,7 @@ export default function VendorProductsTable({
       {showAddVendorProduct && (
         <Modal
           show
-          onHide={() => setShowAddVendorProduct(false)}
+          onHide={() => {setShowAddVendorProduct(false); reset();}}
           centered
           className={vendorProductStyles.vendorProductModal}
         >
@@ -454,14 +456,22 @@ export default function VendorProductsTable({
             <form className={vendorProductStyles.vendorProductForm}>
               <div className={vendorProductStyles.vendorProductGridContainer}>
                 <div className={vendorProductStyles.item1}>
-                  <label>Vendor</label>
-                  <input type="text" {...register("vendor")}></input>
-                  <label>Vendor Sku</label>
-                  <input type="text" {...register("vendorSku")}></input>
-                  <label>Min Order Quantity</label>
-                  <input type="text" {...register("minOrderQuantity")}></input>
-                  <label>Lead Time (Days)</label>
-                  <input type="text" {...register("leadTime")}></input>
+                  <label>Vendor {errors.vendor && <p className={styles.errorMessageInline}>{errors.vendor.message}</p>}</label>
+                  <input type="text" {...register("vendor", {
+                    required: "Required"
+                  })}/>
+                  <label>Vendor Sku {errors.vendorSku && <p className={styles.errorMessageInline}>{errors.vendorSku.message}</p>}</label>
+                  <input type="text" {...register("vendorSku", {
+                    required: "Required"
+                  })}/>
+                  <label>Min Order Quantity {errors.minOrderQuantity && <p className={styles.errorMessageInline}>{errors.minOrderQuantity.message}</p>}</label>
+                  <input type="text" {...register("minOrderQuantity", {
+                    required: "Required"
+                  })}/>
+                  <label>Lead Time (Days) {errors.leadTime && <p className={styles.errorMessageInline}>{errors.leadTime.message}</p>}</label>
+                  <input type="text" {...register("leadTime", {
+                    required: "Required"
+                  })}/>
                 </div>
                 <div
                   className={`${vendorProductStyles.item2} ${vendorProductStyles.priceRangeContainer}`}
@@ -590,14 +600,22 @@ export default function VendorProductsTable({
             <form className={vendorProductStyles.vendorProductForm}>
               <div className={vendorProductStyles.vendorProductGridContainer}>
                 <div className={vendorProductStyles.item1}>
-                  <label>Vendor</label>
-                  <input type="text" {...register("vendor")}></input>
-                  <label>Vendor Sku</label>
-                  <input type="text" {...register("vendorSku")}></input>
-                  <label>Min Order Quantity</label>
-                  <input type="text" {...register("minOrderQuantity")}></input>
-                  <label>Lead Time (Days)</label>
-                  <input type="text" {...register("leadTime")}></input>
+                  <label>Vendor {errors.vendor && <p className={styles.errorMessageInline}>{errors.vendor.message}</p>}</label>
+                  <input type="text" {...register("vendor", {
+                    required: "Required"
+                  })}/>
+                  <label>Vendor Sku {errors.vendorSku && <p className={styles.errorMessageInline}>{errors.vendorSku.message}</p>}</label>
+                  <input type="text" {...register("vendorSku", {
+                    required: "Required"
+                  })}/>
+                  <label>Min Order Quantity {errors.minOrderQuantity && <p className={styles.errorMessageInline}>{errors.minOrderQuantity.message}</p>}</label>
+                  <input type="text" {...register("minOrderQuantity", {
+                    required: "Required"
+                  })}/>
+                  <label>Lead Time (Days) {errors.leadTime && <p className={styles.errorMessageInline}>{errors.leadTime.message}</p>}</label>
+                  <input type="text" {...register("leadTime", {
+                    required: "Required"
+                  })}/>
                 </div>
                 <div
                   className={`${vendorProductStyles.item2} ${vendorProductStyles.priceRangeContainer}`}
