@@ -34,6 +34,7 @@ import PackagingModal from "./PackagingModal";
 import { PackagingModel } from "./PackagingTable";
 import TextDisplayField from "./form/TextDisplayField";
 import PercentageInputField from "./form/PercentageInputField";
+import MoneyInputField from "./form/MoneyInputField";
 
 interface AddEditProductDialogProps {
   productToEdit?: Product;
@@ -484,12 +485,14 @@ const AddEditProductDialog = ({
                 </Row>
                 <Row>
                   <Col>
-                    <TextInputField
+                    <MoneyInputField
                       name="domesticShippingCosts"
                       label="Ship to Amazon FBA Cost"
                       type="text"
                       placeholder="Ship to Amazon FBA Cost  "
                       register={register}
+                      setValue={setValue}
+                      control={control}
                     />
                   </Col>
                   <Col>
@@ -515,23 +518,27 @@ const AddEditProductDialog = ({
                     />
                   </Col>
                   <Col>
-                    <TextInputField
+                    <MoneyInputField
                       name="pickAndPackFee"
                       label="Pick And Pack Fee"
                       type="text"
                       placeholder="Pick And Pack Fee"
                       register={register}
+                      setValue={setValue}
+                      control={control}
                     />
                   </Col>
                 </Row>
                 <Row>
                   <Col>
-                    <TextInputField
+                    <MoneyInputField
                       name="amazonReferralFee"
                       label="Amazon Referral Fee"
                       type="text"
                       placeholder="Amazon Referral Fee"
                       register={register}
+                      setValue={setValue}
+                      control={control}
                     />
                   </Col>
                   <Col>
