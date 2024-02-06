@@ -175,3 +175,7 @@
 .packagingInputsContainer label {
     padding-right: 0.7rem;
 }
+
+.errorMessage {
+    color: darkred;
+}

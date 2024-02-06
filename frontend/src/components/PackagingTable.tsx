@@ -59,13 +59,20 @@ export default function PackagingTable({
 
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
 
-  const { register, handleSubmit, reset, setValue, control } =
-    useForm<PackagingModel>({
-      defaultValues: {
-        itemName: "",
-        perUnitCost: "",
-      },
-    });
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setValue,
+    control,
+    formState: { errors, isValid },
+  } = useForm<PackagingModel>({
+    mode: "onChange",
+    defaultValues: {
+      itemName: "",
+      perUnitCost: "",
+    },
+  });
   useEffect(() => {
     setPackagingCosts(productToEdit?.product?.productPackaging ?? []);
   }, [productToEdit]);
@@ -237,13 +244,24 @@ export default function PackagingTable({
                 <div className={styles.packagingInputsContainer}>
                   <div>
                     <label>Item Name:</label>
-                    <input type="text" {...register("itemName")}></input>
+                    <input
+                      type="text"
+                      {...register("itemName", {
+                        required: "Item Name is required.",
+                      })}
+                    />
+                    {errors.itemName && (
+                      <p className={styles.errorMessage}>
+                        {errors.itemName.message}
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label>Per Unit Cost:</label>
                     <Controller
                       name="perUnitCost"
                       control={control}
+                      rules={{ required: "Per Unit Cost is required" }}
                       defaultValue=""
                       render={({ field }) => (
                         <input
@@ -254,6 +272,11 @@ export default function PackagingTable({
                         />
                       )}
                     />
+                    {errors.perUnitCost && (
+                      <p className={styles.errorMessage}>
+                        {errors.perUnitCost.message}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -281,23 +304,43 @@ export default function PackagingTable({
           <Modal.Body>
             <form className={vendorProductStyles.vendorProductForm}>
               <div>
-                <div>
-                  <label>Item Name</label>
-                  <input type="text" {...register("itemName")}></input>
-                  <label>Per Unit Cost</label>
-                  <Controller
-                    name="perUnitCost"
-                    control={control}
-                    defaultValue=""
-                    render={({ field }) => (
-                      <input
-                        type="text"
-                        {...field}
-                        onChange={handleUnitCostChange}
-                        onBlur={handleUnitCostBlur}
-                      />
+                <div className={styles.packagingInputsContainer}>
+                  <div>
+                    <label>Item Name:</label>
+                    <input
+                      type="text"
+                      {...register("itemName", {
+                        required: "Item Name is required.",
+                      })}
+                    />
+                    {errors.itemName && (
+                      <p className={styles.errorMessage}>
+                        {errors.itemName.message}
+                      </p>
                     )}
-                  />
+                  </div>
+                  <div>
+                    <label>Per Unit Cost:</label>
+                    <Controller
+                      name="perUnitCost"
+                      control={control}
+                      rules={{ required: "Per Unit Cost is required." }}
+                      defaultValue=""
+                      render={({ field }) => (
+                        <input
+                          type="text"
+                          {...field}
+                          onChange={handleUnitCostChange}
+                          onBlur={handleUnitCostBlur}
+                        />
+                      )}
+                    />
+                    {errors.perUnitCost && (
+                      <p className={styles.errorMessage}>
+                        {errors.perUnitCost.message}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
               <button onClick={handleSubmit(onSubmit)}>Submit</button>

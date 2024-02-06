@@ -466,7 +466,7 @@ const AddEditProductDialog = ({
                   <Col>
                     <DimensionsInputField
                       name="dimensions"
-                      label="Dimensions"
+                      label="Dimensions | (Length x Width x Height x Diameter)"
                       register={register}
                     />
                   </Col>
