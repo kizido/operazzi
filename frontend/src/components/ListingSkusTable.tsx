@@ -75,7 +75,13 @@ export default function ListingSkusTable({
   const [listingSkus, setListingSkus] = useState<ListingSkusInput[]>([]);
   const [showInactive, setShowInactive] = useState(false);
 
-  const { register, handleSubmit, reset } = useForm<ListingSkusInput>({
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<ListingSkusInput>({
+    mode: "onChange",
     defaultValues: {
       status: true,
     },
@@ -151,7 +157,13 @@ export default function ListingSkusTable({
             const modifiedIndex = listingSkus.findIndex(
               (sku, idx) => sku === filteredSkus[+selectedRowId!]
             );
-            onListingSkusDataSubmit({...listingSkus[modifiedIndex], status: !listingSkus[modifiedIndex].status}, modifiedIndex);
+            onListingSkusDataSubmit(
+              {
+                ...listingSkus[modifiedIndex],
+                status: !listingSkus[modifiedIndex].status,
+              },
+              modifiedIndex
+            );
             setListingSkus(
               listingSkus.map((sku, idx) =>
                 sku === filteredSkus[+selectedRowId!]
@@ -224,7 +236,14 @@ export default function ListingSkusTable({
         </table>
       </div>
       {showAddListingSku && (
-        <Modal show onHide={() => setShowAddListingSku(false)} centered={true}>
+        <Modal
+          show
+          onHide={() => {
+            setShowAddListingSku(false);
+            reset();
+          }}
+          centered={true}
+        >
           <Modal.Header closeButton className={styles.modalHeader}>
             Add Listing Sku
           </Modal.Header>
@@ -234,14 +253,37 @@ export default function ListingSkusTable({
               className={listingSkusStyles.listingSkusForm}
             >
               <label>Channel</label>
-              <input type="text" {...register("channel")}></input>
-
+              <input
+                type="text"
+                {...register("channel", {
+                  required: "Channel is required.",
+                })}
+              />
+              {errors.channel && (
+                <p className={styles.errorMessage}>{errors.channel.message}</p>
+              )}
               <label>Listing Sku</label>
-              <input type="text" {...register("listingSku")}></input>
-
+              <input
+                type="text"
+                {...register("listingSku", {
+                  required: "Listing Sku is required.",
+                })}
+              />
+              {errors.listingSku && (
+                <p className={styles.errorMessage}>
+                  {errors.listingSku.message}
+                </p>
+              )}
               <label>Latency (ms)</label>
-              <input type="text" {...register("latency")}></input>
-
+              <input
+                type="text"
+                {...register("latency", {
+                  required: "Latency is required.",
+                })}
+              />
+              {errors.latency && (
+                <p className={styles.errorMessage}>{errors.latency.message}</p>
+              )}
               <div className={listingSkusStyles.checkboxSection}>
                 <div>
                   <label className={listingSkusStyles.checkboxLabel}>
@@ -293,14 +335,35 @@ export default function ListingSkusTable({
               className={listingSkusStyles.listingSkusForm}
             >
               <label>Channel</label>
-              <input type="text" {...register("channel")}></input>
-
+              <input
+                type="text"
+                {...register("channel", {
+                  required: "Channel is required.",
+                })}
+              />
+              {errors.channel && (
+                <p className={styles.errorMessage}>{errors.channel.message}</p>
+              )}
               <label>Listing Sku</label>
-              <input type="text" {...register("listingSku")}></input>
-
+              <input
+                type="text"
+                {...register("listingSku", {
+                  required: "Listing Sku is required.",
+                })}
+              />
+              {errors.listingSku && (
+                <p className={styles.errorMessage}>{errors.listingSku.message}</p>
+              )}
               <label>Latency</label>
-              <input type="text" {...register("latency")}></input>
-
+              <input
+                type="text"
+                {...register("latency", {
+                  required: "Latency is required.",
+                })}
+              />
+              {errors.latency && (
+                <p className={styles.errorMessage}>{errors.latency.message}</p>
+              )}
               <div className={listingSkusStyles.checkboxSection}>
                 <div>
                   <label className={listingSkusStyles.checkboxLabel}>

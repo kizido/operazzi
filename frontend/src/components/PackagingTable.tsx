@@ -170,6 +170,7 @@ export default function PackagingTable({
               pkgs.filter((_, idx) => idx !== +selectedRowId!)
             );
             deletePackaging(+selectedRowId!);
+            setSelectedRowId(null);
           }}
           disabled={!selectedRowId}
           variant="outline-dark"
