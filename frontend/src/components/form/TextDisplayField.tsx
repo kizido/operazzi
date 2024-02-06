@@ -1,4 +1,4 @@
-import { Form } from "react-bootstrap";
+import { Form, InputGroup } from "react-bootstrap";
 import styles from '../../styles/Forms.module.css';
 
 
@@ -13,14 +13,17 @@ const TextDisplayField = ({ name, label, value, ...props }: TextDisplayFieldProp
     return (
         <Form.Group controlId={name + "-input"}>
             <Form.Label className={styles.formLabel}>{label}</Form.Label>
-            <Form.Control
-                size="sm"
-                step={0.1}
-                {...props}
-                readOnly
-                value={value}
-                className={styles.displayControl}
-            />
+            <InputGroup size="sm">
+                <InputGroup.Text className={styles.displayControl}>$</InputGroup.Text>
+                <Form.Control
+                    size="sm"
+                    step={0.1}
+                    {...props}
+                    readOnly
+                    value={value}
+                    className={styles.displayControl}
+                />
+            </InputGroup>
         </Form.Group>
     );
 }
