@@ -1,5 +1,5 @@
 import { Button, Col, Form, InputGroup, Modal, Row } from "react-bootstrap";
-import { FieldError, RegisterOptions, UseFormRegister } from "react-hook-form";
+import { FieldError, RegisterOptions, UseFormRegister, UseFormSetValue } from "react-hook-form";
 import styles from "../../styles/Forms.module.css";
 import { useState, useEffect, useRef } from "react";
 import { ProductBrand as ProductBrandModel } from "../../models/productBrand";
@@ -16,6 +16,7 @@ interface BrandInputFieldProps {
   registerOptions?: RegisterOptions;
   error?: FieldError;
   [x: string]: any;
+  setValue: UseFormSetValue<any>;
 }
 
 const BrandInputField = ({
@@ -24,6 +25,7 @@ const BrandInputField = ({
   register,
   registerOptions,
   error,
+  setValue,
   ...props
 }: BrandInputFieldProps) => {
   const [brands, setBrands] = useState<ProductBrandModel[]>([]);
@@ -55,6 +57,9 @@ const BrandInputField = ({
       let productBrandResponse: ProductBrandModel;
 
       productBrandResponse = await ProductsApi.createProductBrand(input);
+      if(brands.length < 1) {
+        setValue(name, productBrandResponse.brand);
+      }
       setBrands([...brands, productBrandResponse]);
       setAddOptionDialog(false);
     } catch (error) {

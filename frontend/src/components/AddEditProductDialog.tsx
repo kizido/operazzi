@@ -246,6 +246,13 @@ const AddEditProductDialog = ({
       });
     }
   };
+  const handleListingSkuDelete = (index: number) => {
+    if (listingSkusInputData) {
+      setListingSkusInputData(
+        listingSkusInputData.filter((sku, idx) => idx !== index)
+      );
+    }
+  };
   const handleVendorProductsData = (
     input: VendorProductsModel,
     index?: number
@@ -410,6 +417,7 @@ const AddEditProductDialog = ({
                       placeholder="Brand"
                       register={register}
                       registerOptions={{ required: "Required" }}
+                      setValue={setValue}
                     />
                     <CategoryInputField
                       name="category"
@@ -600,6 +608,7 @@ const AddEditProductDialog = ({
             <Tab.Pane eventKey="listingSkus">
               <ListingSkusModal
                 onListingSkusDataSubmit={handleListingSkusData}
+                onListingSkuDelete={handleListingSkuDelete}
               />
             </Tab.Pane>
             <Tab.Pane eventKey="vendorProducts">
