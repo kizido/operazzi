@@ -60,10 +60,12 @@ const columns = [
 
 interface ListingSkusTableProps {
   onListingSkusDataSubmit: (input: ListingSkusInput, index?: number) => void;
+  onListingSkuDelete: (index: number) => void;
 }
 
 export default function ListingSkusTable({
   onListingSkusDataSubmit,
+  onListingSkuDelete
 }: ListingSkusTableProps) {
   const rerender = useReducer(() => ({}), {})[1];
   const [showAddListingSku, setShowAddListingSku] = useState(false);
@@ -182,6 +184,22 @@ export default function ListingSkusTable({
               ? "ACTIVATE"
               : "DEACTIVATE"}
           </b>
+        </Button>
+        <Button
+          onClick={() => {
+            // const modifiedIndex = listingSkus.findIndex(
+            //   (sku, idx) => sku === filteredSkus[+selectedRowId!]
+            // );
+            // onListingSkuDelete(modifiedIndex);
+            setListingSkus(
+              listingSkus.filter((sku) => sku !== filteredSkus[+selectedRowId!])
+            );
+          }}
+          disabled={!selectedRowId}
+          variant="outline-dark"
+          className={styles.grayButton}
+        >
+          <b>DELETE</b>
         </Button>
         <Button
           onClick={() => {
@@ -352,7 +370,9 @@ export default function ListingSkusTable({
                 })}
               />
               {errors.listingSku && (
-                <p className={styles.errorMessage}>{errors.listingSku.message}</p>
+                <p className={styles.errorMessage}>
+                  {errors.listingSku.message}
+                </p>
               )}
               <label>Latency</label>
               <input
