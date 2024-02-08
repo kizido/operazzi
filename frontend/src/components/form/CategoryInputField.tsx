@@ -8,7 +8,6 @@ import * as ProductsApi from "../../network/products_api";
 import { IconButton } from "@mui/material";
 import { IconSettings, IconPencil, IconX, IconPlus } from '@tabler/icons-react';
 import modalStyles from '../../styles/Modal.module.css';
-import { Product } from "../../models/product";
 
 
 interface CategoryInputFieldProps {
@@ -106,7 +105,7 @@ const CategoryInputField = ({ name, label, register, registerOptions, error, ...
         <div>
             <Form.Group controlId={name + "-input"}>
                 <Form.Label className={styles.formLabel}>{label}</Form.Label>
-                <InputGroup>
+                <InputGroup size="sm">
                     {categoriesLoaded ? (<Form.Select size="sm"
                         {...props}
                         {...register(name, registerOptions)}

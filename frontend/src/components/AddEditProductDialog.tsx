@@ -35,6 +35,7 @@ import { PackagingModel } from "./PackagingTable";
 import TextDisplayField from "./form/TextDisplayField";
 import PercentageInputField from "./form/PercentageInputField";
 import MoneyInputField from "./form/MoneyInputField";
+import UPCBarcodeInputField from "./form/UPCBarcodeInputField";
 
 interface AddEditProductDialogProps {
   productToEdit?: Product;
@@ -461,13 +462,21 @@ const AddEditProductDialog = ({
                     />
                   </Col>
                   <Col>
-                    <TextInputField
+                    <UPCBarcodeInputField
+                      name="barcodeUpc"
+                      label="UPC-A Barcode"
+                      type="text"
+                      placeholder="UPC Barcode"
+                      setValue={setValue}
+                      control={control}
+                    />
+                    {/* <TextInputField
                       name="barcodeUpc"
                       label="UPC Barcode"
                       type="text"
                       placeholder="UPC Barcode"
                       register={register}
-                    />
+                    /> */}
                   </Col>
                 </Row>
                 <Row>
