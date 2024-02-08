@@ -36,7 +36,7 @@ const transposeData = (initialData: UnitCostModel) => {
   const transposedData: TransposedRow[] = Object.entries(initialData).map(
     ([key, value]) => ({
       header: key, // These will be your row headers
-      value: key === "shippingWeight" ? (value + "g") : ("$" + value), // These will be your row values
+      value: key === "shippingWeight" ? value + "g" : "$" + value, // These will be your row values
     })
   );
   return transposedData;
@@ -55,7 +55,7 @@ const columns = [
 interface PricingProps {
   pricingDataSubmit: (name: string, value: string) => void;
   productToEdit?: Product;
-  packageId: string | null,
+  packageId: string | null;
   cogs: string;
   weight: string;
   isc: string;
@@ -63,7 +63,7 @@ interface PricingProps {
   dsc: string;
   pickAndPackFee: string;
   amazonReferralFee: string;
-  packaging: PackagingModel[],
+  packaging: PackagingModel[];
 }
 
 export default function Pricing({
@@ -97,19 +97,15 @@ export default function Pricing({
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
-
-  useEffect(() => {
-    recalculatePricingData();
-  }, [cogs, weight, isc, dutiesAndTariffs, dsc, pickAndPackFee, amazonReferralFee, packaging])
   useEffect(() => {
     const updatePackageWeight = async () => {
       let responseWeight: string = "0";
       try {
         if (packageId) {
-          const response = await ProductsApi.fetchProductPackageType(
-            packageId
-          );
+          console.log("PACKAGE ID RETRIEVED");
+          const response = await ProductsApi.fetchProductPackageType(packageId);
           responseWeight = response.packageWeight.toFixed(2);
+          console.log("RESPONSE WEIGHT: " + responseWeight);
         }
       } catch (error) {
         console.error(error);
@@ -117,7 +113,23 @@ export default function Pricing({
       setPackageWeightData(responseWeight);
     };
     updatePackageWeight();
-  }, [packageId])
+  }, [packageId]);
+  useEffect(() => {
+    defaultPricingData();
+  }, []);
+  useEffect(() => {
+    recalculatePricingData();
+  }, [
+    cogs,
+    weight,
+    isc,
+    dutiesAndTariffs,
+    dsc,
+    pickAndPackFee,
+    amazonReferralFee,
+    packaging,
+    packageWeightData
+  ]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -188,12 +200,6 @@ export default function Pricing({
           return acc + cost;
         }, 0)
         .toFixed(2);
-      console.log("packaging: " + packagingData);
-      console.log("cogs: " + cogs);
-      console.log("isc: " + isc);
-      console.log("tariffs: " + dutiesAndTariffs);
-      console.log("dsc: " + dsc);
-      console.log("weight: " + weight);
       const lcogsData = (
         parseFloat(packagingData ?? "0") +
         parseFloat(cogs !== "" ? cogs : "0") +
@@ -201,6 +207,8 @@ export default function Pricing({
         parseFloat(dutiesAndTariffs ?? "0") +
         parseFloat(dsc ?? "0")
       ).toFixed(2);
+      console.log("WEIGHT: " + weight);
+      console.log("PACKAGE WEIGHT: " + packageWeightData);
       const shippingWeight = (
         parseFloat(weight ?? "0") + parseFloat(packageWeightData)
       ).toFixed(2);
@@ -245,11 +253,6 @@ export default function Pricing({
       setPricingData(transposeData(newPricingData));
     }
   };
-
-  useEffect(() => {
-    recalculatePricingData();
-    defaultPricingData();
-  }, [product]);
 
   const defaultPricingData = () => {
     setOpex(productToEdit?.opex ?? "");

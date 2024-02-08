@@ -515,22 +515,22 @@ const AddEditProductDialog = ({
                 </Row>
                 <Row>
                   <Col>
-                    <PercentageInputField
-                      name="dutiesAndTariffs"
-                      label="Duties And Tariffs"
+                    <MoneyInputField
+                      name="pickAndPackFee"
+                      label="Pick And Pack Fee"
                       type="text"
-                      placeholder="Duties And Tariffs"
+                      placeholder="Pick And Pack Fee"
                       register={register}
                       setValue={setValue}
                       control={control}
                     />
                   </Col>
                   <Col>
-                    <MoneyInputField
-                      name="pickAndPackFee"
-                      label="Pick And Pack Fee"
+                    <PercentageInputField
+                      name="dutiesAndTariffs"
+                      label="Duties And Tariffs"
                       type="text"
-                      placeholder="Pick And Pack Fee"
+                      placeholder="Duties And Tariffs"
                       register={register}
                       setValue={setValue}
                       control={control}
