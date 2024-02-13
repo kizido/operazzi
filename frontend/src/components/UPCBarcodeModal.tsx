@@ -56,6 +56,19 @@ export default function UPCBarcodeModal({
       );
     }
   }
+  function openSVGInNewTab() {
+    const svgElement = document.getElementById("barcode");
+    if (svgElement) {
+      const svgMarkup = svgElement.outerHTML;
+      const dataUrl = 'http://localhost:3000/generate-barcode'
+      const newTab = window.open(dataUrl);
+      newTab!.document.open();
+      newTab!.document.write("<html><body>");
+      newTab!.document.write(svgMarkup); // Display the SVG as well.
+      newTab!.document.write("</body></html>");
+      newTab!.document.close();
+    }
+  }
 
   useEffect(() => {
     generateUPCBarcode();
@@ -79,7 +92,8 @@ export default function UPCBarcodeModal({
             <h3 className={styles.barcodeErrorMessage}>{errorMessage}</h3>
           ) : (
             <div className={styles.barcodeContainer}>
-              <svg id="barcode" />
+              <svg id="barcode" xmlns="http://www.w3.org/2000/svg"/>
+              <button onClick={openSVGInNewTab}>Open in new tab</button>
             </div>
           )}
         </div>

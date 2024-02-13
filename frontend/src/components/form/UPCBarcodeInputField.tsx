@@ -11,7 +11,7 @@ import {
   UseFormSetValue,
 } from "react-hook-form";
 import { IconBarcode } from "@tabler/icons-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import UPCBarcodeModal from "../UPCBarcodeModal";
 
 interface UPCBarcodeInputFieldProps {
@@ -43,6 +43,10 @@ export default function UPCBarcodeInputField({
       setCurrentBarcode(value);
     }
   };
+
+  useEffect(() => {
+    setCurrentBarcode(control._formValues['barcodeUpc'])
+  }, [])
 
   return (
     <div>

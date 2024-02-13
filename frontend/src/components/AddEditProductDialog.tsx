@@ -470,13 +470,6 @@ const AddEditProductDialog = ({
                       setValue={setValue}
                       control={control}
                     />
-                    {/* <TextInputField
-                      name="barcodeUpc"
-                      label="UPC Barcode"
-                      type="text"
-                      placeholder="UPC Barcode"
-                      register={register}
-                    /> */}
                   </Col>
                 </Row>
                 <Row>
