@@ -1,0 +1,27 @@
+.barcodeModal .modal-dialog {
+  max-height: 80%;
+}
+
+.barcodeModal .modal-header,
+.barcodeModal .modal-footer {
+  max-height: 10%;
+}
+
+.barcodeModal .modal-body {
+  max-height: 60%;
+  overflow-y: auto;
+}
+
+.barcodeModalContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+.barcodeContainer {
+    display: flex;
+    flex-direction: column;
+}
+.barcodeErrorMessage {
+  color: darkred;
+}

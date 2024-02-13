@@ -56,7 +56,7 @@ export default function ImageGallery({onSave, onDismiss}: ImageGalleryProps) {
     };
     
     return (
-        <div className={styles.galleryTab}>
+        <div>
             <GalleryInput onFileSelect={handleFileSelect} />
             <div className={styles.gallerySelectionWindow}>
                 <input className={styles.gallerySelectionSearchBar} placeholder='Search filename...' value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}></input>
