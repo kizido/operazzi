@@ -12,4 +12,6 @@ router.post("/login", UserController.login);
 
 router.post("/logout", UserController.logout);
 
+router.get("/verify-email", UserController.verifyEmail);
+
 export default router;

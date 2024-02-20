@@ -10,6 +10,9 @@ import ProductsPage from './pages/ProductsPage';
 import PrivacyPage from './pages/PrivacyPage';
 import NotFoundPage from './pages/NotFoundPage';
 import styles from './styles/App.module.css';
+import VerificationSuccessfulPage from './components/VerificationSuccessfulPage';
+import VerificationFailedPage from './components/VerificationFailedPage';
+import toast, { Toaster } from 'react-hot-toast';
 
 function App() {
 
@@ -52,6 +55,12 @@ function App() {
 							element={<PrivacyPage />}
 						/>
 						<Route
+						element={<VerificationSuccessfulPage/>}
+						path='/verification-successful'/>
+						<Route
+						element={<VerificationFailedPage/>}
+						path='/verification-failed'/>
+						<Route
 							path='/*'
 							element={<NotFoundPage />}
 						/>
@@ -61,8 +70,9 @@ function App() {
 					<SignUpModal
 						onDismiss={() => setShowSignUpModal(false)}
 						onSignUpSuccessful={(user) => {
-							setLoggedInUser(user);
-							setShowSignUpModal(false)
+							// setLoggedInUser(user);
+							setShowSignUpModal(false);
+							toast.success("Verification link sent to your email!")
 						}}
 					/>
 
@@ -77,6 +87,7 @@ function App() {
 					/>
 				}
 			</div>
+			<Toaster/>
 		</BrowserRouter>
 	);
 }
