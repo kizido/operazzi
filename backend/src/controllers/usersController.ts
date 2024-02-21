@@ -82,7 +82,7 @@ export const signUp: RequestHandler<
       from: "kieranphillipking@gmail.com",
       to: email,
       subject: "Email Verification",
-      html: `Please click this link to verify your email: <a href="${verificationUrl}">${verificationUrl}</a>`,
+      html: `Please click this link to verify your email: <a href="${verificationUrl}">Click this link to verify your email!</a>`,
     });
 
     // req.session.userId = newUser._id;
