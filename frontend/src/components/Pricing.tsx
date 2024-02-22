@@ -13,7 +13,7 @@ import modalStyles from "../styles/Modal.module.css";
 import pricingStyles from "../styles/Pricing.module.css";
 import { ProductPackageType } from "../models/productPackageType";
 import { Product } from "../models/product";
-import { PackagingModel } from "./PackagingTable";
+import { PackagingModel } from "./Packaging/PackagingTable";
 
 type UnitCostModel = {
   packagingCosts: string; // total packaging cost from packaging page

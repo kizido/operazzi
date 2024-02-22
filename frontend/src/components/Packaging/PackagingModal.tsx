@@ -1,5 +1,4 @@
-import React from 'react'
-import styles from '../styles/Modal.module.css'
+import styles from '../../styles/Modal.module.css'
 import PackagingTable, { PackagingModel } from './PackagingTable'
 
 interface PackagingModalProps {

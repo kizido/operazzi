@@ -4,6 +4,7 @@ import React, {
   useEffect,
   useContext,
   ChangeEvent,
+  useRef,
 } from "react";
 import {
   createColumnHelper,
@@ -13,11 +14,11 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
-import styles from "../styles/Modal.module.css";
-import tableStyles from "../styles/Table.module.css";
-import vendorProductStyles from "../styles/VendorProducts.module.css";
+import styles from "../../styles/Modal.module.css";
+import tableStyles from "../../styles/Table.module.css";
+import vendorProductStyles from "../../styles/VendorProducts.module.css";
 import { Button, Modal } from "react-bootstrap";
-import { ProductContext } from "../contexts/ProductContext";
+import { ProductContext } from "../../contexts/ProductContext";
 
 export type PackagingModel = {
   itemName: string;
@@ -65,7 +66,8 @@ export default function PackagingTable({
     reset,
     setValue,
     control,
-    formState: { errors, isValid },
+    formState: { errors },
+    setFocus,
   } = useForm<PackagingModel>({
     mode: "onChange",
     defaultValues: {
@@ -79,12 +81,16 @@ export default function PackagingTable({
   useEffect(() => {
     if (showEditPackaging) {
       reset(packagingCosts[+selectedRowId!]);
+      setFocus("itemName");
     }
     if (showAddPackaging) {
       reset({
         itemName: "",
         perUnitCost: "",
       });
+      setTimeout(() => {
+        setFocus("itemName");
+      }, 2000);
     }
   }, [showEditPackaging, showAddPackaging]);
   useEffect(() => {
@@ -154,7 +160,7 @@ export default function PackagingTable({
           variant="outline-dark"
           className={styles.grayButton}
         >
-          <b>NEW PACKAGING</b>
+          <b>ADD PACKAGING ITEM</b>
         </Button>
         <Button
           onClick={() => setShowEditPackaging(true)}
