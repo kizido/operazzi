@@ -552,23 +552,14 @@ const AddEditProductDialog = ({
                     />
                   </Col>
                   <Col>
-                    <TextInputField
-                      name="description"
-                      label="Description"
-                      type="text"
-                      placeholder="Description"
+                    <MasterCaseDimensionsInputField
+                      name="masterCaseDimensions"
+                      label="Master Case Dimensions (in.)"
                       register={register}
                     />
                   </Col>
                 </Row>
                 <Row>
-                  <Col>
-                    <MasterCaseDimensionsInputField
-                      name="masterCaseDimensions"
-                      label="Master Case Dimensions"
-                      register={register}
-                    />
-                  </Col>
                   <Col>
                     <TextInputField
                       name="masterCaseWeight"
@@ -578,8 +569,6 @@ const AddEditProductDialog = ({
                       register={register}
                     />
                   </Col>
-                </Row>
-                <Row>
                   <Col>
                     <TextDisplayField
                       name="cogs"
@@ -589,6 +578,8 @@ const AddEditProductDialog = ({
                       value={retrievedUnitCogs}
                     />
                   </Col>
+                </Row>
+                <Row>
                   <Col>
                     <TextDisplayField
                       name="internationalShippingCosts"
@@ -598,6 +589,7 @@ const AddEditProductDialog = ({
                       value={calculatedISC}
                     />
                   </Col>
+                  <Col></Col>
                 </Row>
               </Form>
             </Tab.Pane>
