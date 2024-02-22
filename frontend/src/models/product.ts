@@ -36,7 +36,6 @@ export interface Product {
     listingSku: string;
     pushInventory: boolean;
     latency: string;
-    status: boolean;
   }[];
   productVendorProducts: {
     vendor: string;

@@ -115,7 +115,6 @@ export interface ProductInput {
     listingSku: string;
     pushInventory: boolean;
     latency: string;
-    status: boolean;
   }[];
   productVendorProducts?: {
     vendor: string;
@@ -385,5 +384,4 @@ export interface ListingSkusInput {
   listingSku: string;
   pushInventory: boolean;
   latency: string;
-  status: boolean;
 }

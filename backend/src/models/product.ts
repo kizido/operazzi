@@ -5,7 +5,6 @@ const productListingSkuSchema = new Schema({
   listingSku: { type: String, required: true },
   pushInventory: { type: Boolean, required: true },
   latency: { type: String, required: true },
-  status: { type: Boolean, required: true },
 });
 const vendorRangePriceSchema = new Schema({
   minUnits: { type: String, required: true },
@@ -30,7 +29,6 @@ export interface IProductListingSku {
   listingSku: string;
   pushInventory: boolean;
   latency: string;
-  status: boolean;
 }
 
 export interface IProductVendorProduct {

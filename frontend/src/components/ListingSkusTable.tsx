@@ -15,8 +15,6 @@ import greenToggle from "../assets/icons8-toggle-50.png";
 import { useForm } from "react-hook-form";
 import { ListingSkusInput } from "../network/products_api";
 import { ProductContext } from "../contexts/ProductContext";
-import * as ProductsApi from "../network/products_api";
-import { channel } from "diagnostics_channel";
 
 const columnHelper = createColumnHelper<ListingSkusInput>();
 
@@ -49,12 +47,8 @@ const columns = [
       ), // Added parentheses to imply return
   }),
   columnHelper.accessor("latency", {
-    header: () => <span>Latency</span>,
+    header: () => <span>Shipping Window (days)</span>,
     cell: (info) => <i>{info.getValue()}</i>,
-  }),
-  columnHelper.accessor("status", {
-    header: () => <span>Status</span>,
-    cell: (info) => (info.getValue() ? <i>Active</i> : <i>Inactive</i>), // Added parentheses to imply return
   }),
 ];
 
@@ -75,7 +69,6 @@ export default function ListingSkusTable({
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
 
   const [listingSkus, setListingSkus] = useState<ListingSkusInput[]>([]);
-  const [showInactive, setShowInactive] = useState(false);
 
   const {
     register,
@@ -84,9 +77,6 @@ export default function ListingSkusTable({
     formState: { errors },
   } = useForm<ListingSkusInput>({
     mode: "onChange",
-    defaultValues: {
-      status: true,
-    },
   });
 
   useEffect(() => {
@@ -97,12 +87,6 @@ export default function ListingSkusTable({
       reset(listingSkus[+selectedRowId!]);
     }
   }, [showEditListingSku]);
-
-  const filteredSkus = useMemo(() => {
-    return showInactive
-      ? listingSkus.filter((sku) => !sku.status || sku.status)
-      : listingSkus.filter((sku) => sku.status);
-  }, [listingSkus, showInactive]);
 
   const onSubmit = (input: ListingSkusInput) => {
     if (showEditListingSku && selectedRowId !== null) {
@@ -127,12 +111,11 @@ export default function ListingSkusTable({
       listingSku: "",
       pushInventory: false,
       latency: "",
-      status: true,
     });
   };
 
   const table = useReactTable({
-    data: filteredSkus,
+    data: listingSkus,
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
@@ -156,43 +139,9 @@ export default function ListingSkusTable({
         </Button>
         <Button
           onClick={() => {
-            const modifiedIndex = listingSkus.findIndex(
-              (sku, idx) => sku === filteredSkus[+selectedRowId!]
-            );
-            onListingSkusDataSubmit(
-              {
-                ...listingSkus[modifiedIndex],
-                status: !listingSkus[modifiedIndex].status,
-              },
-              modifiedIndex
-            );
+            onListingSkuDelete(+selectedRowId!);
             setListingSkus(
-              listingSkus.map((sku, idx) =>
-                sku === filteredSkus[+selectedRowId!]
-                  ? { ...sku, status: !sku.status }
-                  : sku
-              )
-            );
-            if (!showInactive) setSelectedRowId(null);
-          }}
-          disabled={!selectedRowId}
-          variant="outline-dark"
-          className={styles.grayButton}
-        >
-          <b>
-            {selectedRowId && !filteredSkus[+selectedRowId!].status
-              ? "ACTIVATE"
-              : "DEACTIVATE"}
-          </b>
-        </Button>
-        <Button
-          onClick={() => {
-            // const modifiedIndex = listingSkus.findIndex(
-            //   (sku, idx) => sku === filteredSkus[+selectedRowId!]
-            // );
-            // onListingSkuDelete(modifiedIndex);
-            setListingSkus(
-              listingSkus.filter((sku) => sku !== filteredSkus[+selectedRowId!])
+              listingSkus.filter((sku) => sku !== listingSkus[+selectedRowId!])
             );
           }}
           disabled={!selectedRowId}
@@ -200,16 +149,6 @@ export default function ListingSkusTable({
           className={styles.grayButton}
         >
           <b>DELETE</b>
-        </Button>
-        <Button
-          onClick={() => {
-            setShowInactive(!showInactive);
-            setSelectedRowId(null);
-          }}
-          variant="outline-dark"
-          className={styles.grayButton}
-        >
-          <b>{showInactive ? "HIDE INACTIVE" : "SHOW INACTIVE"}</b>
         </Button>
       </div>
       <div className={styles.scrollableTableContainer}>
@@ -292,11 +231,11 @@ export default function ListingSkusTable({
                   {errors.listingSku.message}
                 </p>
               )}
-              <label>Latency (ms)</label>
+              <label>Shipping Window (days)</label>
               <input
                 type="text"
                 {...register("latency", {
-                  required: "Latency is required.",
+                  required: "Shipping Window is required.",
                 })}
               />
               {errors.latency && (
@@ -311,17 +250,7 @@ export default function ListingSkusTable({
                     type="checkbox"
                     {...register("pushInventory")}
                     className={listingSkusStyles.checkboxLarge}
-                  ></input>
-                </div>
-                <div>
-                  <label className={listingSkusStyles.checkboxLabel}>
-                    Status
-                  </label>
-                  <input
-                    type="checkbox"
-                    {...register("status")}
-                    className={listingSkusStyles.checkboxLarge}
-                  ></input>
+                  />
                 </div>
               </div>
               <button type="submit">Submit</button>
@@ -339,7 +268,6 @@ export default function ListingSkusTable({
               listingSku: "",
               pushInventory: false,
               latency: "",
-              status: true,
             });
           }}
           centered={true}
@@ -374,11 +302,11 @@ export default function ListingSkusTable({
                   {errors.listingSku.message}
                 </p>
               )}
-              <label>Latency</label>
+              <label>Shipping Window (days)</label>
               <input
                 type="text"
                 {...register("latency", {
-                  required: "Latency is required.",
+                  required: "Shipping Window is required.",
                 })}
               />
               {errors.latency && (
@@ -392,16 +320,6 @@ export default function ListingSkusTable({
                   <input
                     type="checkbox"
                     {...register("pushInventory")}
-                    className={listingSkusStyles.checkboxLarge}
-                  ></input>
-                </div>
-                <div>
-                  <label className={listingSkusStyles.checkboxLabel}>
-                    Status
-                  </label>
-                  <input
-                    type="checkbox"
-                    {...register("status")}
                     className={listingSkusStyles.checkboxLarge}
                   ></input>
                 </div>
