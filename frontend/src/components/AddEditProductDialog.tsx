@@ -476,7 +476,7 @@ const AddEditProductDialog = ({
                   <Col>
                     <DimensionsInputField
                       name="dimensions"
-                      label="Dimensions | (Length x Width x Height x Diameter)"
+                      label="Package Dimensions (in.)"
                       register={register}
                     />
                   </Col>
@@ -528,11 +528,11 @@ const AddEditProductDialog = ({
                     />
                   </Col>
                   <Col>
-                    <PercentageInputField
-                      name="dutiesAndTariffs"
-                      label="Duties And Tariffs"
+                    <MoneyInputField
+                      name="amazonReferralFee"
+                      label="Amazon Referral Fee"
                       type="text"
-                      placeholder="Duties And Tariffs"
+                      placeholder="Amazon Referral Fee"
                       register={register}
                       setValue={setValue}
                       control={control}
@@ -541,11 +541,11 @@ const AddEditProductDialog = ({
                 </Row>
                 <Row>
                   <Col>
-                    <MoneyInputField
-                      name="amazonReferralFee"
-                      label="Amazon Referral Fee"
+                    <PercentageInputField
+                      name="dutiesAndTariffs"
+                      label="Duties And Tariffs"
                       type="text"
-                      placeholder="Amazon Referral Fee"
+                      placeholder="Duties And Tariffs"
                       register={register}
                       setValue={setValue}
                       control={control}
