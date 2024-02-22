@@ -4,7 +4,6 @@ import React, {
   useEffect,
   useContext,
   ChangeEvent,
-  useRef,
 } from "react";
 import {
   createColumnHelper,
@@ -13,12 +12,13 @@ import {
   getExpandedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { useForm, useFieldArray, Controller } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import styles from "../../styles/Modal.module.css";
 import tableStyles from "../../styles/Table.module.css";
 import vendorProductStyles from "../../styles/VendorProducts.module.css";
 import { Button, Modal } from "react-bootstrap";
 import { ProductContext } from "../../contexts/ProductContext";
+import AddEditPackagingForm from "./AddEditPackagingForm";
 
 export type PackagingModel = {
   itemName: string;
@@ -81,16 +81,12 @@ export default function PackagingTable({
   useEffect(() => {
     if (showEditPackaging) {
       reset(packagingCosts[+selectedRowId!]);
-      setFocus("itemName");
     }
     if (showAddPackaging) {
       reset({
         itemName: "",
         perUnitCost: "",
       });
-      setTimeout(() => {
-        setFocus("itemName");
-      }, 2000);
     }
   }, [showEditPackaging, showAddPackaging]);
   useEffect(() => {
@@ -108,32 +104,6 @@ export default function PackagingTable({
     getCoreRowModel: getCoreRowModel(),
     getExpandedRowModel: getExpandedRowModel(),
   });
-
-  const handleUnitCostChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
-
-    // Checks if the input is all digits
-    if (/^\d*(\.\d{0,2})?$/.test(value)) {
-      setValue("perUnitCost", value);
-    }
-  };
-  const handleUnitCostBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    let value = e.target.value;
-
-    // If there's no decimal or not exactly two digits after the decimal, format it
-    if (!/\.\d{2}$/.test(value)) {
-      const [whole = "", fractional = ""] = value.split(".");
-      const paddedFractional = fractional.padEnd(2, "0");
-      value = `${whole}.${paddedFractional}`;
-    }
-
-    // If the value starts with a decimal, add a '0' before it
-    if (/^\./.test(value)) {
-      value = `0${value}`;
-    }
-
-    setValue("perUnitCost", value);
-  };
 
   const onSubmit = (input: PackagingModel) => {
     if (showEditPackaging && selectedRowId) {
@@ -246,49 +216,15 @@ export default function PackagingTable({
             <Modal.Title>Add Packaging</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <form className={vendorProductStyles.vendorProductForm}>
-              <div>
-                <div className={styles.packagingInputsContainer}>
-                  <div>
-                    <label>Item Name:</label>
-                    <input
-                      type="text"
-                      {...register("itemName", {
-                        required: "Item Name is required.",
-                      })}
-                    />
-                    {errors.itemName && (
-                      <p className={styles.errorMessage}>
-                        {errors.itemName.message}
-                      </p>
-                    )}
-                  </div>
-                  <div>
-                    <label>Per Unit Cost:</label>
-                    <Controller
-                      name="perUnitCost"
-                      control={control}
-                      rules={{ required: "Per Unit Cost is required" }}
-                      defaultValue=""
-                      render={({ field }) => (
-                        <input
-                          type="text"
-                          {...field}
-                          onChange={handleUnitCostChange}
-                          onBlur={handleUnitCostBlur}
-                        />
-                      )}
-                    />
-                    {errors.perUnitCost && (
-                      <p className={styles.errorMessage}>
-                        {errors.perUnitCost.message}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </div>
-              <button onClick={handleSubmit(onSubmit)}>Submit</button>
-            </form>
+            <AddEditPackagingForm
+              register={register}
+              handleSubmit={handleSubmit}
+              onSubmit={onSubmit}
+              errors={errors}
+              control={control}
+              setValue={setValue}
+              setFocus={setFocus}
+            />
           </Modal.Body>
         </Modal>
       )}
@@ -309,49 +245,15 @@ export default function PackagingTable({
             <Modal.Title>Edit Packaging</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <form className={vendorProductStyles.vendorProductForm}>
-              <div>
-                <div className={styles.packagingInputsContainer}>
-                  <div>
-                    <label>Item Name:</label>
-                    <input
-                      type="text"
-                      {...register("itemName", {
-                        required: "Item Name is required.",
-                      })}
-                    />
-                    {errors.itemName && (
-                      <p className={styles.errorMessage}>
-                        {errors.itemName.message}
-                      </p>
-                    )}
-                  </div>
-                  <div>
-                    <label>Per Unit Cost:</label>
-                    <Controller
-                      name="perUnitCost"
-                      control={control}
-                      rules={{ required: "Per Unit Cost is required." }}
-                      defaultValue=""
-                      render={({ field }) => (
-                        <input
-                          type="text"
-                          {...field}
-                          onChange={handleUnitCostChange}
-                          onBlur={handleUnitCostBlur}
-                        />
-                      )}
-                    />
-                    {errors.perUnitCost && (
-                      <p className={styles.errorMessage}>
-                        {errors.perUnitCost.message}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </div>
-              <button onClick={handleSubmit(onSubmit)}>Submit</button>
-            </form>
+            <AddEditPackagingForm
+              register={register}
+              handleSubmit={handleSubmit}
+              onSubmit={onSubmit}
+              errors={errors}
+              control={control}
+              setValue={setValue}
+              setFocus={setFocus}
+            />
           </Modal.Body>
         </Modal>
       )}
