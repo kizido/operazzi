@@ -188,8 +188,8 @@ const PackageTypeInputField = ({
       <Form.Group controlId={name + "-input"}>
         <Form.Label className={styles.formLabel}>{label}</Form.Label>
         <InputGroup>
-          {packagesLoaded ?
-            (<Form.Select
+          {packagesLoaded ? (
+            <Form.Select
               size="sm"
               key={packageTypes.length}
               {...props}
@@ -204,11 +204,13 @@ const PackageTypeInputField = ({
               {/* Render packageTypes options if available */}
               {packageTypes?.map((packageType) => (
                 <option key={packageType._id} value={packageType._id}>
-                  {`${packageType.packageName} (${packageType.packageLength}" x ${packageType.packageWidth}" x ${packageType.packageHeight})`}
+                  {`${packageType.packageName} (${packageType.packageLength}" x ${packageType.packageWidth}" x ${packageType.packageHeight}")`}
                 </option>
               ))}
-            </Form.Select>) : <Form.Select size="sm"></Form.Select>
-          }
+            </Form.Select>
+          ) : (
+            <Form.Select size="sm"></Form.Select>
+          )}
           <Form.Control.Feedback type="invalid">
             {error?.message}
           </Form.Control.Feedback>
@@ -236,6 +238,7 @@ const PackageTypeInputField = ({
             setPackageIdToEdit(null);
             resetErrors();
           }}
+          centered
         >
           <Modal.Header closeButton>
             {packageIdToEdit ? (
@@ -337,8 +340,7 @@ const PackageTypeInputField = ({
           show
           onHide={() => setEditOptionMenuDialog(false)}
           dialogClassName={modalStyles.dropDownEditModalWidth}
-          centered={true}
-          keyboard={false}
+          centered
         >
           <Modal.Header closeButton>
             <Modal.Title>Edit {label}</Modal.Title>
@@ -350,14 +352,7 @@ const PackageTypeInputField = ({
                   return (
                     <Row key={index} className={modalStyles.editCategoryRow}>
                       <p className={modalStyles.editCategoryRowText}>
-                        {packageTypeModel.packageName +
-                          " (" +
-                          packageTypeModel.packageLength +
-                          '" x ' +
-                          packageTypeModel.packageWidth +
-                          '" x ' +
-                          packageTypeModel.packageHeight +
-                          ")"}
+                        {`${packageTypeModel.packageName} (${packageTypeModel.packageLength}" x ${packageTypeModel.packageWidth}" x ${packageTypeModel.packageHeight}")`}
                       </p>
                       <Button
                         className={modalStyles.editCategoryRowButton}
