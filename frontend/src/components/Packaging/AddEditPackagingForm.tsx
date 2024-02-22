@@ -1,7 +1,15 @@
 import React, { ChangeEvent, FocusEvent, useEffect } from "react";
 import vendorProductStyles from "../../styles/VendorProducts.module.css";
 import styles from "../../styles/Modal.module.css";
-import { Control, Controller, FieldErrors, UseFormHandleSubmit, UseFormRegister, UseFormSetFocus, UseFormSetValue } from "react-hook-form";
+import {
+  Control,
+  Controller,
+  FieldErrors,
+  UseFormHandleSubmit,
+  UseFormRegister,
+  UseFormSetFocus,
+  UseFormSetValue,
+} from "react-hook-form";
 import { PackagingModel } from "./PackagingTable";
 
 interface AddEditPackagingFormProps {
@@ -21,12 +29,13 @@ export default function AddEditPackagingForm({
   errors,
   control,
   setValue,
-  setFocus
+  setFocus,
 }: AddEditPackagingFormProps) {
-
   useEffect(() => {
-    setFocus("itemName");
-  }, [])
+    setTimeout(() => {
+      setFocus("itemName");
+    }, 1);
+  }, [setFocus]);
 
   const handleUnitCostChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -53,8 +62,6 @@ export default function AddEditPackagingForm({
 
     setValue("perUnitCost", value);
   };
-
-
 
   return (
     <form className={vendorProductStyles.vendorProductForm}>
