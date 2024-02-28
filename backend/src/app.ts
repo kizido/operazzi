@@ -7,6 +7,7 @@ import productBrandsRoutes from "./routes/productBrandsRoutes";
 import productPackageTypesRoutes from "./routes/productPackageTypesRoutes";
 import productImagesRoutes from "./routes/productImagesRoutes";
 import productCustomsRoutes from "./routes/productCustomsRoutes";
+import productVendorsRoutes from "./routes/productVendorsRoutes";
 import morgan from "morgan";
 import createHttpError, { isHttpError } from "http-errors";
 import session from "express-session";
@@ -27,7 +28,7 @@ app.use(
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       maxAge: 60 * 60 * 1000, // Adjust as needed
-      sameSite: process.env.NODE_ENV === "production" ? 'none' : 'lax',
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     },
     rolling: true,
     store: MongoStore.create({
@@ -51,6 +52,7 @@ app.use(express.json());
 app.use("/api/users", userRoutes);
 app.use("/api/products", requiresAuth, productsRoutes);
 app.use("/api/productCategories", requiresAuth, productCategoriesRoutes);
+app.use("/api/productVendors", requiresAuth, productVendorsRoutes);
 app.use("/api/productBrands", requiresAuth, productBrandsRoutes);
 app.use("/api/productPackageTypes", requiresAuth, productPackageTypesRoutes);
 app.use("/api/productImages", requiresAuth, productImagesRoutes);

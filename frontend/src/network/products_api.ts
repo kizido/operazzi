@@ -8,10 +8,11 @@ import { ProductPackageType } from "../models/productPackageType";
 import { ProductImage } from "../models/productImage";
 import { ProductCustoms } from "../models/productCustoms";
 import { PriceRange } from "../components/VendorProductsTable";
+import { ProductVendor } from "../models/productVendor";
 
-const apiUrl = process.env.REACT_APP_API_URL || '';
+const apiUrl = process.env.REACT_APP_API_URL || "";
 async function fetchData(input: RequestInfo, init?: RequestInit) {
-  init = {...init, credentials: 'include'};
+  init = { ...init, credentials: "include" };
   const response = await fetch(`${apiUrl}${input}`, init);
   if (response.ok) {
     return response;
@@ -199,6 +200,50 @@ export async function createProductCategory(
   });
   return response.json();
 }
+export async function deleteProductCategory(productCategoryId: string) {
+  await fetchData("/api/productCategories/" + productCategoryId, {
+    method: "DELETE",
+  });
+}
+export async function updateProductCategory(
+  productCategory: ProductCategoryInput,
+  productCategoryId: string
+): Promise<ProductCategory> {
+  const response = await fetchData(
+    "/api/productCategories/" + productCategoryId,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(productCategory),
+    }
+  );
+  return response.json();
+}
+
+export async function fetchProductVendors(): Promise<ProductVendor[]> {
+  const response = await fetchData("/api/productVendors", { method: "GET" });
+  return response.json();
+}
+
+export async function createProductVendor(
+  vendor: String
+): Promise<ProductVendor> {
+  const response = await fetchData("/api/productVendors", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(vendor),
+  });
+  return response.json();
+}
+export async function deleteProductVendor(productVendorId: string) {
+  await fetchData("/api/productVendors/" + productVendorId, {
+    method: "DELETE",
+  });
+}
 
 export interface ProductBrandInput {
   brand: string;
@@ -232,9 +277,12 @@ export interface ProductPackageTypeInput {
 export async function fetchProductPackageType(
   packageTypeId: string
 ): Promise<ProductPackageType> {
-  const response = await fetchData("/api/productPackageTypes/" + packageTypeId, {
-    method: "GET",
-  });
+  const response = await fetchData(
+    "/api/productPackageTypes/" + packageTypeId,
+    {
+      method: "GET",
+    }
+  );
   const productPackageType: ProductPackageType = await response.json();
   return productPackageType;
 }
@@ -286,12 +334,6 @@ export async function fetchProductImages(): Promise<ProductImage[]> {
   return response.json();
 }
 
-export async function deleteProductCategory(productCategoryId: string) {
-  await fetchData("/api/productCategories/" + productCategoryId, {
-    method: "DELETE",
-  });
-}
-
 export async function deleteProductPackageType(productPackageTypeId: string) {
   await fetchData("/api/productPackageTypes/" + productPackageTypeId, {
     method: "DELETE",
@@ -302,22 +344,6 @@ export async function deleteProductBrand(productBrandId: string) {
   await fetchData("/api/productBrands/" + productBrandId, { method: "DELETE" });
 }
 
-export async function updateProductCategory(
-  productCategory: ProductCategoryInput,
-  productCategoryId: string
-): Promise<ProductCategory> {
-  const response = await fetchData(
-    "/api/productCategories/" + productCategoryId,
-    {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(productCategory),
-    }
-  );
-  return response.json();
-}
 export async function updateProductBrand(
   productBrand: ProductBrandInput,
   productBrandId: string
