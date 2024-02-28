@@ -123,8 +123,6 @@ export default function VendorProductsTable({
   const [editRowId, setEditRowId] = useState<string | null>(null);
   const [cogsDefaultRowId, setCogsDefaultRowId] = useState<string | null>(null);
 
-  const vendorProductsLoaded = useRef(true);
-
   const {
     register,
     control,
@@ -147,9 +145,11 @@ export default function VendorProductsTable({
     name: "vendorRangePrice",
   });
   const priceRanges = watch("vendorRangePrice");
+  const minOrderQty = watch("minOrderQuantity");
 
   // Recalculate COGS everytime price ranges change (max of prices)
   useEffect(() => {
+    resetMinUnits();
     if (priceRanges.length > 0) {
       const indexOfMaxValue = priceRanges.reduce(
         (maxIndex, currentElement, currentIndex) => {
@@ -205,6 +205,25 @@ export default function VendorProductsTable({
   useEffect(() => {
     defaultCogsRowIdSubmit(cogsDefaultRowId);
   }, [cogsDefaultRowId]);
+  useEffect(() => {
+    // if (priceRanges.length < 1) {
+    //   setNewPriceRange((prevState) => ({
+    //     ...prevState,
+    //     minUnits: minOrderQty,
+    //   }));
+    // } else {
+    //   const currentMin = parseInt(newPriceRange.minUnits)
+    //     ? parseInt(newPriceRange.minUnits)
+    //     : 0;
+    //   if (parseInt(minOrderQty) > currentMin) {
+    //     setNewPriceRange((prevState) => ({
+    //       ...prevState,
+    //       minUnits: minOrderQty,
+    //     }));
+    //   }
+    // }
+    resetMinUnits();
+  }, [minOrderQty]);
 
   const table = useReactTable({
     data: vendorProducts,
@@ -285,6 +304,28 @@ export default function VendorProductsTable({
   const addPriceRange = () => {
     append(newPriceRange);
     setNewPriceRange({ minUnits: "", maxUnits: "", price: "" });
+    console.log("adding price range");
+  };
+  const resetMinUnits = () => {
+    if (priceRanges.length < 1) {
+      setNewPriceRange((prevState) => ({
+        ...prevState,
+        minUnits: minOrderQty,
+      }));
+    } else {
+      const curMaxUnits = priceRanges.reduce((max, current) => {
+        const currentUnits = parseInt(current.maxUnits);
+        return currentUnits > parseInt(max.maxUnits) ? current : max;
+      });
+      const parsedMinOrderQty = parseInt(minOrderQty) || 0;
+      const parsedNewMinUnits = (parseInt(curMaxUnits.maxUnits) || 0) + 1;
+      const newMinUnits = parsedNewMinUnits > parsedMinOrderQty ? parsedNewMinUnits : parsedMinOrderQty;
+
+      setNewPriceRange((prevState) => ({
+        ...prevState,
+        minUnits: newMinUnits.toString(),
+      }));
+    }
   };
   const handlePriceInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -445,7 +486,10 @@ export default function VendorProductsTable({
       {showAddVendorProduct && (
         <Modal
           show
-          onHide={() => {setShowAddVendorProduct(false); reset();}}
+          onHide={() => {
+            setShowAddVendorProduct(false);
+            reset();
+          }}
           centered
           className={vendorProductStyles.vendorProductModal}
         >
@@ -456,22 +500,68 @@ export default function VendorProductsTable({
             <form className={vendorProductStyles.vendorProductForm}>
               <div className={vendorProductStyles.vendorProductGridContainer}>
                 <div className={vendorProductStyles.item1}>
-                  <label>Vendor {errors.vendor && <p className={styles.errorMessageInline}>{errors.vendor.message}</p>}</label>
-                  <input type="text" {...register("vendor", {
-                    required: "Required"
-                  })}/>
-                  <label>Vendor Sku {errors.vendorSku && <p className={styles.errorMessageInline}>{errors.vendorSku.message}</p>}</label>
-                  <input type="text" {...register("vendorSku", {
-                    required: "Required"
-                  })}/>
-                  <label>Min Order Quantity {errors.minOrderQuantity && <p className={styles.errorMessageInline}>{errors.minOrderQuantity.message}</p>}</label>
-                  <input type="text" {...register("minOrderQuantity", {
-                    required: "Required"
-                  })}/>
-                  <label>Lead Time (Days) {errors.leadTime && <p className={styles.errorMessageInline}>{errors.leadTime.message}</p>}</label>
-                  <input type="text" {...register("leadTime", {
-                    required: "Required"
-                  })}/>
+                  <label>
+                    Vendor{" "}
+                    {errors.vendor && (
+                      <p className={styles.errorMessageInline}>
+                        {errors.vendor.message}
+                      </p>
+                    )}
+                  </label>
+                  <input
+                    type="text"
+                    {...register("vendor", {
+                      required: "Required",
+                    })}
+                  />
+                  <label>
+                    Vendor Sku{" "}
+                    {errors.vendorSku && (
+                      <p className={styles.errorMessageInline}>
+                        {errors.vendorSku.message}
+                      </p>
+                    )}
+                  </label>
+                  <input
+                    type="text"
+                    {...register("vendorSku", {
+                      required: "Required",
+                    })}
+                  />
+                  <label>
+                    Min Order Quantity{" "}
+                    {errors.minOrderQuantity && (
+                      <p className={styles.errorMessageInline}>
+                        {errors.minOrderQuantity.message}
+                      </p>
+                    )}
+                  </label>
+                  <input
+                    type="text"
+                    {...register("minOrderQuantity")}
+                    value={minOrderQty} // Use the watched value
+                    onChange={(e) => {
+                      const newValue = e.target.value;
+                      if (/^\d*$/.test(newValue)) {
+                        // Checks if the input is all digits
+                        setValue("minOrderQuantity", newValue);
+                      }
+                    }}
+                  />
+                  <label>
+                    Lead Time (Days){" "}
+                    {errors.leadTime && (
+                      <p className={styles.errorMessageInline}>
+                        {errors.leadTime.message}
+                      </p>
+                    )}
+                  </label>
+                  <input
+                    type="text"
+                    {...register("leadTime", {
+                      required: "Required",
+                    })}
+                  />
                 </div>
                 <div
                   className={`${vendorProductStyles.item2} ${vendorProductStyles.priceRangeContainer}`}
@@ -600,22 +690,62 @@ export default function VendorProductsTable({
             <form className={vendorProductStyles.vendorProductForm}>
               <div className={vendorProductStyles.vendorProductGridContainer}>
                 <div className={vendorProductStyles.item1}>
-                  <label>Vendor {errors.vendor && <p className={styles.errorMessageInline}>{errors.vendor.message}</p>}</label>
-                  <input type="text" {...register("vendor", {
-                    required: "Required"
-                  })}/>
-                  <label>Vendor Sku {errors.vendorSku && <p className={styles.errorMessageInline}>{errors.vendorSku.message}</p>}</label>
-                  <input type="text" {...register("vendorSku", {
-                    required: "Required"
-                  })}/>
-                  <label>Min Order Quantity {errors.minOrderQuantity && <p className={styles.errorMessageInline}>{errors.minOrderQuantity.message}</p>}</label>
-                  <input type="text" {...register("minOrderQuantity", {
-                    required: "Required"
-                  })}/>
-                  <label>Lead Time (Days) {errors.leadTime && <p className={styles.errorMessageInline}>{errors.leadTime.message}</p>}</label>
-                  <input type="text" {...register("leadTime", {
-                    required: "Required"
-                  })}/>
+                  <label>
+                    Vendor{" "}
+                    {errors.vendor && (
+                      <p className={styles.errorMessageInline}>
+                        {errors.vendor.message}
+                      </p>
+                    )}
+                  </label>
+                  <input
+                    type="text"
+                    {...register("vendor", {
+                      required: "Required",
+                    })}
+                  />
+                  <label>
+                    Vendor Sku{" "}
+                    {errors.vendorSku && (
+                      <p className={styles.errorMessageInline}>
+                        {errors.vendorSku.message}
+                      </p>
+                    )}
+                  </label>
+                  <input
+                    type="text"
+                    {...register("vendorSku", {
+                      required: "Required",
+                    })}
+                  />
+                  <label>
+                    Min Order Quantity{" "}
+                    {errors.minOrderQuantity && (
+                      <p className={styles.errorMessageInline}>
+                        {errors.minOrderQuantity.message}
+                      </p>
+                    )}
+                  </label>
+                  <input
+                    type="text"
+                    {...register("minOrderQuantity", {
+                      required: "Required",
+                    })}
+                  />
+                  <label>
+                    Lead Time (Days){" "}
+                    {errors.leadTime && (
+                      <p className={styles.errorMessageInline}>
+                        {errors.leadTime.message}
+                      </p>
+                    )}
+                  </label>
+                  <input
+                    type="text"
+                    {...register("leadTime", {
+                      required: "Required",
+                    })}
+                  />
                 </div>
                 <div
                   className={`${vendorProductStyles.item2} ${vendorProductStyles.priceRangeContainer}`}
