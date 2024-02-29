@@ -49,10 +49,7 @@ const VendorInputField = ({
     loadVendors();
   }, []);
 
-  async function handleEditVendor(
-    vendorInput: string,
-    idInput: string
-  ) {
+  async function handleEditVendor(vendorInput: string, idInput: string) {
     try {
       await ProductsApi.updateProductVendor(vendorInput, idInput);
     } catch (error) {
@@ -109,41 +106,45 @@ const VendorInputField = ({
   return (
     <div>
       <Form.Group controlId={name + "-input"}>
-        <Form.Label className={styles.formLabel}>{label}</Form.Label>
-        <InputGroup size="sm">
+        <InputGroup size="sm" className={styles.inputGroup}>
           {vendorsLoaded ? (
-            <Form.Select
-              size="sm"
+            // <Form.Select
+            //   size="sm"
+            //   {...props}
+            //   {...register(name, registerOptions)}
+            //   isInvalid={!!error}
+            // >
+            //   {/* <option></option> */}
+            //   {vendors?.map((vendor, index) => (
+            //     <option key={index}>{vendor.vendor}</option>
+            //   ))}
+            // </Form.Select>
+            <select
               {...props}
               {...register(name, registerOptions)}
-              isInvalid={!!error}
             >
               {/* <option></option> */}
               {vendors?.map((vendor, index) => (
                 <option key={index}>{vendor.vendor}</option>
               ))}
-            </Form.Select>
+            </select>
           ) : (
             <Form.Select size="sm"></Form.Select>
           )}
           <Form.Control.Feedback type="invalid">
             {error?.message}
           </Form.Control.Feedback>
-          <IconButton
-            onClick={() => {
-              setNewOption("");
-              setAddOptionDialog(true);
-            }}
-            className={styles.formButton}
-          >
-            <IconPlus />
-          </IconButton>
-          <IconButton
+          {/* <IconButton
             onClick={() => setEditOptionDialog(true)}
             className={styles.formButton}
           >
             <IconSettings />
-          </IconButton>
+          </IconButton> */}
+          <IconSettings
+          size={20}
+            onClick={() => setEditOptionDialog(true)}
+            className={styles.formButton}
+          />
         </InputGroup>
       </Form.Group>
 
@@ -162,9 +163,7 @@ const VendorInputField = ({
             <Form>
               <Form.Control
                 value={newOption}
-                onChange={(e) =>
-                  setNewOption(e.target.value)
-                }
+                onChange={(e) => setNewOption(e.target.value)}
               />
             </Form>
           </Modal.Body>
@@ -195,7 +194,7 @@ const VendorInputField = ({
           show
           onHide={() => setEditOptionDialog(false)}
           dialogClassName={modalStyles.dropDownEditModalWidth}
-          centered={true}
+          centered
           keyboard={false}
         >
           <Modal.Header closeButton>
@@ -203,53 +202,70 @@ const VendorInputField = ({
           </Modal.Header>
           <Modal.Body className={modalStyles.dropDownEditModalBody}>
             <Col>
-              {vendors.map(
-                (vendorModel: ProductVendorModel, index: number) => {
-                  return (
-                    <Row key={index} className={modalStyles.editVendorRow}>
-                      {editingIndex === index ? (
-                        <input
-                          className={modalStyles.editVendorRowText}
-                          value={newOption}
-                          onChange={(e) =>
-                            setNewOption(e.target.value)
-                          }
-                          onBlur={() => {
-                            valueSubmittedRef.current === true
-                              ? handleSave(index)
-                              : revertSave(index);
-                          }}
-                          // onBlur={() => revertSave(index)}
-                          autoFocus
-                          onKeyDown={handleKeyDown}
-                        />
-                      ) : (
-                        <p className={modalStyles.editVendorRowText}>
-                          {vendorModel.vendor}
-                        </p>
-                      )}
-
-                      <Button
-                        disabled={editingIndex !== null}
-                        className={modalStyles.editVendorRowButton}
-                        onClick={() => {
-                          setEditingIndex(index);
-                          setNewOption(vendorModel.vendor);
+              {vendors.map((vendorModel: ProductVendorModel, index: number) => {
+                return (
+                  <Row key={index} className={modalStyles.editCategoryRow}>
+                    {editingIndex === index ? (
+                      <input
+                        className={modalStyles.editCategoryRowText}
+                        value={newOption}
+                        onChange={(e) => setNewOption(e.target.value)}
+                        onBlur={() => {
+                          valueSubmittedRef.current === true
+                            ? handleSave(index)
+                            : revertSave(index);
                         }}
-                      >
-                        Edit
-                      </Button>
+                        // onBlur={() => revertSave(index)}
+                        autoFocus
+                        onKeyDown={handleKeyDown}
+                      />
+                    ) : (
+                      <p className={modalStyles.editCategoryRowText}>
+                        {vendorModel.vendor}
+                      </p>
+                    )}
 
-                      <Button
-                        className={modalStyles.editVendorRowButton}
-                        onClick={() => deleteProductVendor(vendorModel)}
-                      >
-                        Delete
-                      </Button>
-                    </Row>
-                  );
-                }
-              )}
+                    <Button
+                      disabled={editingIndex !== null}
+                      className={modalStyles.editCategoryRowButton}
+                      onClick={() => {
+                        setEditingIndex(index);
+                        setNewOption(vendorModel.vendor);
+                      }}
+                    >
+                      Edit
+                    </Button>
+
+                    <Button
+                      className={modalStyles.editCategoryRowButton}
+                      onClick={() => deleteProductVendor(vendorModel)}
+                    >
+                      Delete
+                    </Button>
+                  </Row>
+                );
+              })}
+              <div className={styles.addVendorButtonContainer}>
+                {/* <IconButton
+                  onClick={() => {
+                    setNewOption("");
+                    setAddOptionDialog(true);
+                  }}
+                  className={styles.addVendorButton}
+                >
+                  <IconPlus className={styles.addVendorButtonImage}/>
+                </IconButton> */}
+                <IconPlus
+                  size={50}
+                  color="blue"
+                  stroke={3}
+                  onClick={() => {
+                    setNewOption("");
+                    setAddOptionDialog(true);
+                  }}
+                  className={styles.addVendorButton}
+                />
+              </div>
             </Col>
           </Modal.Body>
         </Modal>

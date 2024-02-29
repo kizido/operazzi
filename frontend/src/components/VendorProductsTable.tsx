@@ -495,7 +495,7 @@ export default function VendorProductsTable({
             reset();
           }}
           centered
-          className={vendorProductStyles.vendorProductModal}
+          dialogClassName={vendorProductStyles.vendorProductModal}
         >
           <Modal.Header closeButton className={styles.modalHeader}>
             <Modal.Title>Add Vendor Product</Modal.Title>
@@ -524,6 +524,7 @@ export default function VendorProductsTable({
                     type="text"
                     placeholder="Vendor"
                     register={register}
+                    registerOptions={{ required: "Required" }}
                   />
                   <label>
                     Vendor Sku{" "}
@@ -549,7 +550,9 @@ export default function VendorProductsTable({
                   </label>
                   <input
                     type="text"
-                    {...register("minOrderQuantity")}
+                    {...register("minOrderQuantity", {
+                      required: "Required",
+                    })}
                     value={minOrderQty} // Use the watched value
                     onChange={(e) => {
                       const newValue = e.target.value;

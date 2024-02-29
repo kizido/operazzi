@@ -228,14 +228,14 @@ export async function fetchProductVendors(): Promise<ProductVendor[]> {
 }
 
 export async function createProductVendor(
-  vendor: String
+  vendor: string
 ): Promise<ProductVendor> {
   const response = await fetchData("/api/productVendors", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(vendor),
+    body: JSON.stringify({vendor}),
   });
   return response.json();
 }
@@ -255,7 +255,7 @@ export async function updateProductVendor(
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(productVendor),
+      body: JSON.stringify({vendor: productVendor}),
     }
   );
   return response.json();
