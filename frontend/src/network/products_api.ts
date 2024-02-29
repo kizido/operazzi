@@ -244,6 +244,22 @@ export async function deleteProductVendor(productVendorId: string) {
     method: "DELETE",
   });
 }
+export async function updateProductVendor(
+  productVendor: string,
+  productVendorId: string
+): Promise<ProductVendor> {
+  const response = await fetchData(
+    "/api/productVendors/" + productVendorId,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(productVendor),
+    }
+  );
+  return response.json();
+}
 
 export interface ProductBrandInput {
   brand: string;

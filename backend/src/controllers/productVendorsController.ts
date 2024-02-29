@@ -94,3 +94,47 @@ export const deleteProductVendor: RequestHandler = async (req, res, next) => {
         next(error);
     }
 }
+
+interface UpdateProductVendorParams {
+    productVendorId: string,
+}
+interface UpdateProductVendorBody {
+    vendor?: string,
+}
+
+export const updateProductVendor: RequestHandler<UpdateProductVendorParams, unknown, UpdateProductVendorBody, unknown> = async (req, res, next) => {
+    const productVendorId = req.params.productVendorId;
+    const newVendor = req.body.vendor;
+
+    const authenticatedUserId = req.session.userId;
+
+    try {
+        assertIsDefined(authenticatedUserId);
+
+        if (!mongoose.isValidObjectId(productVendorId)) {
+            throw createHttpError(400, "Invalid product vendor ID");
+        }
+
+        // Validate product body
+        if (!newVendor) {
+            throw createHttpError(400, "Vendor must have a vendor name!");
+        }
+
+        const productVendor = await ProductVendorModel.findById(productVendorId).exec();
+
+        if (!productVendor) {
+            throw createHttpError(404, "Product vendor not found");
+        }
+
+        if (!productVendor.userId.equals(authenticatedUserId)) {
+            throw createHttpError(401, "You cannot access this product vendor");
+        }
+
+        productVendor.vendor = newVendor;
+
+        const updatedProductVendor = await productVendor.save();
+        res.status(200).json(updatedProductVendor);
+    } catch (error) {
+        next(error);
+    }
+}

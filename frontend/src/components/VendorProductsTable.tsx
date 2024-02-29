@@ -12,6 +12,7 @@ import tableStyles from "../styles/Table.module.css";
 import vendorProductStyles from "../styles/VendorProducts.module.css";
 import { Button, Modal } from "react-bootstrap";
 import { Product } from "../models/product";
+import VendorInputField from "./form/VendorInputField";
 
 export type VendorProductsModel = {
   vendor: string;
@@ -319,7 +320,10 @@ export default function VendorProductsTable({
       });
       const parsedMinOrderQty = parseInt(minOrderQty) || 0;
       const parsedNewMinUnits = (parseInt(curMaxUnits.maxUnits) || 0) + 1;
-      const newMinUnits = parsedNewMinUnits > parsedMinOrderQty ? parsedNewMinUnits : parsedMinOrderQty;
+      const newMinUnits =
+        parsedNewMinUnits > parsedMinOrderQty
+          ? parsedNewMinUnits
+          : parsedMinOrderQty;
 
       setNewPriceRange((prevState) => ({
         ...prevState,
@@ -508,11 +512,18 @@ export default function VendorProductsTable({
                       </p>
                     )}
                   </label>
-                  <input
+                  {/* <input
                     type="text"
                     {...register("vendor", {
                       required: "Required",
                     })}
+                  /> */}
+                  <VendorInputField
+                    name="vendor"
+                    label="Vendor"
+                    type="text"
+                    placeholder="Vendor"
+                    register={register}
                   />
                   <label>
                     Vendor Sku{" "}
