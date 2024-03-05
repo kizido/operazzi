@@ -1,49 +1,76 @@
 /** DIMENSION INPUT FORM */
 
 .dimensionInput {
-    width: 4rem;
+  width: 4rem;
 }
 
 .dFlex {
-    display: flex;
+  display: flex;
 }
 
 .leftAlignColumns {
-    justify-content: flex-start;
+  justify-content: flex-start;
 }
 
 .noFlex {
-    flex: 0 0 auto;
+  flex: 0 0 auto;
 }
 
 .columnPadding {
-    margin-right: 3rem;
+  margin-right: 3rem;
 }
 
 .formLabel {
-    font-size: 10px;
-    margin-bottom: 0px;
+  font-size: 10px;
+  margin-bottom: 0px;
 }
 
 .formControl {
-    height: 2.5rem;
+  height: 2.5rem;
 }
 .displayControl {
-    background-color: rgb(233, 233, 233) !important;
+  background-color: rgb(233, 233, 233) !important;
 }
-.displayControl:active, .displayControl:focus {
-    outline: none;
-    box-shadow: none;
-    border: 1px solid darkgray;
+.displayControl:active,
+.displayControl:focus {
+  outline: none;
+  box-shadow: none;
+  border: 1px solid darkgray;
 }
 
 .formButton {
-    height: 29.2px;
-    text-align: center;
-    justify-content: center;
-    
+  height: 29.2px;
+}
+.formButtonVendor {
+  cursor: pointer;
+}
+.vendorGroup {
+    margin-bottom: 1rem;
+}
+.vendorInput {
+    height: 1.9rem; /* Adjust the height as needed */
+    width: 6rem;
+    font-size: small;
 }
 
-.formButton p {
-    margin-top: 0;
+.small-placeholder::placeholder {
+  font-size: 4px; /* Adjust the size as needed */
+}
+
+.addVendorButtonContainer {
+  display: flex;
+  justify-content: center;
+}
+.addVendorButton {
+  margin-top: 1rem;
+  border: 2px groove blue;
+  cursor: pointer;
+}
+.inputGroup {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.inputGroupInput {
+  height: 30px;
 }

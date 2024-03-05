@@ -58,6 +58,10 @@
     display: inline-block;
     width: min-content;
 }
+.editVendorAddButton {
+    margin: 0.5rem;
+    display: inline-block;
+}
 
 .editCategoryRowInput {
     display: inline-block;

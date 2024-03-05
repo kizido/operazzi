@@ -104,46 +104,31 @@ const VendorInputField = ({
   }
 
   return (
-    <div>
+    <div className={styles.vendorGroup}>
       <Form.Group controlId={name + "-input"}>
-        <InputGroup size="sm" className={styles.inputGroup}>
+        <InputGroup className={styles.inputGroup}>
           {vendorsLoaded ? (
-            // <Form.Select
-            //   size="sm"
-            //   {...props}
-            //   {...register(name, registerOptions)}
-            //   isInvalid={!!error}
-            // >
-            //   {/* <option></option> */}
-            //   {vendors?.map((vendor, index) => (
-            //     <option key={index}>{vendor.vendor}</option>
-            //   ))}
-            // </Form.Select>
             <select
+              className={styles.vendorInput}
               {...props}
               {...register(name, registerOptions)}
             >
-              {/* <option></option> */}
               {vendors?.map((vendor, index) => (
                 <option key={index}>{vendor.vendor}</option>
               ))}
             </select>
           ) : (
-            <Form.Select size="sm"></Form.Select>
+            <select
+              className={styles.vendorInput}
+            ></select>
           )}
           <Form.Control.Feedback type="invalid">
             {error?.message}
           </Form.Control.Feedback>
-          {/* <IconButton
-            onClick={() => setEditOptionDialog(true)}
-            className={styles.formButton}
-          >
-            <IconSettings />
-          </IconButton> */}
           <IconSettings
-          size={20}
+            size={20}
             onClick={() => setEditOptionDialog(true)}
-            className={styles.formButton}
+            className={styles.formButtonVendor}
           />
         </InputGroup>
       </Form.Group>
@@ -246,25 +231,15 @@ const VendorInputField = ({
                 );
               })}
               <div className={styles.addVendorButtonContainer}>
-                {/* <IconButton
+                <Button
+                  className={modalStyles.editVendorAddButton}
                   onClick={() => {
                     setNewOption("");
                     setAddOptionDialog(true);
                   }}
-                  className={styles.addVendorButton}
                 >
-                  <IconPlus className={styles.addVendorButtonImage}/>
-                </IconButton> */}
-                <IconPlus
-                  size={50}
-                  color="blue"
-                  stroke={3}
-                  onClick={() => {
-                    setNewOption("");
-                    setAddOptionDialog(true);
-                  }}
-                  className={styles.addVendorButton}
-                />
+                  Add Vendor
+                </Button>
               </div>
             </Col>
           </Modal.Body>

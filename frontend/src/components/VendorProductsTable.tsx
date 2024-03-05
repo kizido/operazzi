@@ -145,6 +145,7 @@ export default function VendorProductsTable({
     control,
     name: "vendorRangePrice",
   });
+  const vendor = watch("vendor");
   const priceRanges = watch("vendorRangePrice");
   const minOrderQty = watch("minOrderQuantity");
 
@@ -512,12 +513,6 @@ export default function VendorProductsTable({
                       </p>
                     )}
                   </label>
-                  {/* <input
-                    type="text"
-                    {...register("vendor", {
-                      required: "Required",
-                    })}
-                  /> */}
                   <VendorInputField
                     name="vendor"
                     label="Vendor"
@@ -525,6 +520,7 @@ export default function VendorProductsTable({
                     placeholder="Vendor"
                     register={register}
                     registerOptions={{ required: "Required" }}
+                    value={vendor}
                   />
                   <label>
                     Vendor Sku{" "}
@@ -695,7 +691,7 @@ export default function VendorProductsTable({
             });
           }}
           centered
-          className={vendorProductStyles.vendorProductModal}
+          dialogClassName={vendorProductStyles.vendorProductModal}
         >
           <Modal.Header closeButton className={styles.modalHeader}>
             <Modal.Title>Edit Vendor Product</Modal.Title>
@@ -712,11 +708,13 @@ export default function VendorProductsTable({
                       </p>
                     )}
                   </label>
-                  <input
+                  <VendorInputField
+                    name="vendor"
+                    label="Vendor"
                     type="text"
-                    {...register("vendor", {
-                      required: "Required",
-                    })}
+                    placeholder="Vendor"
+                    register={register}
+                    registerOptions={{ required: "Required" }}
                   />
                   <label>
                     Vendor Sku{" "}
@@ -745,6 +743,14 @@ export default function VendorProductsTable({
                     {...register("minOrderQuantity", {
                       required: "Required",
                     })}
+                    value={minOrderQty} // Use the watched value
+                    onChange={(e) => {
+                      const newValue = e.target.value;
+                      if (/^\d*$/.test(newValue)) {
+                        // Checks if the input is all digits
+                        setValue("minOrderQuantity", newValue);
+                      }
+                    }}
                   />
                   <label>
                     Lead Time (Days){" "}

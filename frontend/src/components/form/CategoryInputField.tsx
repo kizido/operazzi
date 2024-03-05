@@ -121,7 +121,6 @@ const CategoryInputField = ({
               {...register(name, registerOptions)}
               isInvalid={!!error}
             >
-              {/* <option></option> */}
               {categories?.map((category, index) => (
                 <option key={index}>{category.category}</option>
               ))}
