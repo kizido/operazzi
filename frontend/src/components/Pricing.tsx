@@ -5,6 +5,7 @@ import {
   getCoreRowModel,
   useReactTable,
   RowData,
+  getExpandedRowModel,
 } from "@tanstack/react-table";
 import * as ProductsApi from "../network/products_api";
 import { ProductContext } from "../contexts/ProductContext";
@@ -45,6 +46,19 @@ const transposeData = (initialData: UnitCostModel) => {
 const columnHelper = createColumnHelper<TransposedRow>();
 
 const columns = [
+  columnHelper.display({
+    id: "expander",
+    cell: ({ row }) => (
+      <button
+        type="button"
+        onClick={() => row.toggleExpanded()}
+        aria-label="Toggle Row Expanded"
+      >
+        {row.getIsExpanded() ? "-" : "+"}{" "}
+        {/* Change the icon based on the row's expanded state */}
+      </button>
+    ),
+  }),
   columnHelper.accessor("header", {
     cell: (info) => <span>{info.getValue()}</span>,
   }),
@@ -52,6 +66,17 @@ const columns = [
     cell: (info) => <span>{info.getValue()}</span>,
   }),
 ];
+
+const ExpandedRowContent = () => {
+  return (
+    <table
+      className={`${modalStyles.listingSkuTable} ${tableStyles.expandedRowTable}`}
+    >
+      <tbody className={modalStyles.listingSkuTableBody}></tbody>
+    </table>
+  );
+};
+
 interface PricingProps {
   pricingDataSubmit: (name: string, value: string) => void;
   productToEdit?: Product;
@@ -96,6 +121,7 @@ export default function Pricing({
     data: pricingData,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    getExpandedRowModel: getExpandedRowModel(),
   });
   useEffect(() => {
     const updatePackageWeight = async () => {
@@ -128,7 +154,7 @@ export default function Pricing({
     pickAndPackFee,
     amazonReferralFee,
     packaging,
-    packageWeightData
+    packageWeightData,
   ]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -307,21 +333,33 @@ export default function Pricing({
         >
           <tbody className={modalStyles.listingSkuTableBody}>
             {table.getRowModel().rows.map((row) => (
-              <tr
-                key={row.id}
-                className={`${tableStyles.tableRow} ${
-                  row.id === selectedRowId ? tableStyles.selected : ""
-                }`}
-                onClick={() =>
-                  setSelectedRowId(row.id === selectedRowId ? null : row.id)
-                }
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                ))}
-              </tr>
+              <React.Fragment key={row.id}>
+                <tr
+                  key={row.id}
+                  className={`${tableStyles.tableRow} ${
+                    row.id === selectedRowId ? tableStyles.selected : ""
+                  }`}
+                  onClick={() =>
+                    setSelectedRowId(row.id === selectedRowId ? null : row.id)
+                  }
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <td key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </td>
+                  ))}
+                </tr>
+                {row.getIsExpanded() && (
+                  <tr>
+                    <td colSpan={row.getVisibleCells().length - 1}>
+                      <ExpandedRowContent />
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
             ))}
           </tbody>
         </table>
