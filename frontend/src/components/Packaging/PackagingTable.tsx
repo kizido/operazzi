@@ -210,7 +210,7 @@ export default function PackagingTable({
             reset();
           }}
           centered
-          className={vendorProductStyles.vendorProductModal}
+          dialogClassName={vendorProductStyles.vendorProductModal}
         >
           <Modal.Header closeButton className={styles.modalHeader}>
             <Modal.Title>Add Packaging</Modal.Title>
@@ -239,7 +239,7 @@ export default function PackagingTable({
             });
           }}
           centered
-          className={vendorProductStyles.vendorProductModal}
+          dialogClassName={vendorProductStyles.vendorProductModal}
         >
           <Modal.Header closeButton className={styles.modalHeader}>
             <Modal.Title>Edit Packaging</Modal.Title>

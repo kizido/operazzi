@@ -196,8 +196,6 @@ export default function VendorProductsTable({
           })
         : []
     );
-    // vendorProductsLoaded.current = false;
-    // }
   }, []);
   useEffect(() => {
     if (showEditVendorProduct) {
@@ -208,22 +206,6 @@ export default function VendorProductsTable({
     defaultCogsRowIdSubmit(cogsDefaultRowId);
   }, [cogsDefaultRowId]);
   useEffect(() => {
-    // if (priceRanges.length < 1) {
-    //   setNewPriceRange((prevState) => ({
-    //     ...prevState,
-    //     minUnits: minOrderQty,
-    //   }));
-    // } else {
-    //   const currentMin = parseInt(newPriceRange.minUnits)
-    //     ? parseInt(newPriceRange.minUnits)
-    //     : 0;
-    //   if (parseInt(minOrderQty) > currentMin) {
-    //     setNewPriceRange((prevState) => ({
-    //       ...prevState,
-    //       minUnits: minOrderQty,
-    //     }));
-    //   }
-    // }
     resetMinUnits();
   }, [minOrderQty]);
 
