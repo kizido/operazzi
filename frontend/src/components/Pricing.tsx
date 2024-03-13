@@ -4,23 +4,22 @@ import {
   flexRender,
   getCoreRowModel,
   useReactTable,
-  RowData,
   getExpandedRowModel,
 } from "@tanstack/react-table";
 import * as ProductsApi from "../network/products_api";
-import { ProductContext } from "../contexts/ProductContext";
 import tableStyles from "../styles/Table.module.css";
 import modalStyles from "../styles/Modal.module.css";
 import pricingStyles from "../styles/Pricing.module.css";
-import { ProductPackageType } from "../models/productPackageType";
 import { Product } from "../models/product";
 import { PackagingModel } from "./Packaging/PackagingTable";
 
 type UnitCostModel = {
-  packagingCosts: string; // total packaging cost from packaging page
   lcogs: string;
-  shippingWeight: string; // weight (gramss) from basic info
+  opex: string;
   amazonFees: string;
+  subtotal: string;
+  ppcFees: string;
+  netProfit: string;
   growthFund: string;
   marketingBudget: string;
   amazonPrice: string;
@@ -29,6 +28,7 @@ type UnitCostModel = {
 
 // Create a type that represents the structure of your transposed rows
 type TransposedRow = {
+  headerDisplay: string;
   header: string;
   value: string;
 };
@@ -37,7 +37,29 @@ const transposeData = (initialData: UnitCostModel) => {
   const transposedData: TransposedRow[] = Object.entries(initialData).map(
     ([key, value]) => ({
       header: key, // These will be your row headers
-      value: key === "shippingWeight" ? value + "g" : "$" + value, // These will be your row values
+      value: "$" + value, // These will be your row values
+      headerDisplay:
+        key === "lcogs"
+          ? "LCOGS"
+          : key === "opex"
+          ? "OPEX"
+          : key === "amazonFees"
+          ? "Amazon Fees"
+          : key === "marketingBudget"
+          ? "Marketing Budget"
+          : key === "amazonPrice"
+          ? "Amazon Price"
+          : key === "websitePrice"
+          ? "Website Price"
+          : key === "subtotal"
+          ? "Subtotal"
+          : key === "ppcFees"
+          ? "PPC Fees"
+          : key === "netProfit"
+          ? "Net Profit"
+          : key === "growthFund"
+          ? "Growth Fund"
+          : "",
     })
   );
   return transposedData;
@@ -48,34 +70,29 @@ const columnHelper = createColumnHelper<TransposedRow>();
 const columns = [
   columnHelper.display({
     id: "expander",
-    cell: ({ row }) => (
-      <button
-        type="button"
-        onClick={() => row.toggleExpanded()}
-        aria-label="Toggle Row Expanded"
-      >
-        {row.getIsExpanded() ? "-" : "+"}{" "}
-        {/* Change the icon based on the row's expanded state */}
-      </button>
-    ),
+    cell: ({ row }) =>
+      row.original.header !== "opex" &&
+      row.original.header !== "ppcFees" &&
+      row.original.header !== "netProfit" &&
+      row.original.header !== "growthFund" &&
+       (
+        <button
+          type="button"
+          onClick={() => row.toggleExpanded()}
+          aria-label="Toggle Row Expanded"
+        >
+          {row.getIsExpanded() ? "-" : "+"}{" "}
+          {/* Change the icon based on the row's expanded state */}
+        </button>
+      ),
   }),
-  columnHelper.accessor("header", {
+  columnHelper.accessor("headerDisplay", {
     cell: (info) => <span>{info.getValue()}</span>,
   }),
   columnHelper.accessor("value", {
     cell: (info) => <span>{info.getValue()}</span>,
   }),
 ];
-
-const ExpandedRowContent = () => {
-  return (
-    <table
-      className={`${modalStyles.listingSkuTable} ${tableStyles.expandedRowTable}`}
-    >
-      <tbody className={modalStyles.listingSkuTableBody}></tbody>
-    </table>
-  );
-};
 
 interface PricingProps {
   pricingDataSubmit: (name: string, value: string) => void;
@@ -104,7 +121,86 @@ export default function Pricing({
   amazonReferralFee,
   packaging,
 }: PricingProps) {
-  // const [data, setData] = useState(transposedData);
+  const ExpandedRowContent = ({ rowData }: { rowData: TransposedRow }) => {
+    let content;
+    switch (rowData.header) {
+      case "lcogs":
+        content = (
+          <>
+            <tr>
+              <td>COGS</td>
+              <td>{cogs}</td>
+            </tr>
+            <tr>
+              <td>Packaging Costs</td>
+              <td>{packageCostsData}</td>
+            </tr>
+            <tr>
+              <td>International Shipping Costs</td>
+              <td>{isc}</td>
+            </tr>
+            <tr>
+              <td>International Duties & Taxes</td>
+              <td>{dutiesAndTariffs}</td>
+            </tr>
+            <tr>
+              <td>Ship to Amazon FBA</td>
+              <td>{dsc}</td>
+            </tr>
+          </>
+        );
+        break;
+      case "amazonFees":
+        content = (
+          <>
+            <tr>
+              <td>FBA Pick & Pack Fee</td>
+              <td>{pickAndPackFee}</td>
+            </tr>
+            <tr>
+              <td>Referral Fee</td>
+              <td>{amazonReferralFee}</td>
+            </tr>
+          </>
+        );
+        break;
+      case "subtotal":
+        content = (
+          <>
+            <tr>
+              <td>LCOGS</td>
+              <td>{lcogs}</td>
+            </tr>
+            <tr>
+              <td>OPEX</td>
+              <td>{opex}</td>
+            </tr>
+            <tr>
+              <td>Amazon Fees</td>
+              <td>{amazonFees}</td>
+            </tr>
+          </>
+        );
+        break;
+      // Add cases for other headers as needed
+      default:
+        content = (
+          <>
+            <tr></tr>
+          </>
+        );
+        break;
+    }
+
+    return (
+      <table
+        className={`${modalStyles.listingSkuTable} ${tableStyles.expandedRowTable}`}
+      >
+        <tbody className={modalStyles.listingSkuTableBody}>{content}</tbody>
+      </table>
+    );
+  };
+
   const [pricingData, setPricingData] = useState<TransposedRow[]>([]);
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
 
@@ -114,8 +210,9 @@ export default function Pricing({
   const [netProfitTarget, setNetProfitTarget] = useState("");
 
   const [packageWeightData, setPackageWeightData] = useState<string>("");
-
-  const product = useContext(ProductContext);
+  const [packageCostsData, setPackageCostsData] = useState<string>("");
+  const [lcogs, setLcogs] = useState<string>("");
+  const [amazonFees, setAmazonFees] = useState<string>("");
 
   const table = useReactTable({
     data: pricingData,
@@ -216,36 +313,50 @@ export default function Pricing({
     pricingDataSubmit(name, value);
     recalculatePricingData();
   };
-
-  const recalculatePricingData = async () => {
+  const calculatePackagingCosts = () => {
+    const totalPackagingCosts = packaging
+      .reduce((acc, curr) => {
+        const cleanedCost = curr.perUnitCost.replace(/[^\d.-]/g, "");
+        const cost = parseFloat(cleanedCost) || 0;
+        return acc + cost;
+      }, 0)
+      .toFixed(2);
+    setPackageCostsData(totalPackagingCosts);
+  };
+  const parseAndAdd = (nums: string[]) => {
+    let total: number = 0;
+    nums.forEach((num) => {
+      total += parseFloat(num ?? "0");
+    });
+    return total.toFixed(2);
+  };
+  const recalculatePricingData = () => {
     if (productToEdit != null) {
-      const packagingData = packaging
-        .reduce((acc, curr) => {
-          const cleanedCost = curr.perUnitCost.replace(/[^\d.-]/g, "");
-          const cost = parseFloat(cleanedCost) || 0;
-          return acc + cost;
-        }, 0)
-        .toFixed(2);
-      const lcogsData = (
-        parseFloat(packagingData ?? "0") +
-        parseFloat(cogs !== "" ? cogs : "0") +
-        parseFloat(isc !== "" ? isc : "0") +
-        parseFloat(dutiesAndTariffs ?? "0") +
-        parseFloat(dsc ?? "0")
-      ).toFixed(2);
-      console.log("WEIGHT: " + weight);
-      console.log("PACKAGE WEIGHT: " + packageWeightData);
-      const shippingWeight = (
-        parseFloat(weight ?? "0") + parseFloat(packageWeightData)
-      ).toFixed(2);
+      calculatePackagingCosts();
+      const lcogsData = parseAndAdd([
+        cogs,
+        packageCostsData,
+        isc,
+        dutiesAndTariffs,
+        dsc,
+      ]);
+      setLcogs(lcogsData);
+      // (
+      //   parseFloat(cogs !== "" ? cogs : "0") +
+      //   parseFloat(packageCostsData ?? "0") +
+      //   parseFloat(isc !== "" ? isc : "0") +
+      //   parseFloat(dutiesAndTariffs ?? "0") +
+      //   parseFloat(dsc ?? "0")
+      // ).toFixed(2);
+      // const shippingWeight = (
+      //   parseFloat(weight ?? "0") + parseFloat(packageWeightData)
+      // ).toFixed(2);
       const amazonFees = (
         parseFloat(pickAndPackFee ?? "0") + parseFloat(amazonReferralFee ?? "0")
       ).toFixed(2);
-      const growthFund = (parseFloat(cogs ?? "0") * parseFloat(growth)).toFixed(
-        2
-      );
+      setAmazonFees(amazonFees);
       const marketingBudget = (
-        (parseFloat(packagingData ?? "0") +
+        (parseFloat(packageCostsData ?? "0") +
           parseFloat(lcogsData ?? "0") +
           parseFloat(amazonFees ?? "0")) *
         parseFloat(ppcSpend ?? "0")
@@ -258,6 +369,7 @@ export default function Pricing({
         parseFloat(netProfitTarget ?? "0") +
         parseFloat(growth ?? "0")
       ).toFixed(2);
+      const subtotal = parseAndAdd([lcogsData, opex, amazonFees]);
       const websitePrice = (
         parseFloat(lcogsData ?? "0") +
         parseFloat(opex ?? "0") +
@@ -266,11 +378,19 @@ export default function Pricing({
         parseFloat(netProfitTarget ?? "0") +
         parseFloat(growth ?? "0")
       ).toFixed(2);
+      const ppcRate = parseFloat(ppcSpend) / Math.pow(10, 2);
+      const ppcFees = (parseFloat(subtotal) * ppcRate).toFixed(2);
+      const netProfitRate = parseFloat(netProfitTarget) / Math.pow(10, 2);
+      const netProfit = (parseFloat(subtotal) * netProfitRate).toFixed(2);
+      const growthFundRate = parseFloat(growth) / Math.pow(10, 2);
+      const growthFund = (parseFloat(cogs) * growthFundRate).toFixed(2);
       const newPricingData: UnitCostModel = {
-        packagingCosts: packagingData ?? "N/A",
         lcogs: lcogsData, // cogs + packaging costs + isc + int. duties & taxes + fbacost
-        shippingWeight, // product weight + shipping box weight
+        opex,
         amazonFees, // pick & pack + referral fee
+        subtotal,
+        ppcFees,
+        netProfit,
         growthFund, // cogs * growth %
         marketingBudget, // (packagingcosts + lcogs + amazonfees) * PPC SPEND %
         amazonPrice, // lcogs + opex + amazon fees + PPC + net profit % + growth %
@@ -355,7 +475,7 @@ export default function Pricing({
                 {row.getIsExpanded() && (
                   <tr>
                     <td colSpan={row.getVisibleCells().length - 1}>
-                      <ExpandedRowContent />
+                      <ExpandedRowContent rowData={row.original} />
                     </td>
                   </tr>
                 )}

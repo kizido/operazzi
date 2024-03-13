@@ -8,3 +8,7 @@
 .pricingInputContainer input {
     width: 10rem;
 }
+
+.subtotalRow {
+    background-color: rgb(193, 49, 49);
+}
