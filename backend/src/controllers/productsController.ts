@@ -80,6 +80,7 @@ interface CreateProductBody {
   dutiesAndTariffs?: string;
   pickAndPackFee?: string;
   amazonReferralFee?: string;
+  amazonStorageFee?: string;
   productImageId?: Types.ObjectId | null;
   productCustomsId?: Types.ObjectId;
   productCustomsInfo?: {
@@ -123,6 +124,7 @@ export const createProduct: RequestHandler<
   const dutiesAndTariffs = req.body.dutiesAndTariffs;
   const pickAndPackFee = req.body.pickAndPackFee;
   const amazonReferralFee = req.body.amazonReferralFee;
+  const amazonStorageFee = req.body.amazonStorageFee;
   const activated = req.body.activated;
   const productImageId = req.body.productImageId;
   const productCustomsInfo = req.body.productCustomsInfo;
@@ -181,6 +183,7 @@ export const createProduct: RequestHandler<
       dutiesAndTariffs: dutiesAndTariffs,
       pickAndPackFee: pickAndPackFee,
       amazonReferralFee: amazonReferralFee,
+      amazonStorageFee: amazonStorageFee,
       opex,
       ppcSpend,
       growth,
@@ -232,6 +235,7 @@ interface UpdateProductBody {
   dutiesAndTariffs?: string;
   pickAndPackFee?: string;
   amazonReferralFee?: string;
+  amazonStorageFee?: string;
   productImageId?: Types.ObjectId;
   productListingSkus?: IProductListingSku[];
   productVendorProducts?: IProductVendorProduct[];
@@ -268,6 +272,7 @@ export const updateProduct: RequestHandler<
   const newDutiesAndTariffs = req.body.dutiesAndTariffs;
   const newPickAndPackFee = req.body.pickAndPackFee;
   const newAmazonReferralFee = req.body.amazonReferralFee;
+  const newAmazonStorageFee = req.body.amazonStorageFee;
   const newProductImageId = req.body.productImageId;
   const newProductListingSkus = req.body.productListingSkus ?? null;
   const newProductVendorProducts = req.body.productVendorProducts ?? null;
@@ -341,6 +346,7 @@ export const updateProduct: RequestHandler<
     product.dutiesAndTariffs = newDutiesAndTariffs;
     product.pickAndPackFee = newPickAndPackFee;
     product.amazonReferralFee = newAmazonReferralFee;
+    product.amazonStorageFee = newAmazonStorageFee;
     product.opex = newOpex;
     product.ppcSpend = newPpcSpend;
     product.growth = newGrowth;

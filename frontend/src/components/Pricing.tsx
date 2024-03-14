@@ -18,12 +18,9 @@ type UnitCostModel = {
   opex: string;
   amazonFees: string;
   subtotal: string;
-  ppcFees: string;
+  marketingBudget: string;
   netProfit: string;
   growthFund: string;
-  marketingBudget: string;
-  amazonPrice: string;
-  websitePrice: string;
 };
 
 // Create a type that represents the structure of your transposed rows
@@ -47,14 +44,8 @@ const transposeData = (initialData: UnitCostModel) => {
           ? "Amazon Fees"
           : key === "marketingBudget"
           ? "Marketing Budget"
-          : key === "amazonPrice"
-          ? "Amazon Price"
-          : key === "websitePrice"
-          ? "Website Price"
           : key === "subtotal"
           ? "Subtotal"
-          : key === "ppcFees"
-          ? "PPC Fees"
           : key === "netProfit"
           ? "Net Profit"
           : key === "growthFund"
@@ -72,10 +63,9 @@ const columns = [
     id: "expander",
     cell: ({ row }) =>
       row.original.header !== "opex" &&
-      row.original.header !== "ppcFees" &&
       row.original.header !== "netProfit" &&
       row.original.header !== "growthFund" &&
-       (
+      row.original.header !== "marketingBudget" && (
         <button
           type="button"
           onClick={() => row.toggleExpanded()}
@@ -105,6 +95,7 @@ interface PricingProps {
   dsc: string;
   pickAndPackFee: string;
   amazonReferralFee: string;
+  amazonStorageFee: string;
   packaging: PackagingModel[];
 }
 
@@ -119,6 +110,7 @@ export default function Pricing({
   dsc,
   pickAndPackFee,
   amazonReferralFee,
+  amazonStorageFee,
   packaging,
 }: PricingProps) {
   const ExpandedRowContent = ({ rowData }: { rowData: TransposedRow }) => {
@@ -160,6 +152,10 @@ export default function Pricing({
             <tr>
               <td>Referral Fee</td>
               <td>{amazonReferralFee}</td>
+            </tr>
+            <tr>
+              <td>Store Fee</td>
+              <td>{amazonStorageFee}</td>
             </tr>
           </>
         );
@@ -213,6 +209,8 @@ export default function Pricing({
   const [packageCostsData, setPackageCostsData] = useState<string>("");
   const [lcogs, setLcogs] = useState<string>("");
   const [amazonFees, setAmazonFees] = useState<string>("");
+  const [amazonPrice, setAmazonPrice] = useState<string>("");
+  const [websitePrice, setWebsitePrice] = useState<string>("");
 
   const table = useReactTable({
     data: pricingData,
@@ -351,17 +349,13 @@ export default function Pricing({
       // const shippingWeight = (
       //   parseFloat(weight ?? "0") + parseFloat(packageWeightData)
       // ).toFixed(2);
-      const amazonFees = (
-        parseFloat(pickAndPackFee ?? "0") + parseFloat(amazonReferralFee ?? "0")
-      ).toFixed(2);
+      const amazonFees = parseAndAdd([
+        pickAndPackFee,
+        amazonReferralFee,
+        amazonStorageFee,
+      ]);
       setAmazonFees(amazonFees);
-      const marketingBudget = (
-        (parseFloat(packageCostsData ?? "0") +
-          parseFloat(lcogsData ?? "0") +
-          parseFloat(amazonFees ?? "0")) *
-        parseFloat(ppcSpend ?? "0")
-      ).toFixed(2);
-      const amazonPrice = (
+      const amazonPriceData = (
         parseFloat(lcogsData ?? "0") +
         parseFloat(opex ?? "0") +
         parseFloat(amazonFees ?? "0") +
@@ -369,8 +363,9 @@ export default function Pricing({
         parseFloat(netProfitTarget ?? "0") +
         parseFloat(growth ?? "0")
       ).toFixed(2);
+      setAmazonPrice(amazonPriceData);
       const subtotal = parseAndAdd([lcogsData, opex, amazonFees]);
-      const websitePrice = (
+      const websitePriceData = (
         parseFloat(lcogsData ?? "0") +
         parseFloat(opex ?? "0") +
         parseFloat(isc ?? "0") +
@@ -378,8 +373,9 @@ export default function Pricing({
         parseFloat(netProfitTarget ?? "0") +
         parseFloat(growth ?? "0")
       ).toFixed(2);
-      const ppcRate = parseFloat(ppcSpend) / Math.pow(10, 2);
-      const ppcFees = (parseFloat(subtotal) * ppcRate).toFixed(2);
+      setWebsitePrice(websitePriceData);
+      const marketingRate = parseFloat(ppcSpend) / Math.pow(10, 2);
+      const marketingBudget = (parseFloat(subtotal) * marketingRate).toFixed(2);
       const netProfitRate = parseFloat(netProfitTarget) / Math.pow(10, 2);
       const netProfit = (parseFloat(subtotal) * netProfitRate).toFixed(2);
       const growthFundRate = parseFloat(growth) / Math.pow(10, 2);
@@ -389,12 +385,11 @@ export default function Pricing({
         opex,
         amazonFees, // pick & pack + referral fee
         subtotal,
-        ppcFees,
         netProfit,
         growthFund, // cogs * growth %
         marketingBudget, // (packagingcosts + lcogs + amazonfees) * PPC SPEND %
-        amazonPrice, // lcogs + opex + amazon fees + PPC + net profit % + growth %
-        websitePrice, // lcogs + opex + shipping fees + PPC + net profit % + growth %
+        // amazonPrice: amazonPriceData, // lcogs + opex + amazon fees + PPC + net profit % + growth %
+        // websitePrice: websitePriceData, // lcogs + opex + shipping fees + PPC + net profit % + growth %
       };
       setPricingData(transposeData(newPricingData));
     }
@@ -402,9 +397,9 @@ export default function Pricing({
 
   const defaultPricingData = () => {
     setOpex(productToEdit?.opex ?? "");
-    setPpcSpend(productToEdit?.ppcSpend ?? "");
+    setPpcSpend(productToEdit?.ppcSpend ?? "7.50");
     setGrowth(productToEdit?.growth ?? "");
-    setNetProfitTarget(productToEdit?.netProfitTarget ?? "");
+    setNetProfitTarget(productToEdit?.netProfitTarget ?? "25.00");
   };
 
   return (
@@ -420,7 +415,7 @@ export default function Pricing({
           />
         </label>
         <label>
-          PPC Spend %:{" "}
+          Marketing Budget %:{" "}
           <input
             name="ppcSpend"
             value={ppcSpend}
@@ -458,6 +453,10 @@ export default function Pricing({
                   key={row.id}
                   className={`${tableStyles.tableRow} ${
                     row.id === selectedRowId ? tableStyles.selected : ""
+                  } ${
+                    row.original.header === "subtotal"
+                      ? pricingStyles.subtotalRow
+                      : ""
                   }`}
                   onClick={() =>
                     setSelectedRowId(row.id === selectedRowId ? null : row.id)
@@ -483,6 +482,10 @@ export default function Pricing({
             ))}
           </tbody>
         </table>
+      </div>
+      <div className={pricingStyles.pricingFinalPricesContainer}>
+        <h3>Amazon Price: ${amazonPrice}</h3>
+        <h3>Website Price: ${websitePrice}</h3>
       </div>
     </div>
   );

@@ -109,6 +109,7 @@ export interface ProductInput {
   dutiesAndTariffs: string;
   pickAndPackFee: string;
   amazonReferralFee: string;
+  amazonStorageFee: string;
   productImageId: string | null;
   productCustomsInfo?: CustomsInput;
   productListingSkus?: {

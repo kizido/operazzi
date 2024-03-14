@@ -90,6 +90,7 @@ const AddEditProductDialog = ({
       dutiesAndTariffs: productToEdit?.dutiesAndTariffs || "25.00",
       pickAndPackFee: productToEdit?.pickAndPackFee || "",
       amazonReferralFee: productToEdit?.amazonReferralFee || "",
+      amazonStorageFee: productToEdit?.amazonStorageFee || "",
       opex: productToEdit?.opex || "",
       productImageId: productToEdit?.productImageId || null,
       activated: productToEdit?.activated || true,
@@ -130,6 +131,7 @@ const AddEditProductDialog = ({
   const watchedDSC = watch("domesticShippingCosts");
   const watchedPickAndPackFee = watch("pickAndPackFee");
   const watchedAmazonReferralFee = watch("amazonReferralFee");
+  const watchedAmazonStorageFee = watch("amazonStorageFee");
 
   useEffect(() => {
     if (productToEdit) {
@@ -552,14 +554,25 @@ const AddEditProductDialog = ({
                     />
                   </Col>
                   <Col>
+                    <MoneyInputField
+                      name="amazonStorageFee"
+                      label="Amazon Storage Fee"
+                      type="text"
+                      placeholder="Amazon Storage Fee"
+                      register={register}
+                      setValue={setValue}
+                      control={control}
+                    />
+                  </Col>
+                </Row>
+                <Row>
+                  <Col>
                     <MasterCaseDimensionsInputField
                       name="masterCaseDimensions"
                       label="Master Case Dimensions (in.)"
                       register={register}
                     />
                   </Col>
-                </Row>
-                <Row>
                   <Col>
                     <TextInputField
                       name="masterCaseWeight"
@@ -569,6 +582,8 @@ const AddEditProductDialog = ({
                       register={register}
                     />
                   </Col>
+                </Row>
+                <Row>
                   <Col>
                     <TextDisplayField
                       name="cogs"
@@ -578,8 +593,6 @@ const AddEditProductDialog = ({
                       value={retrievedUnitCogs}
                     />
                   </Col>
-                </Row>
-                <Row>
                   <Col>
                     <TextDisplayField
                       name="internationalShippingCosts"
@@ -589,7 +602,6 @@ const AddEditProductDialog = ({
                       value={calculatedISC}
                     />
                   </Col>
-                  <Col></Col>
                 </Row>
               </Form>
             </Tab.Pane>
@@ -631,6 +643,7 @@ const AddEditProductDialog = ({
                 dsc={watchedDSC}
                 pickAndPackFee={watchedPickAndPackFee}
                 amazonReferralFee={watchedAmazonReferralFee}
+                amazonStorageFee={watchedAmazonStorageFee}
                 packaging={packagingInputData}
               />
             </Tab.Pane>

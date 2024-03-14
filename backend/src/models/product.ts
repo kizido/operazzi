@@ -80,6 +80,7 @@ const productSchema = new Schema(
     dutiesAndTariffs: { type: String },
     pickAndPackFee: { type: String },
     amazonReferralFee: { type: String },
+    amazonStorageFee: { type: String },
     productImageId: {
       type: Schema.Types.ObjectId || null,
       ref: "ProductImage",
