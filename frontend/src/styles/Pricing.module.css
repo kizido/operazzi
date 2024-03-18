@@ -10,9 +10,12 @@
 }
 
 .subtotalRow {
-    background-color: rgb(255, 176, 176) !important;
+    background-color: rgb(184, 255, 200) !important;
 }
 .pricingFinalPricesContainer {
     display: flex;
     justify-content: space-between;
+}
+.emptyExpandedRow {
+    background-color: rgb(255, 201, 201);
 }

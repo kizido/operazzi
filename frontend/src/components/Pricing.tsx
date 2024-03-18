@@ -34,7 +34,7 @@ const transposeData = (initialData: UnitCostModel) => {
   const transposedData: TransposedRow[] = Object.entries(initialData).map(
     ([key, value]) => ({
       header: key, // These will be your row headers
-      value: "$" + value, // These will be your row values
+      value: `$${value === "" ? "0.00" : value}`, // These will be your row values
       headerDisplay:
         key === "lcogs"
           ? "LCOGS"
@@ -119,25 +119,65 @@ export default function Pricing({
       case "lcogs":
         content = (
           <>
-            <tr>
+            <tr
+              className={
+                cogs === ""
+                  ? pricingStyles.emptyExpandedRow
+                  : cogs === "0.00"
+                  ? pricingStyles.emptyExpandedRow
+                  : ""
+              }
+            >
               <td>COGS</td>
-              <td>{cogs}</td>
+              <td>{cogs === "" ? "0.00" : cogs}</td>
             </tr>
-            <tr>
+            <tr
+              className={
+                packageCostsData === ""
+                  ? pricingStyles.emptyExpandedRow
+                  : packageCostsData === "0.00"
+                  ? pricingStyles.emptyExpandedRow
+                  : ""
+              }
+            >
               <td>Packaging Costs</td>
-              <td>{packageCostsData}</td>
+              <td>{packageCostsData === "" ? "0.00" : packageCostsData}</td>
             </tr>
-            <tr>
+            <tr
+              className={
+                isc === ""
+                  ? pricingStyles.emptyExpandedRow
+                  : isc === "0.00"
+                  ? pricingStyles.emptyExpandedRow
+                  : ""
+              }
+            >
               <td>International Shipping Costs</td>
-              <td>{isc}</td>
+              <td>{isc === "" ? "0.00" : isc}</td>
             </tr>
-            <tr>
+            <tr
+              className={
+                dutiesAndTariffs === ""
+                  ? pricingStyles.emptyExpandedRow
+                  : dutiesAndTariffs === "0.00"
+                  ? pricingStyles.emptyExpandedRow
+                  : ""
+              }
+            >
               <td>International Duties & Taxes</td>
-              <td>{dutiesAndTariffs}</td>
+              <td>{dutiesAndTariffs === "" ? "0.00" : dutiesAndTariffs}</td>
             </tr>
-            <tr>
+            <tr
+              className={
+                dsc === ""
+                  ? pricingStyles.emptyExpandedRow
+                  : dsc === "0.00"
+                  ? pricingStyles.emptyExpandedRow
+                  : ""
+              }
+            >
               <td>Ship to Amazon FBA</td>
-              <td>{dsc}</td>
+              <td>{dsc === "" ? "0.00" : dsc}</td>
             </tr>
           </>
         );
@@ -145,17 +185,41 @@ export default function Pricing({
       case "amazonFees":
         content = (
           <>
-            <tr>
+            <tr
+              className={
+                pickAndPackFee === ""
+                  ? pricingStyles.emptyExpandedRow
+                  : pickAndPackFee === "0.00"
+                  ? pricingStyles.emptyExpandedRow
+                  : ""
+              }
+            >
               <td>FBA Pick & Pack Fee</td>
-              <td>{pickAndPackFee}</td>
+              <td>{pickAndPackFee === "" ? "0.00" : pickAndPackFee}</td>
             </tr>
-            <tr>
-              <td>Referral Fee</td>
-              <td>{amazonReferralFee}</td>
+            <tr
+              className={
+                amazonReferralFee === ""
+                  ? pricingStyles.emptyExpandedRow
+                  : amazonReferralFee === "0.00"
+                  ? pricingStyles.emptyExpandedRow
+                  : ""
+              }
+            >
+              <td>Amazon Referral Fee</td>
+              <td>{amazonReferralFee === "" ? "0.00" : amazonReferralFee}</td>
             </tr>
-            <tr>
-              <td>Store Fee</td>
-              <td>{amazonStorageFee}</td>
+            <tr
+              className={
+                amazonStorageFee === ""
+                  ? pricingStyles.emptyExpandedRow
+                  : amazonStorageFee === "0.00"
+                  ? pricingStyles.emptyExpandedRow
+                  : ""
+              }
+            >
+              <td>Amazon Storage Fee</td>
+              <td>{amazonStorageFee === "" ? "0.00" : amazonStorageFee}</td>
             </tr>
           </>
         );
@@ -163,17 +227,41 @@ export default function Pricing({
       case "subtotal":
         content = (
           <>
-            <tr>
+            <tr
+              className={
+                lcogs === ""
+                  ? pricingStyles.emptyExpandedRow
+                  : lcogs === "0.00"
+                  ? pricingStyles.emptyExpandedRow
+                  : ""
+              }
+            >
               <td>LCOGS</td>
-              <td>{lcogs}</td>
+              <td>{lcogs === "" ? "0.00" : lcogs}</td>
             </tr>
-            <tr>
+            <tr
+              className={
+                opex === ""
+                  ? pricingStyles.emptyExpandedRow
+                  : opex === "0.00"
+                  ? pricingStyles.emptyExpandedRow
+                  : ""
+              }
+            >
               <td>OPEX</td>
-              <td>{opex}</td>
+              <td>{opex === "" ? "0.00" : opex}</td>
             </tr>
-            <tr>
+            <tr
+              className={
+                amazonFees === ""
+                  ? pricingStyles.emptyExpandedRow
+                  : amazonFees === "0.00"
+                  ? pricingStyles.emptyExpandedRow
+                  : ""
+              }
+            >
               <td>Amazon Fees</td>
-              <td>{amazonFees}</td>
+              <td>{amazonFees === "" ? "0.00" : amazonFees}</td>
             </tr>
           </>
         );
@@ -223,10 +311,8 @@ export default function Pricing({
       let responseWeight: string = "0";
       try {
         if (packageId) {
-          console.log("PACKAGE ID RETRIEVED");
           const response = await ProductsApi.fetchProductPackageType(packageId);
           responseWeight = response.packageWeight.toFixed(2);
-          console.log("RESPONSE WEIGHT: " + responseWeight);
         }
       } catch (error) {
         console.error(error);
@@ -248,6 +334,7 @@ export default function Pricing({
     dsc,
     pickAndPackFee,
     amazonReferralFee,
+    amazonStorageFee,
     packaging,
     packageWeightData,
   ]);
@@ -312,93 +399,78 @@ export default function Pricing({
     recalculatePricingData();
   };
   const calculatePackagingCosts = () => {
-    const totalPackagingCosts = packaging
-      .reduce((acc, curr) => {
-        const cleanedCost = curr.perUnitCost.replace(/[^\d.-]/g, "");
-        const cost = parseFloat(cleanedCost) || 0;
-        return acc + cost;
-      }, 0)
-      .toFixed(2);
-    setPackageCostsData(totalPackagingCosts);
+    if (packaging.length > 0) {
+      const totalPackagingCosts = packaging
+        .reduce((acc, curr) => {
+          const cleanedCost = curr.perUnitCost.replace(/[^\d.-]/g, "");
+          const cost = parseFloat(cleanedCost) || 0;
+          return acc + cost;
+        }, 0)
+        .toFixed(2);
+      setPackageCostsData(totalPackagingCosts);
+    }
   };
   const parseAndAdd = (nums: string[]) => {
     let total: number = 0;
     nums.forEach((num) => {
-      total += parseFloat(num ?? "0");
+      total += parseFloat(num !== "" ? num : "0.00");
     });
     return total.toFixed(2);
   };
   const recalculatePricingData = () => {
-    if (productToEdit != null) {
-      calculatePackagingCosts();
-      const lcogsData = parseAndAdd([
-        cogs,
-        packageCostsData,
-        isc,
-        dutiesAndTariffs,
-        dsc,
-      ]);
-      setLcogs(lcogsData);
-      // (
-      //   parseFloat(cogs !== "" ? cogs : "0") +
-      //   parseFloat(packageCostsData ?? "0") +
-      //   parseFloat(isc !== "" ? isc : "0") +
-      //   parseFloat(dutiesAndTariffs ?? "0") +
-      //   parseFloat(dsc ?? "0")
-      // ).toFixed(2);
-      // const shippingWeight = (
-      //   parseFloat(weight ?? "0") + parseFloat(packageWeightData)
-      // ).toFixed(2);
-      const amazonFees = parseAndAdd([
-        pickAndPackFee,
-        amazonReferralFee,
-        amazonStorageFee,
-      ]);
-      setAmazonFees(amazonFees);
-      const amazonPriceData = (
-        parseFloat(lcogsData ?? "0") +
-        parseFloat(opex ?? "0") +
-        parseFloat(amazonFees ?? "0") +
-        parseFloat(ppcSpend ?? "0") +
-        parseFloat(netProfitTarget ?? "0") +
-        parseFloat(growth ?? "0")
-      ).toFixed(2);
-      setAmazonPrice(amazonPriceData);
-      const subtotal = parseAndAdd([lcogsData, opex, amazonFees]);
-      const websitePriceData = (
-        parseFloat(lcogsData ?? "0") +
-        parseFloat(opex ?? "0") +
-        parseFloat(isc ?? "0") +
-        parseFloat(ppcSpend ?? "0") +
-        parseFloat(netProfitTarget ?? "0") +
-        parseFloat(growth ?? "0")
-      ).toFixed(2);
-      setWebsitePrice(websitePriceData);
-      const marketingRate = parseFloat(ppcSpend) / Math.pow(10, 2);
-      const marketingBudget = (parseFloat(subtotal) * marketingRate).toFixed(2);
-      const netProfitRate = parseFloat(netProfitTarget) / Math.pow(10, 2);
-      const netProfit = (parseFloat(subtotal) * netProfitRate).toFixed(2);
-      const growthFundRate = parseFloat(growth) / Math.pow(10, 2);
-      const growthFund = (parseFloat(cogs) * growthFundRate).toFixed(2);
-      const newPricingData: UnitCostModel = {
-        lcogs: lcogsData, // cogs + packaging costs + isc + int. duties & taxes + fbacost
-        opex,
-        amazonFees, // pick & pack + referral fee
-        subtotal,
-        netProfit,
-        growthFund, // cogs * growth %
-        marketingBudget, // (packagingcosts + lcogs + amazonfees) * PPC SPEND %
-        // amazonPrice: amazonPriceData, // lcogs + opex + amazon fees + PPC + net profit % + growth %
-        // websitePrice: websitePriceData, // lcogs + opex + shipping fees + PPC + net profit % + growth %
-      };
-      setPricingData(transposeData(newPricingData));
-    }
+    // if (productToEdit != null) {
+    calculatePackagingCosts();
+    const lcogsData = parseAndAdd([
+      cogs,
+      packageCostsData,
+      isc,
+      dutiesAndTariffs,
+      dsc,
+    ]);
+    setLcogs(lcogsData);
+    const amazonFees = parseAndAdd([
+      pickAndPackFee,
+      amazonReferralFee,
+      amazonStorageFee,
+    ]);
+    setAmazonFees(amazonFees);
+    const subtotal = parseAndAdd([lcogsData, opex, amazonFees]);
+    const marketingRate = parseFloat(ppcSpend) / Math.pow(10, 2);
+    const marketingBudget = (parseFloat(subtotal) * marketingRate).toFixed(2);
+    const netProfitRate = parseFloat(netProfitTarget) / Math.pow(10, 2);
+    const netProfit = (parseFloat(subtotal) * netProfitRate).toFixed(2);
+    const growthFundRate = parseFloat(growth) / Math.pow(10, 2);
+    const growthFund = (parseFloat(cogs === "" ? "0.00" : cogs) * growthFundRate).toFixed(2);
+    const newOpex = parseFloat(opex).toFixed(2);
+    const amazonPriceData = parseAndAdd([subtotal, marketingBudget, netProfit, growthFund]);
+    setAmazonPrice(amazonPriceData);
+    const websitePriceData = parseAndAdd([lcogs, opex, ]);(
+      parseFloat(lcogsData ?? "0") +
+      parseFloat(opex ?? "0") +
+      parseFloat(isc ?? "0") +
+      parseFloat(ppcSpend ?? "0") +
+      parseFloat(netProfitTarget ?? "0") +
+      parseFloat(growthFund ?? "0")
+    ).toFixed(2);
+    setWebsitePrice(websitePriceData);
+    const newPricingData: UnitCostModel = {
+      lcogs: lcogsData, // cogs + packaging costs + isc + int. duties & taxes + fbacost
+      opex: newOpex,
+      amazonFees, // pick & pack + referral fee
+      subtotal,
+      netProfit,
+      growthFund, // cogs * growth %
+      marketingBudget, // (packagingcosts + lcogs + amazonfees) * PPC SPEND %
+      // amazonPrice: amazonPriceData, // lcogs + opex + amazon fees + PPC + net profit % + growth %
+      // websitePrice: websitePriceData, // lcogs + opex + shipping fees + PPC + net profit % + growth %
+    };
+    setPricingData(transposeData(newPricingData));
   };
 
   const defaultPricingData = () => {
-    setOpex(productToEdit?.opex ?? "");
+    setOpex(productToEdit?.opex ?? "0.00");
     setPpcSpend(productToEdit?.ppcSpend ?? "7.50");
-    setGrowth(productToEdit?.growth ?? "");
+    setGrowth(productToEdit?.growth ?? "0.00");
     setNetProfitTarget(productToEdit?.netProfitTarget ?? "25.00");
   };
 
