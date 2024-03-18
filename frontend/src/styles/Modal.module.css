@@ -1,191 +1,205 @@
 .productModalWidth {
-    max-width: 60rem;
+  max-width: 60rem;
 }
 
 .productModalBody {
-    max-height: 40rem;
-    min-height: 40rem;
-    margin: 0px 10px 25px 10px;
-    position: relative;
+  max-height: 40rem;
+  min-height: 40rem;
+  margin: 0px 10px 25px 10px;
+  position: relative;
 }
 
 .productModalTabs {
-    justify-content: space-around;
-    margin-bottom: 1rem;
+  justify-content: space-around;
+  margin-bottom: 1rem;
 }
 
 .productModalTabLink {
-    font-size: 0.8em;
-    padding: 5px 10px;
-    color: gray;
+  font-size: 0.8em;
+  padding: 5px 10px;
+  color: gray;
 }
 
 .productModalTabLink :hover {
-    color: black;
+  color: black;
 }
 
 .productModalInput {
-    height: 5rem;
+  height: 5rem;
 }
 
 .dropDownEditModalWidth {
-    max-width: 40rem;
+  max-width: 40rem;
 }
 
 .dropDownEditModalBody {
-    max-height: 30rem;
-    min-height: 30rem;
-    overflow-y: scroll;
+  max-height: 30rem;
+  min-height: 30rem;
+  overflow-y: scroll;
 }
 
 .editCategoryRow {
-    border: 1px black solid;
-    margin: 0.1rem;
-    height: 3.5rem;
+  border: 1px black solid;
+  margin: 0.1rem;
+  height: 3.5rem;
 }
 
 .editCategoryRowText {
-    margin: 0.5rem;
-    display: inline-block;
-    width: 65%;
-    font-size: large;
-    font-weight: bold;
-    margin-right: auto;
+  margin: 0.5rem;
+  display: inline-block;
+  width: 65%;
+  font-size: large;
+  font-weight: bold;
+  margin-right: auto;
 }
 
 .editCategoryRowButton {
-    margin: 0.5rem;
-    display: inline-block;
-    width: min-content;
+  margin: 0.5rem;
+  display: inline-block;
+  width: min-content;
 }
 .editVendorAddButton {
-    margin: 0.5rem;
-    display: inline-block;
+  margin: 0.5rem;
+  display: inline-block;
 }
 
 .editCategoryRowInput {
-    display: inline-block;
-    width: 65%;
-    margin-right: auto;
+  display: inline-block;
+  width: 65%;
+  margin-right: auto;
 }
 
 .productPreviewContainer {
-    border: 1px black dashed;
-    height: 10rem;
-    width: 10rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #fcfcfc;
-    margin-left: auto;
+  border: 1px black dashed;
+  height: 10rem;
+  width: 10rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #fcfcfc;
+  margin-left: auto;
 }
 
 .productPreviewImage {
-    width: 7rem;
-    height: 7rem;
-    margin: auto;
-    display: block;
+  width: 7rem;
+  height: 7rem;
+  margin: auto;
+  display: block;
 }
 
 .productPreviewContainer:hover {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .smallDescriptionText {
-    font-size: 0.8em;
-    line-height: 14px;
+  font-size: 0.8em;
+  line-height: 14px;
 }
-
 .scrollableTableContainer {
-    height: 29.7rem;
-    margin-top: 0.5rem;
-    /* Adjust the max-height as needed */
-    overflow: auto;
-    border: 2px solid lightgray;
+  height: 29.7rem;
+  margin-top: 0.5rem;
+  /* Adjust the max-height as needed */
+  overflow: auto;
+  border: 2px solid lightgray;
 }
-
+.scrollablePricingTableContainer {
+  display: flex;
+}
 .listingSkuTable {
-    width: 100%;
-    overflow: scroll;
+  width: 100%;
+  overflow: scroll;
 }
 
 .listingSkuTableBody {
-    border-bottom: 1px solid lightgray;
+  border-bottom: 1px solid lightgray;
 }
 
 .listingSkuTableBody td {
-    font-size: 13px;
+  font-size: 13px;
 }
 
 .listingSkuTableH {
-    border-bottom: 1px solid lightgray;
-    border-right: 1px solid lightgray;
+  border-bottom: 1px solid lightgray;
+  border-right: 1px solid lightgray;
 }
 
 .grayButton {
-    border-color: #f8f8f8;
-    background-color: #f8f8f8;
+  border-color: #f8f8f8;
+  background-color: #f8f8f8;
 }
 
 .grayButton:enabled {
-    border: none;
+  border: none;
 }
 
-.grayButton:active, .grayButton:focus {
-    background-color: #f8f8f8 !important;
-    color: black !important;
-    border: 0;
-    outline: 0;
-    box-shadow: none;
+.grayButton:active,
+.grayButton:focus {
+  background-color: #f8f8f8 !important;
+  color: black !important;
+  border: 0;
+  outline: 0;
+  box-shadow: none;
 }
 .grayButton:hover {
-    background-color: #dddddd !important;
-    color: #4fa2a8 !important;
-    border-color: #f0f0f0;
+  background-color: #dddddd !important;
+  color: #4fa2a8 !important;
+  border-color: #f0f0f0;
 }
 
 .grayButton:disabled {
-    border: none;
+  border: none;
 }
 
 .buttonRow {
-    display: flex;
-    width: 100%;
-    justify-content: flex-start;
-    gap: 6px;
+  display: flex;
+  width: 100%;
+  justify-content: flex-start;
+  gap: 6px;
 }
 
 .toggleGreen {
-    margin-right: 0.3rem;
-    height: auto;
-    width: 15px;
+  margin-right: 0.3rem;
+  height: auto;
+  width: 15px;
 }
 
 .toggleRed {
-    margin-right: 0.4rem;
-    height: auto;
-    width: 15px;
+  margin-right: 0.4rem;
+  height: auto;
+  width: 15px;
 }
 
 .modalHeader {
-    font-weight: 600;
-    font-size: 1.5em;
+  font-weight: 600;
+  font-size: 1.5em;
 }
 
 .packagingInputsContainer {
-    display: flex;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
 }
 .packagingInputsContainer label {
-    padding-right: 0.7rem;
+  padding-right: 0.7rem;
 }
 
 .errorMessageInline {
-    display: inline;
-    color: darkred;
-    font-size: 0.8em;
+  display: inline;
+  color: darkred;
+  font-size: 0.8em;
 }
 .errorMessage {
-    color: darkred;
-    font-size: 0.8em;
+  color: darkred;
+  font-size: 0.8em;
+}
+.pricingHeaders {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+.pricingHeaders h4 {
+  margin: 0;
+}
+
+.pricingTableDividedContainer {
+  width: 100%;
 }

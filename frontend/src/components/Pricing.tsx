@@ -13,10 +13,20 @@ import pricingStyles from "../styles/Pricing.module.css";
 import { Product } from "../models/product";
 import { PackagingModel } from "./Packaging/PackagingTable";
 
-type UnitCostModel = {
+type AmazonCostModel = {
   lcogs: string;
   opex: string;
   amazonFees: string;
+  subtotal: string;
+  marketingBudget: string;
+  netProfit: string;
+  growthFund: string;
+};
+type WebsiteCostModel = {
+  lcogs: string;
+  opex: string;
+  shippingFees: string; // weight (of product + shipping box) in grams *  $0.007
+  packingFees: string; // shipping box 0.80$ + shipping label 0.05$ + packing tape 0.05$ + packing list $0.05 + marketing inserts $1.75 + labor $0.55
   subtotal: string;
   marketingBudget: string;
   netProfit: string;
@@ -30,7 +40,7 @@ type TransposedRow = {
   value: string;
 };
 
-const transposeData = (initialData: UnitCostModel) => {
+const transposeData = (initialData: AmazonCostModel) => {
   const transposedData: TransposedRow[] = Object.entries(initialData).map(
     ([key, value]) => ({
       header: key, // These will be your row headers
@@ -42,14 +52,41 @@ const transposeData = (initialData: UnitCostModel) => {
           ? "OPEX"
           : key === "amazonFees"
           ? "Amazon Fees"
-          : key === "marketingBudget"
-          ? "Marketing Budget"
           : key === "subtotal"
           ? "Subtotal"
+          : key === "marketingBudget"
+          ? "+ Marketing Budget"
           : key === "netProfit"
-          ? "Net Profit"
+          ? "+ Net Profit"
           : key === "growthFund"
-          ? "Growth Fund"
+          ? "+ Growth Fund"
+          : "",
+    })
+  );
+  return transposedData;
+};
+const transposeWebsitePriceData = (initialData: WebsiteCostModel) => {
+  const transposedData: TransposedRow[] = Object.entries(initialData).map(
+    ([key, value]) => ({
+      header: key, // These will be your row headers
+      value: `$${value === "" ? "0.00" : value}`, // These will be your row values
+      headerDisplay:
+        key === "lcogs"
+          ? "LCOGS"
+          : key === "opex"
+          ? "OPEX"
+          : key === "shippingFees"
+          ? "Shipping Fees"
+          : key === "packingFees"
+          ? "Packing Fees"
+          : key === "subtotal"
+          ? "Subtotal"
+          : key === "marketingBudget"
+          ? "+ Marketing Budget"
+          : key === "netProfit"
+          ? "+ Net Profit"
+          : key === "growthFund"
+          ? "+ Growth Fund"
           : "",
     })
   );
@@ -286,6 +323,9 @@ export default function Pricing({
   };
 
   const [pricingData, setPricingData] = useState<TransposedRow[]>([]);
+  const [websitePricingData, setWebsitePricingData] = useState<TransposedRow[]>(
+    []
+  );
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
 
   const [opex, setOpex] = useState("");
@@ -302,6 +342,12 @@ export default function Pricing({
 
   const table = useReactTable({
     data: pricingData,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getExpandedRowModel: getExpandedRowModel(),
+  });
+  const websiteTable = useReactTable({
+    data: websitePricingData,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getExpandedRowModel: getExpandedRowModel(),
@@ -325,7 +371,7 @@ export default function Pricing({
     defaultPricingData();
   }, []);
   useEffect(() => {
-    recalculatePricingData();
+    recalculateAmazonPricingData();
   }, [
     cogs,
     weight,
@@ -396,7 +442,7 @@ export default function Pricing({
         break;
     }
     pricingDataSubmit(name, value);
-    recalculatePricingData();
+    recalculateAmazonPricingData();
   };
   const calculatePackagingCosts = () => {
     if (packaging.length > 0) {
@@ -417,8 +463,48 @@ export default function Pricing({
     });
     return total.toFixed(2);
   };
-  const recalculatePricingData = () => {
-    // if (productToEdit != null) {
+  const recalculateWebsitePricingData = () => {
+    const lcogsData = parseAndAdd([
+      cogs,
+      packageCostsData,
+      isc,
+      dutiesAndTariffs,
+    ]);
+    const shippingFees = (
+      (parseFloat(weight) + parseFloat(packageWeightData)) *
+      0.007
+    ).toFixed(2);
+    const packingFees = "3.25"; // placeholder constant
+    const subtotal = parseAndAdd([lcogsData, opex, shippingFees, packingFees]);
+    const netProfitRate = parseFloat(netProfitTarget) / Math.pow(10, 2);
+    const netProfit = (
+      parseFloat(subtotal) +
+      parseFloat(subtotal) * netProfitRate
+    ).toFixed(2);
+    const growthFundRate = parseFloat(growth) / Math.pow(10, 2);
+    const growthFund = (
+      parseFloat(netProfit) +
+      parseFloat(cogs === "" ? "0.00" : cogs) * growthFundRate
+    ).toFixed(2);
+    const marketingRate = parseFloat(ppcSpend) / Math.pow(10, 2);
+    const marketingBudget = (
+      parseFloat(growthFund) +
+      parseFloat(subtotal) * marketingRate
+    ).toFixed(2);
+    const newOpex = parseFloat(opex).toFixed(2);
+    const newPricingData: WebsiteCostModel = {
+      lcogs: lcogsData, // cogs + packaging costs + isc + int. duties & taxes + fbacost
+      opex: newOpex,
+      shippingFees,
+      packingFees,
+      subtotal,
+      netProfit,
+      growthFund, // cogs * growth %
+      marketingBudget, // (packagingcosts + lcogs + amazonfees) * PPC SPEND %
+    };
+    setWebsitePricingData(transposeWebsitePriceData(newPricingData));
+  };
+  const recalculateAmazonPricingData = () => {
     calculatePackagingCosts();
     const lcogsData = parseAndAdd([
       cogs,
@@ -435,16 +521,31 @@ export default function Pricing({
     ]);
     setAmazonFees(amazonFees);
     const subtotal = parseAndAdd([lcogsData, opex, amazonFees]);
-    const marketingRate = parseFloat(ppcSpend) / Math.pow(10, 2);
-    const marketingBudget = (parseFloat(subtotal) * marketingRate).toFixed(2);
     const netProfitRate = parseFloat(netProfitTarget) / Math.pow(10, 2);
-    const netProfit = (parseFloat(subtotal) * netProfitRate).toFixed(2);
+    const netProfit = (
+      parseFloat(subtotal) +
+      parseFloat(subtotal) * netProfitRate
+    ).toFixed(2);
     const growthFundRate = parseFloat(growth) / Math.pow(10, 2);
-    const growthFund = (parseFloat(cogs === "" ? "0.00" : cogs) * growthFundRate).toFixed(2);
+    const growthFund = (
+      parseFloat(netProfit) +
+      parseFloat(cogs === "" ? "0.00" : cogs) * growthFundRate
+    ).toFixed(2);
+    const marketingRate = parseFloat(ppcSpend) / Math.pow(10, 2);
+    const marketingBudget = (
+      parseFloat(growthFund) +
+      parseFloat(subtotal) * marketingRate
+    ).toFixed(2);
     const newOpex = parseFloat(opex).toFixed(2);
-    const amazonPriceData = parseAndAdd([subtotal, marketingBudget, netProfit, growthFund]);
+    const amazonPriceData = parseAndAdd([
+      subtotal,
+      marketingBudget,
+      netProfit,
+      growthFund,
+    ]);
     setAmazonPrice(amazonPriceData);
-    const websitePriceData = parseAndAdd([lcogs, opex, ]);(
+    const websitePriceData = parseAndAdd([lcogs, opex]);
+    (
       parseFloat(lcogsData ?? "0") +
       parseFloat(opex ?? "0") +
       parseFloat(isc ?? "0") +
@@ -453,7 +554,7 @@ export default function Pricing({
       parseFloat(growthFund ?? "0")
     ).toFixed(2);
     setWebsitePrice(websitePriceData);
-    const newPricingData: UnitCostModel = {
+    const newPricingData: AmazonCostModel = {
       lcogs: lcogsData, // cogs + packaging costs + isc + int. duties & taxes + fbacost
       opex: newOpex,
       amazonFees, // pick & pack + referral fee
@@ -514,46 +615,101 @@ export default function Pricing({
           />
         </label>
       </div>
-      <div className={modalStyles.scrollableTableContainer}>
-        <table
-          className={`${modalStyles.listingSkuTable} ${tableStyles.listingSkuTable}`}
-        >
-          <tbody className={modalStyles.listingSkuTableBody}>
-            {table.getRowModel().rows.map((row) => (
-              <React.Fragment key={row.id}>
-                <tr
-                  key={row.id}
-                  className={`${tableStyles.tableRow} ${
-                    row.id === selectedRowId ? tableStyles.selected : ""
-                  } ${
-                    row.original.header === "subtotal"
-                      ? pricingStyles.subtotalRow
-                      : ""
-                  }`}
-                  onClick={() =>
-                    setSelectedRowId(row.id === selectedRowId ? null : row.id)
-                  }
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </td>
-                  ))}
-                </tr>
-                {row.getIsExpanded() && (
-                  <tr>
-                    <td colSpan={row.getVisibleCells().length - 1}>
-                      <ExpandedRowContent rowData={row.original} />
-                    </td>
+      <div
+        className={`${modalStyles.scrollableTableContainer} ${modalStyles.scrollablePricingTableContainer}`}
+      >
+        {/* <div className={modalStyles.pricingHeaders}>
+          <h4>Amazon Price</h4>
+          <h4>Website Price</h4>
+        </div> */}
+
+        {/* Amazon Pricing Table */}
+        <div className={modalStyles.pricingTableDividedContainer}>
+          <h4 className="text-center">Amazon Price</h4>
+          <table
+            className={`${modalStyles.listingSkuTable} ${tableStyles.listingSkuTable}`}
+          >
+            <tbody className={modalStyles.listingSkuTableBody}>
+              {table.getRowModel().rows.map((row) => (
+                <React.Fragment key={row.id}>
+                  <tr
+                    key={row.id}
+                    className={`${tableStyles.tableRow} ${
+                      row.id === selectedRowId ? tableStyles.selected : ""
+                    } ${
+                      row.original.header === "subtotal"
+                        ? pricingStyles.subtotalRow
+                        : ""
+                    }`}
+                    onClick={() =>
+                      setSelectedRowId(row.id === selectedRowId ? null : row.id)
+                    }
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <td key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </td>
+                    ))}
                   </tr>
-                )}
-              </React.Fragment>
-            ))}
-          </tbody>
-        </table>
+                  {row.getIsExpanded() && (
+                    <tr>
+                      <td colSpan={row.getVisibleCells().length - 1}>
+                        <ExpandedRowContent rowData={row.original} />
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Website Pricing Table */}
+        <div className={modalStyles.pricingTableDividedContainer}>
+          <h4 className="text-center">Website Price</h4>
+          <table
+            className={`${modalStyles.listingSkuTable} ${tableStyles.listingSkuTable}`}
+          >
+            <tbody className={modalStyles.listingSkuTableBody}>
+              {websiteTable.getRowModel().rows.map((row) => (
+                <React.Fragment key={row.id}>
+                  <tr
+                    key={row.id}
+                    className={`${tableStyles.tableRow} ${
+                      row.id === selectedRowId ? tableStyles.selected : ""
+                    } ${
+                      row.original.header === "subtotal"
+                        ? pricingStyles.subtotalRow
+                        : ""
+                    }`}
+                    onClick={() =>
+                      setSelectedRowId(row.id === selectedRowId ? null : row.id)
+                    }
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <td key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                  {row.getIsExpanded() && (
+                    <tr>
+                      <td colSpan={row.getVisibleCells().length - 1}>
+                        <ExpandedRowContent rowData={row.original} />
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
       <div className={pricingStyles.pricingFinalPricesContainer}>
         <h3>Amazon Price: ${amazonPrice}</h3>
