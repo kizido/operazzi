@@ -102,7 +102,9 @@ const columns = [
       row.original.header !== "opex" &&
       row.original.header !== "netProfit" &&
       row.original.header !== "growthFund" &&
-      row.original.header !== "marketingBudget" && (
+      row.original.header !== "marketingBudget" &&
+      row.original.header !== "shippingFees" &&
+      row.original.header !== "packingFees" && (
         <button
           type="button"
           onClick={() => row.toggleExpanded()}
@@ -150,7 +152,11 @@ export default function Pricing({
   amazonStorageFee,
   packaging,
 }: PricingProps) {
-  const ExpandedRowContent = ({ rowData }: { rowData: TransposedRow }) => {
+  const ExpandedAmazonRowContent = ({
+    rowData,
+  }: {
+    rowData: TransposedRow;
+  }) => {
     let content;
     switch (rowData.header) {
       case "lcogs":
@@ -322,11 +328,180 @@ export default function Pricing({
     );
   };
 
+  const ExpandedWebsiteRowContent = ({
+    rowData,
+  }: {
+    rowData: TransposedRow;
+  }) => {
+    let content;
+    switch (rowData.header) {
+      case "lcogs":
+        content = (
+          <>
+            <tr
+              className={
+                cogs === ""
+                  ? pricingStyles.emptyExpandedRow
+                  : cogs === "0.00"
+                  ? pricingStyles.emptyExpandedRow
+                  : ""
+              }
+            >
+              <td>COGS</td>
+              <td>{cogs === "" ? "0.00" : cogs}</td>
+            </tr>
+            <tr
+              className={
+                packageCostsData === ""
+                  ? pricingStyles.emptyExpandedRow
+                  : packageCostsData === "0.00"
+                  ? pricingStyles.emptyExpandedRow
+                  : ""
+              }
+            >
+              <td>Packaging Costs</td>
+              <td>{packageCostsData === "" ? "0.00" : packageCostsData}</td>
+            </tr>
+            <tr
+              className={
+                isc === ""
+                  ? pricingStyles.emptyExpandedRow
+                  : isc === "0.00"
+                  ? pricingStyles.emptyExpandedRow
+                  : ""
+              }
+            >
+              <td>International Shipping Costs</td>
+              <td>{isc === "" ? "0.00" : isc}</td>
+            </tr>
+            <tr
+              className={
+                dutiesAndTariffs === ""
+                  ? pricingStyles.emptyExpandedRow
+                  : dutiesAndTariffs === "0.00"
+                  ? pricingStyles.emptyExpandedRow
+                  : ""
+              }
+            >
+              <td>International Duties & Taxes</td>
+              <td>{dutiesAndTariffs === "" ? "0.00" : dutiesAndTariffs}</td>
+            </tr>
+          </>
+        );
+        break;
+      case "amazonFees":
+        content = (
+          <>
+            <tr
+              className={
+                pickAndPackFee === ""
+                  ? pricingStyles.emptyExpandedRow
+                  : pickAndPackFee === "0.00"
+                  ? pricingStyles.emptyExpandedRow
+                  : ""
+              }
+            >
+              <td>FBA Pick & Pack Fee</td>
+              <td>{pickAndPackFee === "" ? "0.00" : pickAndPackFee}</td>
+            </tr>
+            <tr
+              className={
+                amazonReferralFee === ""
+                  ? pricingStyles.emptyExpandedRow
+                  : amazonReferralFee === "0.00"
+                  ? pricingStyles.emptyExpandedRow
+                  : ""
+              }
+            >
+              <td>Amazon Referral Fee</td>
+              <td>{amazonReferralFee === "" ? "0.00" : amazonReferralFee}</td>
+            </tr>
+            <tr
+              className={
+                amazonStorageFee === ""
+                  ? pricingStyles.emptyExpandedRow
+                  : amazonStorageFee === "0.00"
+                  ? pricingStyles.emptyExpandedRow
+                  : ""
+              }
+            >
+              <td>Amazon Storage Fee</td>
+              <td>{amazonStorageFee === "" ? "0.00" : amazonStorageFee}</td>
+            </tr>
+          </>
+        );
+        break;
+      case "subtotal":
+        content = (
+          <>
+            <tr
+              className={
+                lcogs === ""
+                  ? pricingStyles.emptyExpandedRow
+                  : lcogs === "0.00"
+                  ? pricingStyles.emptyExpandedRow
+                  : ""
+              }
+            >
+              <td>LCOGS</td>
+              <td>{lcogs === "" ? "0.00" : lcogs}</td>
+            </tr>
+            <tr
+              className={
+                opex === ""
+                  ? pricingStyles.emptyExpandedRow
+                  : opex === "0.00"
+                  ? pricingStyles.emptyExpandedRow
+                  : ""
+              }
+            >
+              <td>OPEX</td>
+              <td>{opex === "" ? "0.00" : opex}</td>
+            </tr>
+            <tr
+              className={
+                amazonFees === ""
+                  ? pricingStyles.emptyExpandedRow
+                  : amazonFees === "0.00"
+                  ? pricingStyles.emptyExpandedRow
+                  : ""
+              }
+            >
+              <td>Amazon Fees</td>
+              <td>{amazonFees === "" ? "0.00" : amazonFees}</td>
+            </tr>
+          </>
+        );
+        break;
+      // Add cases for other headers as needed
+      default:
+        content = (
+          <>
+            <tr></tr>
+          </>
+        );
+        break;
+    }
+
+    return (
+      <table
+        className={`${modalStyles.listingSkuTable} ${tableStyles.expandedRowTable}`}
+      >
+        <tbody className={modalStyles.listingSkuTableBody}>{content}</tbody>
+      </table>
+    );
+  };
+
   const [pricingData, setPricingData] = useState<TransposedRow[]>([]);
   const [websitePricingData, setWebsitePricingData] = useState<TransposedRow[]>(
     []
   );
-  const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
+  const [selectedAmazonRowId, setSelectedAmazonRowId] = useState<string | null>(
+    null
+  );
+  const [selectedWebsiteRowId, setSelectedWebsiteRowId] = useState<
+    string | null
+  >(null);
 
   const [opex, setOpex] = useState("");
   const [ppcSpend, setPpcSpend] = useState("");
@@ -372,6 +547,7 @@ export default function Pricing({
   }, []);
   useEffect(() => {
     recalculateAmazonPricingData();
+    recalculateWebsitePricingData();
   }, [
     cogs,
     weight,
@@ -443,6 +619,7 @@ export default function Pricing({
     }
     pricingDataSubmit(name, value);
     recalculateAmazonPricingData();
+    recalculateWebsitePricingData();
   };
   const calculatePackagingCosts = () => {
     if (packaging.length > 0) {
@@ -502,6 +679,7 @@ export default function Pricing({
       growthFund, // cogs * growth %
       marketingBudget, // (packagingcosts + lcogs + amazonfees) * PPC SPEND %
     };
+    setWebsitePrice(marketingBudget);
     setWebsitePricingData(transposeWebsitePriceData(newPricingData));
   };
   const recalculateAmazonPricingData = () => {
@@ -537,23 +715,7 @@ export default function Pricing({
       parseFloat(subtotal) * marketingRate
     ).toFixed(2);
     const newOpex = parseFloat(opex).toFixed(2);
-    const amazonPriceData = parseAndAdd([
-      subtotal,
-      marketingBudget,
-      netProfit,
-      growthFund,
-    ]);
-    setAmazonPrice(amazonPriceData);
-    const websitePriceData = parseAndAdd([lcogs, opex]);
-    (
-      parseFloat(lcogsData ?? "0") +
-      parseFloat(opex ?? "0") +
-      parseFloat(isc ?? "0") +
-      parseFloat(ppcSpend ?? "0") +
-      parseFloat(netProfitTarget ?? "0") +
-      parseFloat(growthFund ?? "0")
-    ).toFixed(2);
-    setWebsitePrice(websitePriceData);
+    setAmazonPrice(marketingBudget);
     const newPricingData: AmazonCostModel = {
       lcogs: lcogsData, // cogs + packaging costs + isc + int. duties & taxes + fbacost
       opex: newOpex,
@@ -635,15 +797,20 @@ export default function Pricing({
                   <tr
                     key={row.id}
                     className={`${tableStyles.tableRow} ${
-                      row.id === selectedRowId ? tableStyles.selected : ""
+                      row.id === selectedAmazonRowId ? tableStyles.selected : ""
                     } ${
                       row.original.header === "subtotal"
                         ? pricingStyles.subtotalRow
                         : ""
                     }`}
-                    onClick={() =>
-                      setSelectedRowId(row.id === selectedRowId ? null : row.id)
-                    }
+                    onClick={() => {
+                      if (selectedWebsiteRowId) {
+                        setSelectedWebsiteRowId(null);
+                      }
+                      setSelectedAmazonRowId(
+                        row.id === selectedAmazonRowId ? null : row.id
+                      );
+                    }}
                   >
                     {row.getVisibleCells().map((cell) => (
                       <td key={cell.id}>
@@ -657,7 +824,7 @@ export default function Pricing({
                   {row.getIsExpanded() && (
                     <tr>
                       <td colSpan={row.getVisibleCells().length - 1}>
-                        <ExpandedRowContent rowData={row.original} />
+                        <ExpandedAmazonRowContent rowData={row.original} />
                       </td>
                     </tr>
                   )}
@@ -679,15 +846,22 @@ export default function Pricing({
                   <tr
                     key={row.id}
                     className={`${tableStyles.tableRow} ${
-                      row.id === selectedRowId ? tableStyles.selected : ""
+                      row.id === selectedWebsiteRowId
+                        ? tableStyles.selected
+                        : ""
                     } ${
                       row.original.header === "subtotal"
                         ? pricingStyles.subtotalRow
                         : ""
                     }`}
-                    onClick={() =>
-                      setSelectedRowId(row.id === selectedRowId ? null : row.id)
-                    }
+                    onClick={() => {
+                      if (selectedAmazonRowId) {
+                        setSelectedAmazonRowId(null);
+                      }
+                      setSelectedWebsiteRowId(
+                        row.id === selectedWebsiteRowId ? null : row.id
+                      );
+                    }}
                   >
                     {row.getVisibleCells().map((cell) => (
                       <td key={cell.id}>
@@ -701,7 +875,7 @@ export default function Pricing({
                   {row.getIsExpanded() && (
                     <tr>
                       <td colSpan={row.getVisibleCells().length - 1}>
-                        <ExpandedRowContent rowData={row.original} />
+                        <ExpandedWebsiteRowContent rowData={row.original} />
                       </td>
                     </tr>
                   )}
