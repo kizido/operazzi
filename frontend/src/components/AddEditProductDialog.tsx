@@ -308,7 +308,7 @@ const AddEditProductDialog = ({
     if (isNaN(currentWeight)) {
       return "";
     }
-    const iscPerGram = 0.004;
+    const iscPerGram = 0.0035;
     setCalculatedISC((currentWeight * iscPerGram).toFixed(2).toString());
   };
   const handlePricingDataSubmit = (name: string, value: string) => {

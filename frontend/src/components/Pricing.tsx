@@ -40,59 +40,6 @@ type TransposedRow = {
   value: string;
 };
 
-const transposeData = (initialData: AmazonCostModel) => {
-  const transposedData: TransposedRow[] = Object.entries(initialData).map(
-    ([key, value]) => ({
-      header: key, // These will be your row headers
-      value: `$${value === "" ? "0.00" : value}`, // These will be your row values
-      headerDisplay:
-        key === "lcogs"
-          ? "LCOGS"
-          : key === "opex"
-          ? "OPEX"
-          : key === "amazonFees"
-          ? "Amazon Fees"
-          : key === "subtotal"
-          ? "Subtotal"
-          : key === "marketingBudget"
-          ? "+ Marketing Budget"
-          : key === "netProfit"
-          ? "+ Net Profit"
-          : key === "growthFund"
-          ? "+ Growth Fund"
-          : "",
-    })
-  );
-  return transposedData;
-};
-const transposeWebsitePriceData = (initialData: WebsiteCostModel) => {
-  const transposedData: TransposedRow[] = Object.entries(initialData).map(
-    ([key, value]) => ({
-      header: key, // These will be your row headers
-      value: `$${value === "" ? "0.00" : value}`, // These will be your row values
-      headerDisplay:
-        key === "lcogs"
-          ? "LCOGS"
-          : key === "opex"
-          ? "OPEX"
-          : key === "shippingFees"
-          ? "Shipping Fees"
-          : key === "packingFees"
-          ? "Packing Fees"
-          : key === "subtotal"
-          ? "Subtotal"
-          : key === "marketingBudget"
-          ? "+ Marketing Budget"
-          : key === "netProfit"
-          ? "+ Net Profit"
-          : key === "growthFund"
-          ? "+ Growth Fund"
-          : "",
-    })
-  );
-  return transposedData;
-};
-
 const columnHelper = createColumnHelper<TransposedRow>();
 
 const columns = [
@@ -208,7 +155,7 @@ export default function Pricing({
               }
             >
               <td>International Duties & Taxes</td>
-              <td>{dutiesAndTariffs === "" ? "0.00" : dutiesAndTariffs}</td>
+              <td>{dutiesAndTariffs === "" ? "0.00" : internationalTax}</td>
             </tr>
             <tr
               className={
@@ -492,6 +439,59 @@ export default function Pricing({
     );
   };
 
+  const transposeData = (initialData: AmazonCostModel) => {
+    const transposedData: TransposedRow[] = Object.entries(initialData).map(
+      ([key, value]) => ({
+        header: key, // These will be your row headers
+        value: `$${value === "" ? "0.00" : value}`, // These will be your row values
+        headerDisplay:
+          key === "lcogs"
+            ? "LCOGS"
+            : key === "opex"
+            ? "OPEX"
+            : key === "amazonFees"
+            ? "Amazon Fees"
+            : key === "subtotal"
+            ? "Subtotal"
+            : key === "marketingBudget"
+            ? `+ Marketing Budget ($${marketingBudgetDollarAmazon})`
+            : key === "netProfit"
+            ? `+ Net Profit ($${netProfitDollarAmazon})`
+            : key === "growthFund"
+            ? `+ Growth Fund ($${growthFundDollarAmazon})`
+            : "",
+      })
+    );
+    return transposedData;
+  };
+  const transposeWebsitePriceData = (initialData: WebsiteCostModel) => {
+    const transposedData: TransposedRow[] = Object.entries(initialData).map(
+      ([key, value]) => ({
+        header: key, // These will be your row headers
+        value: `$${value === "" ? "0.00" : value}`, // These will be your row values
+        headerDisplay:
+          key === "lcogs"
+            ? "LCOGS"
+            : key === "opex"
+            ? "OPEX"
+            : key === "shippingFees"
+            ? "Shipping Fees"
+            : key === "packingFees"
+            ? "Packing Fees"
+            : key === "subtotal"
+            ? "Subtotal"
+            : key === "marketingBudget"
+            ? `+ Marketing Budget ($${marketingBudgetDollarWebsite})`
+            : key === "netProfit"
+            ? `+ Net Profit ($${netProfitDollarWebsite})`
+            : key === "growthFund"
+            ? `+ Growth Fund ($${growthFundDollarWebsite})`
+            : "",
+      })
+    );
+    return transposedData;
+  };
+
   const [pricingData, setPricingData] = useState<TransposedRow[]>([]);
   const [websitePricingData, setWebsitePricingData] = useState<TransposedRow[]>(
     []
@@ -508,12 +508,27 @@ export default function Pricing({
   const [growth, setGrowth] = useState("");
   const [netProfitTarget, setNetProfitTarget] = useState("");
 
+  const [netProfitDollarAmazon, setNetProfitDollarAmazon] =
+    useState<string>("");
+  const [growthFundDollarAmazon, setGrowthFundDollarAmazon] =
+    useState<string>("");
+  const [marketingBudgetDollarAmazon, setMarketingBudgetDollarAmazon] =
+    useState<string>("");
+  const [netProfitDollarWebsite, setNetProfitDollarWebsite] =
+    useState<string>("");
+  const [growthFundDollarWebsite, setGrowthFundDollarWebsite] =
+    useState<string>("");
+  const [marketingBudgetDollarWebsite, setMarketingBudgetDollarWebsite] =
+    useState<string>("");
+
   const [packageWeightData, setPackageWeightData] = useState<string>("");
   const [packageCostsData, setPackageCostsData] = useState<string>("");
   const [lcogs, setLcogs] = useState<string>("");
   const [amazonFees, setAmazonFees] = useState<string>("");
   const [amazonPrice, setAmazonPrice] = useState<string>("");
   const [websitePrice, setWebsitePrice] = useState<string>("");
+  const [internationalTax, setInternationalTax] =
+    useState<string>(dutiesAndTariffs);
 
   const table = useReactTable({
     data: pricingData,
@@ -641,33 +656,41 @@ export default function Pricing({
     return total.toFixed(2);
   };
   const recalculateWebsitePricingData = () => {
-    const lcogsData = parseAndAdd([
-      cogs,
-      packageCostsData,
-      isc,
-      dutiesAndTariffs,
-    ]);
-    const shippingFees = (
-      (parseFloat(weight) + parseFloat(packageWeightData)) *
-      0.007
+    calculatePackagingCosts();
+    const tax = (
+      parseFloat(cogs) *
+      (parseFloat(dutiesAndTariffs) / Math.pow(10, 2))
+    ).toFixed(2);
+    const lcogsData = parseAndAdd([cogs, packageCostsData, isc, tax]);
+    const shippingFees = Math.max(
+      (parseFloat(weight) + parseFloat(packageWeightData)) * 0.007,
+      6
     ).toFixed(2);
     const packingFees = "3.25"; // placeholder constant
     const subtotal = parseAndAdd([lcogsData, opex, shippingFees, packingFees]);
     const netProfitRate = parseFloat(netProfitTarget) / Math.pow(10, 2);
-    const netProfit = (
-      parseFloat(subtotal) +
-      parseFloat(subtotal) * netProfitRate
+    const netProfit = (parseFloat(subtotal) * netProfitRate).toFixed(2);
+    const netProfitAdded = (
+      parseFloat(subtotal) + parseFloat(netProfit)
     ).toFixed(2);
     const growthFundRate = parseFloat(growth) / Math.pow(10, 2);
     const growthFund = (
-      parseFloat(netProfit) +
       parseFloat(cogs === "" ? "0.00" : cogs) * growthFundRate
     ).toFixed(2);
-    const marketingRate = parseFloat(ppcSpend) / Math.pow(10, 2);
-    const marketingBudget = (
-      parseFloat(growthFund) +
-      parseFloat(subtotal) * marketingRate
+    const growthFundAdded = (
+      parseFloat(netProfitAdded) + parseFloat(growthFund)
     ).toFixed(2);
+    const marketingRate = parseFloat(ppcSpend) / Math.pow(10, 2);
+    const marketingBudget = (parseFloat(subtotal) * marketingRate).toFixed(2);
+    const marketingBudgetAdded = (
+      parseFloat(growthFundAdded) + parseFloat(marketingBudget)
+    ).toFixed(2);
+    console.log(netProfit);
+    console.log(growthFund);
+    console.log(marketingBudget);
+    setNetProfitDollarWebsite(netProfit);
+    setGrowthFundDollarWebsite(growthFund);
+    setMarketingBudgetDollarWebsite(marketingBudget);
     const newOpex = parseFloat(opex).toFixed(2);
     const newPricingData: WebsiteCostModel = {
       lcogs: lcogsData, // cogs + packaging costs + isc + int. duties & taxes + fbacost
@@ -675,23 +698,23 @@ export default function Pricing({
       shippingFees,
       packingFees,
       subtotal,
-      netProfit,
-      growthFund, // cogs * growth %
-      marketingBudget, // (packagingcosts + lcogs + amazonfees) * PPC SPEND %
+      netProfit: netProfitAdded,
+      growthFund: growthFundAdded, // cogs * growth %
+      marketingBudget: marketingBudgetAdded, // (packagingcosts + lcogs + amazonfees) * PPC SPEND %
     };
-    setWebsitePrice(marketingBudget);
+    const splitPrice = marketingBudgetAdded.split(".");
+    const adjustedWebsitePrice = splitPrice[0] + ".98";
+    setWebsitePrice(adjustedWebsitePrice);
     setWebsitePricingData(transposeWebsitePriceData(newPricingData));
   };
   const recalculateAmazonPricingData = () => {
     calculatePackagingCosts();
-    const lcogsData = parseAndAdd([
-      cogs,
-      packageCostsData,
-      isc,
-      dutiesAndTariffs,
-      dsc,
-    ]);
-    setLcogs(lcogsData);
+    const tax = (
+      parseFloat(cogs) *
+      (parseFloat(dutiesAndTariffs) / Math.pow(10, 2))
+    ).toFixed(2);
+    setInternationalTax(tax);
+    const lcogsData = parseAndAdd([cogs, packageCostsData, isc, tax, dsc]);
     const amazonFees = parseAndAdd([
       pickAndPackFee,
       amazonReferralFee,
@@ -700,30 +723,37 @@ export default function Pricing({
     setAmazonFees(amazonFees);
     const subtotal = parseAndAdd([lcogsData, opex, amazonFees]);
     const netProfitRate = parseFloat(netProfitTarget) / Math.pow(10, 2);
-    const netProfit = (
-      parseFloat(subtotal) +
-      parseFloat(subtotal) * netProfitRate
+    const netProfit = (parseFloat(subtotal) * netProfitRate).toFixed(2);
+    const netProfitAdded = (
+      parseFloat(subtotal) + parseFloat(netProfit)
     ).toFixed(2);
     const growthFundRate = parseFloat(growth) / Math.pow(10, 2);
     const growthFund = (
-      parseFloat(netProfit) +
       parseFloat(cogs === "" ? "0.00" : cogs) * growthFundRate
     ).toFixed(2);
-    const marketingRate = parseFloat(ppcSpend) / Math.pow(10, 2);
-    const marketingBudget = (
-      parseFloat(growthFund) +
-      parseFloat(subtotal) * marketingRate
+    const growthFundAdded = (
+      parseFloat(netProfitAdded) + parseFloat(growthFund)
     ).toFixed(2);
+    const marketingRate = parseFloat(ppcSpend) / Math.pow(10, 2);
+    const marketingBudget = (parseFloat(subtotal) * marketingRate).toFixed(2);
+    const marketingBudgetAdded = (
+      parseFloat(growthFundAdded) + parseFloat(marketingBudget)
+    ).toFixed(2);
+    setNetProfitDollarAmazon(netProfit);
+    setGrowthFundDollarAmazon(growthFund);
+    setMarketingBudgetDollarAmazon(marketingBudget);
     const newOpex = parseFloat(opex).toFixed(2);
-    setAmazonPrice(marketingBudget);
+    const splitPrice = marketingBudgetAdded.split(".");
+    const adjustedWebsitePrice = splitPrice[0] + ".98";
+    setAmazonPrice(adjustedWebsitePrice);
     const newPricingData: AmazonCostModel = {
       lcogs: lcogsData, // cogs + packaging costs + isc + int. duties & taxes + fbacost
       opex: newOpex,
       amazonFees, // pick & pack + referral fee
       subtotal,
-      netProfit,
-      growthFund, // cogs * growth %
-      marketingBudget, // (packagingcosts + lcogs + amazonfees) * PPC SPEND %
+      netProfit: netProfitAdded,
+      growthFund: growthFundAdded, // cogs * growth %
+      marketingBudget: marketingBudgetAdded, // (packagingcosts + lcogs + amazonfees) * PPC SPEND %
       // amazonPrice: amazonPriceData, // lcogs + opex + amazon fees + PPC + net profit % + growth %
       // websitePrice: websitePriceData, // lcogs + opex + shipping fees + PPC + net profit % + growth %
     };
