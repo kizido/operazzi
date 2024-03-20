@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useReducer, useState } from "react";
 import {
   createColumnHelper,
   flexRender,
@@ -331,7 +331,7 @@ export default function Pricing({
               }
             >
               <td>International Duties & Taxes</td>
-              <td>{dutiesAndTariffs === "" ? "0.00" : dutiesAndTariffs}</td>
+              <td>{dutiesAndTariffs === "" ? "0.00" : internationalTax}</td>
             </tr>
           </>
         );
@@ -407,15 +407,29 @@ export default function Pricing({
             </tr>
             <tr
               className={
-                amazonFees === ""
+                shippingFeesDisplay === ""
                   ? pricingStyles.emptyExpandedRow
-                  : amazonFees === "0.00"
+                  : shippingFeesDisplay === "0.00"
                   ? pricingStyles.emptyExpandedRow
                   : ""
               }
             >
-              <td>Amazon Fees</td>
-              <td>{amazonFees === "" ? "0.00" : amazonFees}</td>
+              <td>Shipping Fees</td>
+              <td>
+                {shippingFeesDisplay === "" ? "0.00" : shippingFeesDisplay}
+              </td>
+            </tr>
+            <tr
+              className={
+                packingFeesDisplay === ""
+                  ? pricingStyles.emptyExpandedRow
+                  : packingFeesDisplay === "0.00"
+                  ? pricingStyles.emptyExpandedRow
+                  : ""
+              }
+            >
+              <td>Packing Fees</td>
+              <td>{packingFeesDisplay === "" ? "0.00" : packingFeesDisplay}</td>
             </tr>
           </>
         );
@@ -493,9 +507,11 @@ export default function Pricing({
   };
 
   const [pricingData, setPricingData] = useState<TransposedRow[]>([]);
-  const [websitePricingData, setWebsitePricingData] = useState<TransposedRow[]>(
-    []
-  );
+  const [websitePricingTableData, setWebsitePricingTableData] = useState<
+    TransposedRow[]
+  >([]);
+  const [websitePricingData, setWebsitePricingData] =
+    useState<WebsiteCostModel | null>(null);
   const [selectedAmazonRowId, setSelectedAmazonRowId] = useState<string | null>(
     null
   );
@@ -525,6 +541,8 @@ export default function Pricing({
   const [packageCostsData, setPackageCostsData] = useState<string>("");
   const [lcogs, setLcogs] = useState<string>("");
   const [amazonFees, setAmazonFees] = useState<string>("");
+  const [shippingFeesDisplay, setShippingFeesDisplay] = useState<string>("");
+  const [packingFeesDisplay, setPackingFeesDisplay] = useState<string>("");
   const [amazonPrice, setAmazonPrice] = useState<string>("");
   const [websitePrice, setWebsitePrice] = useState<string>("");
   const [internationalTax, setInternationalTax] =
@@ -537,14 +555,14 @@ export default function Pricing({
     getExpandedRowModel: getExpandedRowModel(),
   });
   const websiteTable = useReactTable({
-    data: websitePricingData,
+    data: websitePricingTableData,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getExpandedRowModel: getExpandedRowModel(),
   });
   useEffect(() => {
     const updatePackageWeight = async () => {
-      let responseWeight: string = "0";
+      let responseWeight: string = "0.00";
       try {
         if (packageId) {
           const response = await ProductsApi.fetchProductPackageType(packageId);
@@ -575,6 +593,11 @@ export default function Pricing({
     packaging,
     packageWeightData,
   ]);
+  useEffect(() => {
+    if (websitePricingData) {
+      setWebsitePricingTableData(transposeWebsitePriceData(websitePricingData));
+    }
+  }, [websitePricingData]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -651,7 +674,9 @@ export default function Pricing({
   const parseAndAdd = (nums: string[]) => {
     let total: number = 0;
     nums.forEach((num) => {
-      total += parseFloat(num !== "" ? num : "0.00");
+      const added = parseFloat(num !== "" ? num : "0.00");
+      console.log("Added: " + added + " from " + num);
+      total += added;
     });
     return total.toFixed(2);
   };
@@ -661,13 +686,23 @@ export default function Pricing({
       parseFloat(cogs) *
       (parseFloat(dutiesAndTariffs) / Math.pow(10, 2))
     ).toFixed(2);
+    setInternationalTax(tax);
     const lcogsData = parseAndAdd([cogs, packageCostsData, isc, tax]);
+    setLcogs(lcogsData);
+    console.log("PACKAGE WEIGHT: " + packageWeightData);
     const shippingFees = Math.max(
-      (parseFloat(weight) + parseFloat(packageWeightData)) * 0.007,
+      (parseFloat(weight) +
+        parseFloat(packageWeightData === "" ? "0.00" : packageWeightData)) *
+        0.007,
       6
     ).toFixed(2);
+    console.log("SHIPPING FEES: " + shippingFees);
+    console.log("PACKAGE WEIGHT: " + packageWeightData);
+    setShippingFeesDisplay(shippingFees);
     const packingFees = "3.25"; // placeholder constant
+    setPackingFeesDisplay(packingFees);
     const subtotal = parseAndAdd([lcogsData, opex, shippingFees, packingFees]);
+    console.log("SUBTOTAL: " + subtotal);
     const netProfitRate = parseFloat(netProfitTarget) / Math.pow(10, 2);
     const netProfit = (parseFloat(subtotal) * netProfitRate).toFixed(2);
     const netProfitAdded = (
@@ -677,17 +712,17 @@ export default function Pricing({
     const growthFund = (
       parseFloat(cogs === "" ? "0.00" : cogs) * growthFundRate
     ).toFixed(2);
+    console.log("GROWTH FUND: " + growthFund);
     const growthFundAdded = (
       parseFloat(netProfitAdded) + parseFloat(growthFund)
     ).toFixed(2);
     const marketingRate = parseFloat(ppcSpend) / Math.pow(10, 2);
     const marketingBudget = (parseFloat(subtotal) * marketingRate).toFixed(2);
+    console.log("MARKETING BUDGET: " + marketingBudget);
     const marketingBudgetAdded = (
       parseFloat(growthFundAdded) + parseFloat(marketingBudget)
     ).toFixed(2);
-    console.log(netProfit);
-    console.log(growthFund);
-    console.log(marketingBudget);
+    console.log("NET PROFIT: " + netProfit);
     setNetProfitDollarWebsite(netProfit);
     setGrowthFundDollarWebsite(growthFund);
     setMarketingBudgetDollarWebsite(marketingBudget);
@@ -702,11 +737,13 @@ export default function Pricing({
       growthFund: growthFundAdded, // cogs * growth %
       marketingBudget: marketingBudgetAdded, // (packagingcosts + lcogs + amazonfees) * PPC SPEND %
     };
+    setWebsitePricingData(newPricingData);
     const splitPrice = marketingBudgetAdded.split(".");
     const adjustedWebsitePrice = splitPrice[0] + ".98";
     setWebsitePrice(adjustedWebsitePrice);
-    setWebsitePricingData(transposeWebsitePriceData(newPricingData));
+    // setWebsitePricingTableData(transposeWebsitePriceData(newPricingData));
   };
+
   const recalculateAmazonPricingData = () => {
     calculatePackagingCosts();
     const tax = (
@@ -715,6 +752,7 @@ export default function Pricing({
     ).toFixed(2);
     setInternationalTax(tax);
     const lcogsData = parseAndAdd([cogs, packageCostsData, isc, tax, dsc]);
+    setLcogs(lcogsData);
     const amazonFees = parseAndAdd([
       pickAndPackFee,
       amazonReferralFee,
